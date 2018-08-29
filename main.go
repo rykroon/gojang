@@ -19,13 +19,16 @@ func main() {
   // fmt.Println(salary.CreateString())
   // fmt.Println(initials.CreateString())
 
-  var fields [5]models.Field
+  var fields [7]models.Field
 
-  fields[0] = models.IntegerField{}.Init("id").PrimaryKey(true)
+  fields[0] = models.IntegerField{}.Init("population")
   fields[1] = models.TextField{}.Init("text")
   fields[2] = models.FloatField{}.Init("float")
-  fields[3] = models.DecimalField{}.Init("salary",19,4)
-  fields[4] = models.CharField{}.Init("initials",3)
+  fields[3] = models.DecimalField{}.Init("salary",19,4).Null(true)
+  fields[4] = models.CharField{}.Init("initials",3).Unique(true)
+  fields[5] = models.BooleanField{}.Init("us citizen")
+  fields[6] = models.AutoField{}.Init("id").PrimaryKey(true)
+
 
   for _,v := range fields {
     fmt.Println(v.CreateString())

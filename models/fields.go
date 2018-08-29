@@ -4,22 +4,21 @@ import (
 	"strconv"
 )
 
-
 //type constraint bool
 
-// type AutoField struct {
-// 	dbColumn string
-// 	null     bool
-// 	primaryKey bool
-// 	unique     bool
-// }
+type AutoField struct {
+	dbColumn   string
+	null       bool
+	primaryKey bool
+	unique     bool
+}
 
-// type BooleanField struct {
-//   dbColumn string
-// 	null     bool
-// 	primaryKey bool
-// 	unique     bool
-// }
+type BooleanField struct {
+	dbColumn   string
+	null       bool
+	primaryKey bool
+	unique     bool
+}
 
 type CharField struct {
 	dbColumn  string
@@ -64,6 +63,99 @@ type TextField struct {
 	unique     bool
 }
 
+func constraintString(pkey, null, unique bool) string {
+	s := ""
+
+	if pkey {
+		s += " PRIMARY KEY"
+	} else {
+
+		if null {
+			s += " NULL"
+		} else {
+			s += " NOT NULL"
+		}
+
+		if unique {
+			s += " UNIQUE"
+		}
+
+	}
+	return s
+}
+
+//AutoField
+
+func (f AutoField) Init(column string) AutoField {
+	f.dbColumn = column
+
+	f.null = false
+	f.primaryKey = false
+	f.unique = false
+
+	return f
+}
+
+func (f AutoField) PrimaryKey(b bool) AutoField {
+	f.primaryKey = b
+	return f
+}
+
+func (f AutoField) Null(b bool) AutoField {
+	f.null = b
+	return f
+}
+
+func (f AutoField) Unique(b bool) AutoField {
+	f.unique = b
+	return f
+}
+
+func (f AutoField) CreateString() string {
+	s := ""
+	s += f.dbColumn + " SERIAL"
+
+	s += constraintString(f.primaryKey, f.null, f.unique)
+
+	return s
+}
+
+//BooleanField
+
+func (f BooleanField) Init(column string) BooleanField {
+	f.dbColumn = column
+
+	f.null = false
+	f.primaryKey = false
+	f.unique = false
+
+	return f
+}
+
+func (f BooleanField) PrimaryKey(b bool) BooleanField {
+	f.primaryKey = b
+	return f
+}
+
+func (f BooleanField) Null(b bool) BooleanField {
+	f.null = b
+	return f
+}
+
+func (f BooleanField) Unique(b bool) BooleanField {
+	f.unique = b
+	return f
+}
+
+func (f BooleanField) CreateString() string {
+	s := ""
+	s += f.dbColumn + " boolean"
+
+	s += constraintString(f.primaryKey, f.null, f.unique)
+
+	return s
+}
+
 //CharField
 
 func (f CharField) Init(column string, maxLength int) CharField {
@@ -71,7 +163,6 @@ func (f CharField) Init(column string, maxLength int) CharField {
 	f.maxLength = maxLength
 
 	f.null = false
-	//f.default_ = nil
 	f.primaryKey = false
 	f.unique = false
 
@@ -98,23 +189,11 @@ func (f CharField) CreateString() string {
 	n := strconv.Itoa(f.maxLength)
 	s += f.dbColumn + " varchar(" + n + ")"
 
-	if f.primaryKey {
-		s += " PRIMARY KEY"
-	} else {
-
-		if f.null {
-			s += " NULL"
-		} else {
-			s += " NOT NULL"
-		}
-
-		if f.unique {
-			s += " UNIQUE"
-		}
-	}
+	s += constraintString(f.primaryKey, f.null, f.unique)
 
 	return s
 }
+
 
 //DecimalField
 
@@ -124,7 +203,6 @@ func (f DecimalField) Init(column string, maxDigits int, decimalPlaces int) Deci
 	f.decimalPlaces = decimalPlaces
 
 	f.null = false
-	//f.default_ = nil
 	f.primaryKey = false
 	f.unique = false
 	return f
@@ -152,30 +230,17 @@ func (f DecimalField) CreateString() string {
 
 	s += f.dbColumn + " NUMERIC(" + precision + " " + scale + ")"
 
-	if f.primaryKey {
-		s += " PRIMARY KEY"
-	} else {
-
-		if f.null {
-			s += " NULL"
-		} else {
-			s += " NOT NULL"
-		}
-
-		if f.unique {
-			s += " UNIQUE"
-		}
-	}
+	s += constraintString(f.primaryKey, f.null, f.unique)
 
 	return s
 }
+
 
 //FloatField
 
 func (f FloatField) Init(column string) FloatField {
 	f.dbColumn = column
 	f.null = false
-	//f.default_ = nil
 	f.primaryKey = false
 	f.unique = false
 	return f
@@ -200,20 +265,7 @@ func (f FloatField) CreateString() string {
 	s := ""
 	s += f.dbColumn + " double precision"
 
-	if f.primaryKey {
-		s += " PRIMARY KEY"
-	} else {
-
-		if f.null {
-			s += " NULL"
-		} else {
-			s += " NOT NULL"
-		}
-
-		if f.unique {
-			s += " UNIQUE"
-		}
-	}
+	s += constraintString(f.primaryKey, f.null, f.unique)
 
 	return s
 }
@@ -223,7 +275,6 @@ func (f FloatField) CreateString() string {
 func (f IntegerField) Init(column string) IntegerField {
 	f.dbColumn = column
 	f.null = false
-	//f.default_ = nil
 	f.primaryKey = false
 	f.unique = false
 	return f
@@ -246,22 +297,9 @@ func (f IntegerField) Unique(b bool) IntegerField {
 
 func (f IntegerField) CreateString() string {
 	s := ""
-	s += f.dbColumn + " double precision"
+	s += f.dbColumn + " integer"
 
-	if f.primaryKey {
-		s += " PRIMARY KEY"
-	} else {
-
-		if f.null {
-			s += " NULL"
-		} else {
-			s += " NOT NULL"
-		}
-
-		if f.unique {
-			s += " UNIQUE"
-		}
-	}
+	s += constraintString(f.primaryKey, f.null, f.unique)
 
 	return s
 }
@@ -271,7 +309,6 @@ func (f IntegerField) CreateString() string {
 func (f TextField) Init(column string) TextField {
 	f.dbColumn = column
 	f.null = false
-	//f.default_ = nil
 	f.primaryKey = false
 	f.unique = false
 	return f
@@ -294,22 +331,9 @@ func (f TextField) Unique(b bool) TextField {
 
 func (f TextField) CreateString() string {
 	s := ""
-	s += f.dbColumn + " double precision"
+	s += f.dbColumn + " text"
 
-	if f.primaryKey {
-		s += " PRIMARY KEY"
-	} else {
-
-		if f.null {
-			s += " NULL"
-		} else {
-			s += " NOT NULL"
-		}
-
-		if f.unique {
-			s += " UNIQUE"
-		}
-	}
+	s += constraintString(f.primaryKey, f.null, f.unique)
 
 	return s
 }
