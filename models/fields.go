@@ -84,6 +84,10 @@ func constraintString(pkey, null, unique bool) string {
 	return s
 }
 
+func doubleQuote(s string) string {
+	return "\"" + s + "\""
+}
+
 //AutoField
 
 func (f AutoField) Init(column string) AutoField {
@@ -113,7 +117,7 @@ func (f AutoField) Unique(b bool) AutoField {
 
 func (f AutoField) CreateString() string {
 	s := ""
-	s += f.dbColumn + " SERIAL"
+	s += doubleQuote(f.dbColumn) + " SERIAL"
 
 	s += constraintString(f.primaryKey, f.null, f.unique)
 
@@ -149,7 +153,7 @@ func (f BooleanField) Unique(b bool) BooleanField {
 
 func (f BooleanField) CreateString() string {
 	s := ""
-	s += f.dbColumn + " boolean"
+	s += doubleQuote(f.dbColumn) + " boolean"
 
 	s += constraintString(f.primaryKey, f.null, f.unique)
 
@@ -187,7 +191,7 @@ func (f CharField) Unique(b bool) CharField {
 func (f CharField) CreateString() string {
 	s := ""
 	n := strconv.Itoa(f.maxLength)
-	s += f.dbColumn + " varchar(" + n + ")"
+	s += doubleQuote(f.dbColumn) + " varchar(" + n + ")"
 
 	s += constraintString(f.primaryKey, f.null, f.unique)
 
@@ -228,7 +232,7 @@ func (f DecimalField) CreateString() string {
 	precision := strconv.Itoa(f.maxDigits)
 	scale := strconv.Itoa(f.decimalPlaces)
 
-	s += f.dbColumn + " NUMERIC(" + precision + " " + scale + ")"
+	s += doubleQuote(f.dbColumn) + " NUMERIC(" + precision + " " + scale + ")"
 
 	s += constraintString(f.primaryKey, f.null, f.unique)
 
@@ -263,7 +267,7 @@ func (f FloatField) Unique(b bool) FloatField {
 
 func (f FloatField) CreateString() string {
 	s := ""
-	s += f.dbColumn + " double precision"
+	s += doubleQuote(f.dbColumn) + " double precision"
 
 	s += constraintString(f.primaryKey, f.null, f.unique)
 
@@ -297,7 +301,7 @@ func (f IntegerField) Unique(b bool) IntegerField {
 
 func (f IntegerField) CreateString() string {
 	s := ""
-	s += f.dbColumn + " integer"
+	s += doubleQuote(f.dbColumn) + " integer"
 
 	s += constraintString(f.primaryKey, f.null, f.unique)
 
@@ -331,7 +335,7 @@ func (f TextField) Unique(b bool) TextField {
 
 func (f TextField) CreateString() string {
 	s := ""
-	s += f.dbColumn + " text"
+	s += doubleQuote(f.dbColumn) + " text"
 
 	s += constraintString(f.primaryKey, f.null, f.unique)
 

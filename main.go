@@ -34,4 +34,6 @@ func main() {
     fmt.Println(v.CreateString())
   }
 
+  table := models.Model{}
+
 }

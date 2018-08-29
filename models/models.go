@@ -25,5 +25,11 @@ func (m Manager) All() {
 }
 
 func (m Model) CreateTable() {
-  //create sql table
+  s := "CREATE TABLE " + doubleQuotes(m.dbTable) + "("
+
+  for _,field := range m.fields {
+    s += field.CreateString() + " "
+  }
+
+  s += ")"
 }
