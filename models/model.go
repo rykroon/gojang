@@ -1,16 +1,16 @@
 package models
 
 import (
-  "fmt"
+	"fmt"
 )
 
 type Model struct {
-  dbTable string
-	fields map[string]Field
-  objects Manager
+	dbTable string
+	fields  map[string]Field
+	objects Manager
 
-  //Meta
-  uniqueTogether []string
+	//Meta
+	uniqueTogether []string
 }
 
 // type Field interface {
@@ -20,23 +20,22 @@ type Model struct {
 type instance map[string]interface{}
 
 func (m Model) Init(dbTable string) Model {
-  m.dbTable = dbTable
-  return m
+	m.dbTable = dbTable
+	return m
 
 }
 
-
 func (m Model) CreateTable() string {
-  //s := "CREATE TABLE " + DoubleQuotes(m.dbTable) + "("
-  s := "CREATE TABLE " + doubleQuotes(m.dbTable) + "("
+	//s := "CREATE TABLE " + DoubleQuotes(m.dbTable) + "("
+	s := "CREATE TABLE " + doubleQuotes(m.dbTable) + "("
 
-  for _,field := range m.fields {
-    s += field.CreateString() + ", "
-  }
+	for _, field := range m.fields {
+		s += field.CreateString() + ", "
+	}
 
-  fmt.Println(len(m.fields))
+	fmt.Println(len(m.fields))
 
-  s += ")"
+	s += ")"
 
-  return s
+	return s
 }
