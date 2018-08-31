@@ -24,6 +24,7 @@ type Field struct {
 
 //maybe?
 type FldOptn struct {
+  dbColumn string 
   null bool
   primaryKey bool
   unique bool

@@ -3,7 +3,8 @@ package models
 import ()
 
 type Manager struct {
-	queryset QuerySet
+  model *model
+	//queryset QuerySet
 }
 
 func (m Manager) All() QuerySet {

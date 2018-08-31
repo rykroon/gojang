@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 )
 
 type model struct {
@@ -14,9 +13,6 @@ type model struct {
 	uniqueTogether []string
 }
 
-// type Field interface {
-// 	CreateString() string
-// }
 
 type instance map[string]interface{}
 
@@ -39,8 +35,6 @@ func (m model) CreateTable() string {
 	for _, field := range m.Fields {
 		s += field.CreateString() + ", "
 	}
-
-	fmt.Println(len(m.Fields))
 
 	s += ")"
 
