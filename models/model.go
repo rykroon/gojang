@@ -4,10 +4,11 @@ import (
 	"fmt"
 )
 
-type Model struct {
+type model struct {
 	dbTable string
-	fields  map[string]Field
-	objects Manager
+	//Fields  map[string]Field
+  Fields []Field
+	Objects Manager
 
 	//Meta
 	uniqueTogether []string
@@ -19,21 +20,27 @@ type Model struct {
 
 type instance map[string]interface{}
 
-func (m Model) Init(dbTable string) Model {
+func Model(dbTable string) model {
+  m := model{dbTable: dbTable}
+  m.Fields = make([]Field,7)
+  return m
+}
+
+func (m model) Init(dbTable string) model {
 	m.dbTable = dbTable
 	return m
 
 }
 
-func (m Model) CreateTable() string {
+func (m model) CreateTable() string {
 	//s := "CREATE TABLE " + DoubleQuotes(m.dbTable) + "("
-	s := "CREATE TABLE " + doubleQuotes(m.dbTable) + "("
+	s := "CREATE TABLE " + doubleQuotes(m.dbTable) + " ("
 
-	for _, field := range m.fields {
+	for _, field := range m.Fields {
 		s += field.CreateString() + ", "
 	}
 
-	fmt.Println(len(m.fields))
+	fmt.Println(len(m.Fields))
 
 	s += ")"
 

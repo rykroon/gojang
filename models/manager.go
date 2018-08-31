@@ -3,17 +3,17 @@ package models
 import ()
 
 type Manager struct {
-	queryset Queryset
+	queryset QuerySet
 }
 
-func (m Manager) All() Queryset {
-	return Queryset{}
+func (m Manager) All() QuerySet {
+	return QuerySet{}
 }
 
-func (m Manager) Filter() Queryset {
-	return Queryset{}
+func (m Manager) Filter() QuerySet {
+	return QuerySet{}
 }
 
-func (m Manager) Exclude() Queryset {
-	return Queryset{}
+func (m Manager) Exclude() QuerySet {
+	return QuerySet{}
 }

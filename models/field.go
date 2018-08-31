@@ -21,6 +21,14 @@ type Field struct {
 	unique     bool
 }
 
+
+//maybe?
+type FldOptn struct {
+  null bool
+  primaryKey bool
+  unique bool
+}
+
 func AutoField(dbColumn string) Field {
 	return Field{dbColumn: dbColumn, dbDataType: "SERIAL"}
 }

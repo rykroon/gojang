@@ -18,7 +18,7 @@ func main() {
 	// fmt.Println(salary.CreateString())
 	// fmt.Println(initials.CreateString())
 
-	fields := make([]models.Field, 7)
+	//fields := make([]models.Field, 7)
 
 	// fields[0] = models.IntegerField{}.Init("population")
 	// fields[1] = models.TextField{}.Init("text")
@@ -36,17 +36,23 @@ func main() {
 	// fields[5] = models.BooleanField{}.Init("us citizen")
 	// fields[6] = models.AutoField{}.Init("id").PrimaryKey(true)
 
-	fields[0] = models.IntegerField("population")
-	fields[1] = models.TextField("text")
-	fields[2] = models.FloatField("float")
-	fields[3] = models.DecimalField("salary", 19, 4)
-	fields[4] = models.CharField("initials", 3)
-	fields[5] = models.BooleanField("us citizen")
-	fields[6] = models.AutoField("id")
+  table := models.Model("myTable")
 
-	for _, v := range fields {
-		fmt.Println(v.CreateString())
-	}
+  //table.Field["population"].AddField(models.IntegerField())
+
+	table.Fields[0] = models.IntegerField("population")
+	table.Fields[1] = models.TextField("text")
+	table.Fields[2] = models.FloatField("float")
+	table.Fields[3] = models.DecimalField("salary", 19, 4)
+	table.Fields[4] = models.CharField("initials", 3)
+	table.Fields[5] = models.BooleanField("us citizen")
+	table.Fields[6] = models.AutoField("id")
+
+	//for _, v := range table.Fields {
+//		fmt.Println(v.CreateString())
+	//}
+  fmt.Println(table.CreateTable())
+
 
 	//table := models.Model{}.Init("dbtable")
 
