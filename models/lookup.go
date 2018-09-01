@@ -1,30 +1,38 @@
 package models
 
-import ()
+import (
+  "strings"
+)
 
 type Lookup struct {
   fieldLookup string
   value interface{}
 }
 
-func (l Lookup) toSql() string {
-  field := ""
-  lookup := ""
+func lookupToSql(fieldLookup string, value interface{}) string {
+  idx := strings.Index(fieldLookup, "__")
 
-  //field := parse l.fieldLookup for the field
-  //lookup := parse l .fieldLookup for the lookup
+  if idx < 0 {
+    return ""
+  }
+
+  field := fieldLookup[0:idx]
+  lookup :=  fieldLookup[idx+2:]
 
   s := field
 
   switch lookup {
   case "exact":
-    s += exact(l.value)
+    s += exact(value)
 
   case "iexact":
-    s += iexact(l.value)
+    s += iexact(value)
 
   case "contains":
-    s += contains(l.value)
+    s += contains(value)
+
+  case "icontains":
+    s += icontains(value)
 
 
 

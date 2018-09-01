@@ -3,12 +3,14 @@ package models
 import ()
 
 type Manager struct {
-  model *model
+  model *Model
 	//queryset QuerySet
 }
 
 func (m Manager) All() QuerySet {
-	return QuerySet{}
+  q := QuerySet{}
+  q.Query = "SELECT * FROM " + m.model.dbTable
+	return q
 }
 
 func (m Manager) Filter() QuerySet {

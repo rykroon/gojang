@@ -3,8 +3,8 @@ package models
 import ()
 
 type QuerySet struct {
-  model *model
-	query string
+  model *Model
+	Query string
 
 	//select_ string
 	//from string
@@ -22,16 +22,17 @@ func (q QuerySet) buildQuery() string {
 
 //Functions that return QuerySets
 
-func (q QuerySet) Filter(l Lookup) QuerySet {
-  q.where = append(q.where, l.toSql())
-  q.query = q.buildQuery()
+func (q QuerySet) Filter(fieldLookup string, value interface{}) QuerySet {
+
+  q.where = append(q.where, lookupToSql(fieldLookup, value))
+  q.Query = q.buildQuery()
 	return q
 }
 
-func (q QuerySet) Exclude(l Lookup) QuerySet {
-  sql := " NOT(" + l.toSql() + ")"
+func (q QuerySet) Exclude(fieldLookup string, value interface{}) QuerySet {
+  sql := " NOT(" + lookupToSql(fieldLookup, value) + ")"
   q.where = append(q.where, sql)
-  q.query = q.buildQuery()
+  q.Query = q.buildQuery()
 	return q
 }
 

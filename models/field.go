@@ -24,53 +24,54 @@ type Field struct {
 
 //maybe?
 type FldOptn struct {
-  dbColumn string 
+  dbColumn string
   null bool
   primaryKey bool
   unique bool
 }
 
-func AutoField(dbColumn string) Field {
-	return Field{dbColumn: dbColumn, dbDataType: "SERIAL"}
+func AutoField() Field {
+	return Field{dbDataType: "SERIAL"}
 }
 
-func BooleanField(dbColumn string) Field {
-	return Field{dbColumn: dbColumn, dbDataType: "boolean"}
+func BooleanField() Field {
+	return Field{dbDataType: "boolean"}
 }
 
-func CharField(dbColumn string, maxLength int) Field {
+func CharField(maxLength int) Field {
 	n := strconv.Itoa(maxLength)
 	dataType := "varchar(" + n + ")"
 
-	return Field{dbColumn: dbColumn, dbDataType: dataType, maxLength: maxLength}
+	return Field{dbDataType: dataType, maxLength: maxLength}
 }
 
-func DecimalField(dbColumn string, maxDigits int, decimalPlaces int) Field {
+func DecimalField(maxDigits int, decimalPlaces int) Field {
 	precision := strconv.Itoa(maxDigits)
 	scale := strconv.Itoa(decimalPlaces)
 	dataType := "NUMERIC(" + precision + ", " + scale + ")"
 
-	return Field{dbColumn: dbColumn, dbDataType: dataType, maxDigits: maxDigits, decimalPlaces: decimalPlaces}
+	return Field{dbDataType: dataType, maxDigits: maxDigits, decimalPlaces: decimalPlaces}
 }
 
-func FloatField(dbColumn string) Field {
-	return Field{dbColumn: dbColumn, dbDataType: "double precision"}
+func FloatField() Field {
+	return Field{dbDataType: "double precision"}
 }
 
-func IntegerField(dbColumn string) Field {
-	return Field{dbColumn: dbColumn, dbDataType: "integer"}
+func IntegerField() Field {
+	return Field{dbDataType: "integer"}
 }
 
-func TextField(dbColumn string) Field {
-	return Field{dbColumn: dbColumn, dbDataType: "text"}
+func TextField() Field {
+	return Field{dbDataType: "text"}
 }
 
 func doubleQuotes(s string) string {
 	return "\"" + s + "\""
 }
 
-func (f Field) CreateString() string {
-	s := doubleQuotes(f.dbColumn) + " " + f.dbDataType
+func (f Field) createString(dbColumn string) string {
+
+	s := dbColumn + " " + f.dbDataType
 
 	if f.primaryKey {
 		s += " PRIMARY KEY"
