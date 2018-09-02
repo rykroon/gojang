@@ -1,63 +1,200 @@
 package models
 
 import (
-  "strings"
+	"reflect"
+	"strconv"
+	"strings"
 )
 
 type Lookup struct {
-  fieldLookup string
-  value interface{}
+	lhs        string
+	lookupName string
+	rhs        interface{}
 }
 
-func lookupToSql(fieldLookup string, value interface{}) string {
-  idx := strings.Index(fieldLookup, "__")
+func lookupToSql(fieldLookup string, i interface{}) string {
+	idx := strings.Index(fieldLookup, "__")
+	field := ""
+	lookup := ""
 
-  if idx < 0 {
-    return ""
-  }
+	//If no Lookup then default to 'exact'
+	if idx < 0 {
+		field = fieldLookup
+		lookup = "exact"
+	} else {
+		field = fieldLookup[0:idx]
+		lookup = fieldLookup[idx+2:]
+	}
 
-  field := fieldLookup[0:idx]
-  lookup :=  fieldLookup[idx+2:]
+	value := reflect.ValueOf(i)
 
-  s := field
+	expression := field
 
-  switch lookup {
-  case "exact":
-    s += exact(value)
+	switch lookup {
+	case "exact":
+		expression += exact(value)
 
-  case "iexact":
-    s += iexact(value)
+	case "iexact":
+		expression += iexact(value)
 
-  case "contains":
-    s += contains(value)
+	case "contains":
+		expression += contains(value)
 
-  case "icontains":
-    s += icontains(value)
+	case "icontains":
+		expression += icontains(value)
 
+	case "in":
+		expression += in(value)
 
+	case "gt":
+		expression += gt(value)
 
+	case "gte":
+		expression += gte(value)
 
+	case "lt":
+		expression += lt(value)
 
+	case "lte":
+		expression += lte(value)
 
-  }
+	case "startswith":
+		expression += startsWith(value)
 
-  return s
+	case "istartswith":
+		expression += iStartsWith(value)
+
+	case "endswith":
+		expression += endsWith(value)
+
+	case "iendswith":
+		expression += iEndsWith(value)
+
+	case "isnull":
+		expression += isNull(value)
+
+	}
+
+	return expression
 }
 
+//Process Right Hand Side
+func valueToSql(v reflect.Value) string {
+	t := v.Type().String()
 
-func exact(value interface{}) string {
-  //if value is nil the cal isnull()
-  return " = " + value.(string)
+	switch t {
+	case "int":
+		return strconv.Itoa(v.Interface().(int))
+
+	case "string":
+		return v.Interface().(string)
+
+	case "bool":
+		if v.Interface().(bool) {
+			return "TRUE"
+		} else {
+			return "FALSE"
+		}
+	}
+
+	return ""
 }
 
-func iexact(value interface{}) string {
-  return " ILIKE " + value.(string)
+//Helper function for logical operators
+func logicalOperator(v reflect.Value, logOp string) string {
+	value := valueToSql(v)
+	t := v.Type().String()
+
+	if t == "string" {
+		value = singleQuotes(value)
+	}
+
+	return " " + logOp + " " + value
 }
 
-func contains(value interface{}) string {
-  return " LIKE '%" + value.(string) + "%'"
+//Helper Function for pattern matching
+func patternMatch(v reflect.Value, caseInsensitive bool, startPattern string, endPattern string) string {
+	value := valueToSql(v)
+
+	if caseInsensitive {
+		return " ILIKE " + singleQuotes(startPattern+value+endPattern)
+	} else {
+		return " LIKE " + singleQuotes(startPattern+value+endPattern)
+	}
 }
 
-func icontains(value interface{}) string {
-  return " ILIKE '%" + value.(string) + "%'"
+//Lookup functions
+func exact(v reflect.Value) string {
+	//if value is nil then call isnull()
+	return logicalOperator(v, "=")
+}
+
+func iexact(v reflect.Value) string {
+	return patternMatch(v, true, "", "")
+}
+
+func contains(v reflect.Value) string {
+	return patternMatch(v, false, "%", "%")
+}
+
+func icontains(v reflect.Value) string {
+	return patternMatch(v, true, "%", "%")
+}
+
+//check if interface{} is slice or queryset
+func in(v reflect.Value) string {
+	s := " IN ("
+
+	// for i,v := range values {
+	//   s += v.(string) + ", "
+	// }
+	//
+	// s = s[0:len(s)-2] + ")"
+	return s
+}
+
+func gt(v reflect.Value) string {
+	return logicalOperator(v, ">")
+}
+
+func gte(v reflect.Value) string {
+	return logicalOperator(v, ">=")
+}
+
+func lt(v reflect.Value) string {
+	return logicalOperator(v, "<")
+}
+
+func lte(v reflect.Value) string {
+	return logicalOperator(v, "<=")
+}
+
+func startsWith(v reflect.Value) string {
+	return patternMatch(v, false, "", "%")
+}
+
+func iStartsWith(v reflect.Value) string {
+	return patternMatch(v, true, "", "%")
+}
+
+func endsWith(v reflect.Value) string {
+	return patternMatch(v, false, "%", "")
+}
+
+func iEndsWith(v reflect.Value) string {
+	return patternMatch(v, true, "%", "")
+}
+
+func isNull(v reflect.Value) string {
+	t := v.Type().String()
+
+	if t == "bool" {
+		if v.Interface().(bool) {
+			return " IS NULL"
+		} else {
+			return " IS NOT NULL"
+		}
+	}
+
+	return ""
 }

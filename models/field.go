@@ -21,14 +21,13 @@ type Field struct {
 	unique     bool
 }
 
-
 //maybe?
-type FldOptn struct {
-  dbColumn string
-  null bool
-  primaryKey bool
-  unique bool
-}
+// type FldOptn struct {
+// 	dbColumn   string
+// 	null       bool
+// 	primaryKey bool
+// 	unique     bool
+// }
 
 func AutoField() Field {
 	return Field{dbDataType: "SERIAL"}
@@ -65,8 +64,20 @@ func TextField() Field {
 	return Field{dbDataType: "text"}
 }
 
-func doubleQuotes(s string) string {
-	return "\"" + s + "\""
+//Constraints
+func (f Field) PrimaryKey() Field {
+	f.primaryKey = true
+	return f
+}
+
+func (f Field) IsNull() Field {
+	f.null = true
+	return f
+}
+
+func (f Field) Unique() Field {
+	f.unique = true
+	return f
 }
 
 func (f Field) createString(dbColumn string) string {

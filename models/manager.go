@@ -3,20 +3,28 @@ package models
 import ()
 
 type Manager struct {
-  model *Model
+	model *Model
 	//queryset QuerySet
 }
 
 func (m Manager) All() QuerySet {
-  q := QuerySet{}
-  q.Query = "SELECT * FROM " + m.model.dbTable
-	return q
+	qs := QuerySet{}
+	qs.from = m.model.dbTable
+	qs.select_ = "*"
+	qs.Query = qs.buildQuery()
+	return qs
 }
 
-func (m Manager) Filter() QuerySet {
-	return QuerySet{}
+func (m Manager) Filter(fieldLookup string, value interface{}) QuerySet {
+	qs := QuerySet{}
+	qs = m.All()
+	qs = qs.Filter(fieldLookup, value)
+	return qs
 }
 
-func (m Manager) Exclude() QuerySet {
-	return QuerySet{}
+func (m Manager) Exclude(fieldLookup string, value interface{}) QuerySet {
+	qs := QuerySet{}
+	qs = m.All()
+	qs = qs.Exclude(fieldLookup, value)
+	return qs
 }
