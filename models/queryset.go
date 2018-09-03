@@ -12,7 +12,7 @@ type QuerySet struct {
 	where        []string
 	//groupBy      string
 	//having       string
-	orderBy string
+	orderBy []string
 }
 
 func (q QuerySet) buildQuery() string {
@@ -29,8 +29,20 @@ func (q QuerySet) buildQuery() string {
 		}
 	}
 
-	if q.orderBy != "" {
-		s += " ORDER BY " + q.orderBy
+	if len(q.orderBy) != 0 {
+		s += " ORDER BY "
+
+		for idx := 0; idx < len(q.orderBy); idx++ {
+			field := q.orderBy[idx]
+
+			if string(field[0]) == "-" {
+				field = field[1:]
+				s += field + " DESC, "
+			} else {
+				s += field + ", "
+			}
+		}
+		s = s[0 : len(s)-2]
 	}
 
 	s += ";"
@@ -53,7 +65,12 @@ func (q QuerySet) Exclude(fieldLookup string, value interface{}) QuerySet {
 	return q
 }
 
-func (q QuerySet) OrderBy(f []string) QuerySet {
+func (q QuerySet) OrderBy(fields []string) QuerySet {
+	for idx := 0; idx < len(fields); idx++ {
+		q.orderBy = append(q.orderBy, fields[idx])
+	}
+
+	q.Query = q.buildQuery()
 	return q
 }
 

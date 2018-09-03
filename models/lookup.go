@@ -81,19 +81,44 @@ func lookupToSql(fieldLookup string, i interface{}) string {
 //Process Right Hand Side
 func valueToSql(v reflect.Value) string {
 	t := v.Type().String()
+	k := v.Kind().String()
 
-	switch t {
-	case "int":
-		return strconv.Itoa(v.Interface().(int))
+	switch k {
+	case "slice":
+		str := "("
+		for idx := 0; idx < v.Len(); idx++ {
+			element := v.Index(idx)
 
-	case "string":
-		return v.Interface().(string)
+			if t == "[]string" {
+				str += singleQuotes(valueToSql(element)) + ", "
+			} else {
+				str += valueToSql(element) + ", "
+			}
+		}
 
-	case "bool":
-		if v.Interface().(bool) {
-			return "TRUE"
-		} else {
-			return "FALSE"
+		return str[0:len(str)-2] + ")"
+
+	case "struct":
+		if t == "models.QuerySet" {
+			subQuery := v.Interface().(QuerySet)
+			return "(" + subQuery.Query[0:len(subQuery.Query)-1] + ")"
+		}
+
+	default: //Primitive Types
+
+		switch t {
+		case "int":
+			return strconv.Itoa(v.Interface().(int))
+
+		case "string":
+			return v.Interface().(string)
+
+		case "bool":
+			if v.Interface().(bool) {
+				return "TRUE"
+			} else {
+				return "FALSE"
+			}
 		}
 	}
 
@@ -143,14 +168,7 @@ func icontains(v reflect.Value) string {
 
 //check if interface{} is slice or queryset
 func in(v reflect.Value) string {
-	s := " IN ("
-
-	// for i,v := range values {
-	//   s += v.(string) + ", "
-	// }
-	//
-	// s = s[0:len(s)-2] + ")"
-	return s
+	return " IN " + valueToSql(v)
 }
 
 func gt(v reflect.Value) string {
