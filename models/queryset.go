@@ -74,6 +74,10 @@ func (q QuerySet) OrderBy(fields []string) QuerySet {
 	return q
 }
 
+func (q QuerySet) Distinct(fields []string) QuerySet {
+	return q
+}
+
 //Functions that do not return Querysets
 
 //Lookup can be empty. Also takes into account previous filters/excludes/etc

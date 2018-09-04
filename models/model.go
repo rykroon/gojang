@@ -5,6 +5,7 @@ import ()
 type Model struct {
 	dbTable string
 	Objects Manager
+	fields  map[string]Field
 
 	//Meta
 	//uniqueTogether []string

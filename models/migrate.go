@@ -22,6 +22,11 @@ func Migrate(i interface{}) {
 			if structField.Type.String() == "models.Field" {
 				columnName := t.Field(idx).Name
 				field := v.Field(idx).Interface().(Field)
+
+				if field.foreignKey {
+					columnName += "_id"
+				}
+
 				hasPrimaryKey = hasPrimaryKey || field.primaryKey
 				sqlFields += field.createString(columnName) + ", "
 			}

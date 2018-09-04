@@ -4,6 +4,10 @@ import (
 	"strconv"
 )
 
+//maybe?
+type field interface {
+}
+
 type Field struct {
 	dbColumn   string
 	dbDataType string
@@ -19,27 +23,23 @@ type Field struct {
 	null       bool
 	primaryKey bool
 	unique     bool
-}
 
-//maybe?
-// type FldOptn struct {
-// 	dbColumn   string
-// 	null       bool
-// 	primaryKey bool
-// 	unique     bool
-// }
+	foreignKey bool
+	to         *Model
+	onDelete   string
+}
 
 func AutoField() Field {
 	return Field{dbDataType: "SERIAL"}
 }
 
 func BooleanField() Field {
-	return Field{dbDataType: "boolean"}
+	return Field{dbDataType: "BOOLEAN"}
 }
 
 func CharField(maxLength int) Field {
 	n := strconv.Itoa(maxLength)
-	dataType := "varchar(" + n + ")"
+	dataType := "VARCHAR(" + n + ")"
 
 	return Field{dbDataType: dataType, maxLength: maxLength}
 }
@@ -53,20 +53,27 @@ func DecimalField(maxDigits int, decimalPlaces int) Field {
 }
 
 func FloatField() Field {
-	return Field{dbDataType: "double precision"}
+	return Field{dbDataType: "DOUBLE PRECISION"}
+}
+
+func ForeignKey(m *Model, onDelete string) Field {
+	return Field{dbDataType: "INTEGER", foreignKey: true, to: m, onDelete: onDelete}
 }
 
 func IntegerField() Field {
-	return Field{dbDataType: "integer"}
+	return Field{dbDataType: "INTEGER"}
 }
 
 func TextField() Field {
-	return Field{dbDataType: "text"}
+	return Field{dbDataType: "TEXT"}
 }
 
 //Constraints
 func (f Field) PrimaryKey() Field {
-	f.primaryKey = true
+	if !f.foreignKey {
+		f.primaryKey = true
+	}
+
 	return f
 }
 
@@ -81,12 +88,15 @@ func (f Field) Unique() Field {
 }
 
 func (f Field) createString(dbColumn string) string {
-
 	s := dbColumn + " " + f.dbDataType
 
 	if f.primaryKey {
 		s += " PRIMARY KEY"
 	} else {
+
+		if f.foreignKey {
+			s += " REFERENCES " + f.to.dbTable + " ON DELETE " + f.onDelete
+		}
 
 		if f.null {
 			s += " NULL"
