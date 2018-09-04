@@ -65,7 +65,7 @@ func main() {
 
 	qs2 := MyModel.Objects.All()
 	qs = qs.Filter("id__in", qs2)
-	qs = qs.OrderBy([]string{"id", "-text"})
+	qs = qs.OrderBy("id", "-text")
 	fmt.Println(qs.Query)
 
 	fmt.Println("")

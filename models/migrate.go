@@ -5,12 +5,17 @@ import (
 	"reflect"
 )
 
+
+
 func Migrate(i interface{}) {
 
 	v := reflect.ValueOf(i)
+
 	if isAModel(v) {
 
 		t := v.Type()
+		fmt.Println(t.String())
+
 		hasPrimaryKey := false
 		numOfFields := v.NumField()
 		sql := "CREATE TABLE  ("

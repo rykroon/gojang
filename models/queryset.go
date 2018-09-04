@@ -65,8 +65,8 @@ func (q QuerySet) Exclude(fieldLookup string, value interface{}) QuerySet {
 	return q
 }
 
-func (q QuerySet) OrderBy(fields []string) QuerySet {
-	for idx := 0; idx < len(fields); idx++ {
+func (q QuerySet) OrderBy(fields ...string) QuerySet {
+	for idx := range fields {
 		q.orderBy = append(q.orderBy, fields[idx])
 	}
 
