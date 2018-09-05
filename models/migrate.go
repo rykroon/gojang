@@ -14,7 +14,7 @@ func Migrate(i interface{}) {
 	if isAModel(v) {
 
 		t := v.Type()
-		fmt.Println(t.String())
+		fmt.Println(t.String()) //get the table name from t.String()
 
 		hasPrimaryKey := false
 		numOfFields := v.NumField()
@@ -38,8 +38,8 @@ func Migrate(i interface{}) {
 		}
 
 		if !hasPrimaryKey {
-			idField := AutoField().PrimaryKey()
-			sqlFields = idField.createString("id") + ", " + sqlFields
+			//idField := AutoField().PrimaryKey()
+			//sqlFields = idField.createString("id") + ", " + sqlFields
 		}
 
 		sql += sqlFields[0:len(sqlFields)-2] + ");"
@@ -64,8 +64,7 @@ func isAModel(v reflect.Value) bool {
 		anonymous := t.Field(idx).Anonymous
 
 		if (fieldName == "Model") && anonymous {
-			dbTable := v.Field(idx).Interface().(Model).dbTable
-			fmt.Println(dbTable)
+			//dbTable := v.Field(idx).Interface().(Model).dbTable
 			return true
 		}
 	}

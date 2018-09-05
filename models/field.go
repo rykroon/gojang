@@ -29,6 +29,41 @@ type Field struct {
 	onDelete   string
 }
 
+type fieldOption func(*Field)
+
+
+// func newField(options ...func(*Field) error) (*Field, error) {
+// 	f := &Field{}
+//
+// 	for _, option := range options{
+//     err := option(f)
+//     if err != nil {
+//       return nil, err
+//     }
+//   }
+//
+//   return f, nil
+// }
+//
+// func PrimaryKey(pkey bool) fieldOption {
+// 	return func(f *Field) {
+// 		f.primaryKey=pkey
+// 	}
+// }
+//
+// func Unique(unique bool) fieldOption {
+// 	return func(f *Field) {
+// 		f.unique=unique
+// 	}
+// }
+//
+// func Null(null bool) fieldOption {
+// 	return func(f *Field) {
+// 		f.null=null
+// 	}
+// }
+
+
 func AutoField() Field {
 	return Field{dbDataType: "SERIAL"}
 }
@@ -64,6 +99,17 @@ func IntegerField() Field {
 	return Field{dbDataType: "INTEGER"}
 }
 
+// func IntegerField(options ...fieldOption) Field {
+// 	f := &Field{}
+//
+// 	for _, option := range options{
+//     option(f)
+//   }
+//
+// 	f.dbDataType = "INTEGER"
+// 	return *f
+// }
+
 func TextField() Field {
 	return Field{dbDataType: "TEXT"}
 }
@@ -77,7 +123,7 @@ func (f Field) PrimaryKey() Field {
 	return f
 }
 
-func (f Field) IsNull() Field {
+func (f Field) Null() Field {
 	f.null = true
 	return f
 }
@@ -86,6 +132,14 @@ func (f Field) Unique() Field {
 	f.unique = true
 	return f
 }
+
+//maybe make each Field their own type so I can specify the appropriate types as parameters
+func (f Field) Default() Field {
+	return f
+}
+
+
+
 
 func (f Field) createString(dbColumn string) string {
 	s := dbColumn + " " + f.dbDataType

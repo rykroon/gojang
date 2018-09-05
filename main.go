@@ -1,6 +1,7 @@
 package main
 
 import (
+	//. "./models"
 	"./models"
 	"fmt"
 )
@@ -25,8 +26,6 @@ type MyModel struct {
 	Float   models.Field
 	Number  models.Field
 	Fkey	  models.Field
-
-
 	Text models.Field
 }
 
@@ -39,10 +38,11 @@ func main() {
 	OtherModel.Init("other_model")
 
 
-	MyModel.Bool = models.BooleanField().IsNull()
+	MyModel.Bool = models.BooleanField().Null()
 	MyModel.Char = models.CharField(30).Unique()
 	MyModel.Decimal = models.DecimalField(9, 2)
 	MyModel.Float = models.FloatField()
+	//MyModel.Number = models.IntegerField(Null(true),models.Unique(true))
 	MyModel.Number = models.IntegerField()
 	MyModel.Text = models.TextField()
 	MyModel.Fkey = models.ForeignKey(&OtherModel.Model, models.Cascade)
@@ -52,7 +52,6 @@ func main() {
 	//Other Model
 
 	OtherModel.Id = models.AutoField().PrimaryKey()
-
 
 	models.Migrate(MyModel)
 	models.Migrate(OtherModel)
