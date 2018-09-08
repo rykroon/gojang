@@ -51,15 +51,14 @@ func (q QuerySet) buildQuery() string {
 
 //Functions that return QuerySets
 
-func (q QuerySet) Filter(fieldLookup string, value interface{}) QuerySet {
-
-	q.where = append(q.where, lookupToSql(fieldLookup, value))
+func (q QuerySet) Filter(l lookup) QuerySet {
+	q.where = append(q.where, l.toSql())
 	q.Query = q.buildQuery()
 	return q
 }
 
-func (q QuerySet) Exclude(fieldLookup string, value interface{}) QuerySet {
-	sql := "NOT(" + lookupToSql(fieldLookup, value) + ")"
+func (q QuerySet) Exclude(l lookup) QuerySet {
+	sql := "NOT(" + l.toSql() + ")"
 	q.where = append(q.where, sql)
 	q.Query = q.buildQuery()
 	return q
@@ -74,7 +73,7 @@ func (q QuerySet) OrderBy(fields ...string) QuerySet {
 	return q
 }
 
-func (q QuerySet) Distinct(fields []string) QuerySet {
+func (q QuerySet) Distinct(fields ...string) QuerySet {
 	return q
 }
 
