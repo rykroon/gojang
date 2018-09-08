@@ -4,7 +4,6 @@ import ()
 
 type Manager struct {
 	model *Model
-	//queryset QuerySet
 }
 
 func (m Manager) All() QuerySet {
