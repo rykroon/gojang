@@ -34,7 +34,7 @@ func (f Field) Default(i interface{}) Field {
 	k := t.Kind()
 
 	if k == f.defaultType {
-			f.defaultValue = valueToSql(i)
+		f.defaultValue = valueToSql(i)
 	} else {
 		return f
 	}

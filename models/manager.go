@@ -1,7 +1,6 @@
 package models
 
-import (
-)
+import ()
 
 type Manager struct {
 	model *Model
@@ -12,7 +11,6 @@ func (m Manager) All() QuerySet {
 	qs := QuerySet{}
 	qs.model = m.model
 	qs.from = m.model.dbTable
-	qs.select_ = "*"
 	qs.Query = qs.buildQuery()
 	return qs
 }

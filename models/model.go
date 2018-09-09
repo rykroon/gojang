@@ -51,6 +51,17 @@ func (m Model) hasPrimaryKey() bool {
 	return false
 }
 
+//returns a list of fields
+func (m Model) fieldList() []string {
+	list := []string{}
+
+	for key, _ := range m.fields {
+		list = append(list, key)
+	}
+
+	return list
+}
+
 func (m *Model) Migrate() {
 	if !m.hasPrimaryKey() {
 		m.AddField("id", AutoField().PrimaryKey(true))

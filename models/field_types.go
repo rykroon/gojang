@@ -1,13 +1,13 @@
 package models
 
 import (
-	"strconv"
 	"reflect"
+	"strconv"
 )
 
 type Field struct {
-	dbColumn   string
-	dbType string
+	dbColumn string
+	dbType   string
 
 	//specific for CharField
 	maxLength int
@@ -17,10 +17,10 @@ type Field struct {
 	decimalPlaces int
 
 	//constraints
-	null       bool
-	primaryKey bool
-	unique     bool
-	defaultType reflect.Kind
+	null         bool
+	primaryKey   bool
+	unique       bool
+	defaultType  reflect.Kind
 	defaultValue string
 
 	foreignKey bool
@@ -29,18 +29,18 @@ type Field struct {
 }
 
 func AutoField() Field {
-	return Field{dbType: "SERIAL", defaultType:reflect.Int}
+	return Field{dbType: "SERIAL", defaultType: reflect.Int}
 }
 
 func BooleanField() Field {
-	return Field{dbType: "BOOLEAN", defaultType:reflect.Bool}
+	return Field{dbType: "BOOLEAN", defaultType: reflect.Bool}
 }
 
 func CharField(maxLength int) Field {
 	n := strconv.Itoa(maxLength)
 	dataType := "VARCHAR(" + n + ")"
 
-	return Field{dbType: dataType, maxLength: maxLength, defaultType:reflect.String}
+	return Field{dbType: dataType, maxLength: maxLength, defaultType: reflect.String}
 }
 
 func DecimalField(maxDigits int, decimalPlaces int) Field {
@@ -48,25 +48,24 @@ func DecimalField(maxDigits int, decimalPlaces int) Field {
 	scale := strconv.Itoa(decimalPlaces)
 	dataType := "NUMERIC(" + precision + ", " + scale + ")"
 
-	return Field{dbType: dataType, maxDigits: maxDigits, decimalPlaces: decimalPlaces, defaultType:reflect.Float64}
+	return Field{dbType: dataType, maxDigits: maxDigits, decimalPlaces: decimalPlaces, defaultType: reflect.Float64}
 }
 
 func FloatField() Field {
-	return Field{dbType: "DOUBLE PRECISION", defaultType:reflect.Float64}
+	return Field{dbType: "DOUBLE PRECISION", defaultType: reflect.Float64}
 }
 
 func ForeignKey(m *Model, onDelete string) Field {
-	return Field{dbType: "INTEGER", foreignKey: true, to: m, onDelete: onDelete, defaultType:reflect.Int}
+	return Field{dbType: "INTEGER", foreignKey: true, to: m, onDelete: onDelete, defaultType: reflect.Int}
 }
 
 func IntegerField() Field {
-	return Field{dbType: "INTEGER", defaultType:reflect.Int}
+	return Field{dbType: "INTEGER", defaultType: reflect.Int}
 }
 
 func TextField() Field {
-	return Field{dbType: "TEXT", defaultType:reflect.String}
+	return Field{dbType: "TEXT", defaultType: reflect.String}
 }
-
 
 func (f Field) create() string {
 	s := f.dbColumn + " " + f.dbType

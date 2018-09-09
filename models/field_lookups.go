@@ -28,13 +28,13 @@ func ExactChar(field string, value string) lookup {
 
 func Contains(field string, value string) lookup {
 	lookup := lookup{lhs: field, lookupName: "LIKE"}
-	lookup.rhs = "'%" + value + "'%"
+	lookup.rhs = "'%" + value + "%'"
 	return lookup
 }
 
 func IContains(field string, value string) lookup {
 	lookup := lookup{lhs: field, lookupName: "ILIKE"}
-	lookup.rhs = "'%" + value + "'%"
+	lookup.rhs = "'%" + value + "%'"
 	return lookup
 }
 
@@ -76,7 +76,7 @@ func Lte(field string, value int) lookup {
 
 func StartsWith(field string, value string) lookup {
 	lookup := lookup{lhs: field, lookupName: "LIKE"}
-	lookup.rhs = "'" + value + "'%"
+	lookup.rhs = "'" + value + "%'"
 	return lookup
 }
 
