@@ -1,6 +1,7 @@
 package models
 
-import ("fmt")
+import (
+)
 
 type Manager struct {
 	model *Model
@@ -8,7 +9,6 @@ type Manager struct {
 }
 
 func (m Manager) All() QuerySet {
-	fmt.Println(m.model)
 	qs := QuerySet{}
 	qs.model = m.model
 	qs.from = m.model.dbTable

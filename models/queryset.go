@@ -73,9 +73,17 @@ func (q QuerySet) OrderBy(fields ...string) QuerySet {
 	return q
 }
 
-func (q QuerySet) Distinct(fields ...string) QuerySet {
-	return q
-}
+// func (q QuerySet) Distinct(fields ...string) QuerySet {
+// 	return q
+// }
+
+// func (q QuerySet) Defer(fields ...string) QuerySet {
+// 	return q
+// }
+//
+// func (q QuerySet) Only(fields ...string) QuerySet {
+// 	return q
+// }
 
 //Functions that do not return Querysets
 

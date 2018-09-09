@@ -2,11 +2,12 @@ package models
 
 import (
 	"strconv"
+	"reflect"
 )
 
 type Field struct {
 	dbColumn   string
-	dbDataType string
+	dbType string
 
 	//specific for CharField
 	maxLength int
@@ -19,6 +20,8 @@ type Field struct {
 	null       bool
 	primaryKey bool
 	unique     bool
+	defaultType reflect.Kind
+	defaultValue string
 
 	foreignKey bool
 	to         *Model
@@ -26,18 +29,18 @@ type Field struct {
 }
 
 func AutoField() Field {
-	return Field{dbDataType: "SERIAL"}
+	return Field{dbType: "SERIAL", defaultType:reflect.Int}
 }
 
 func BooleanField() Field {
-	return Field{dbDataType: "BOOLEAN"}
+	return Field{dbType: "BOOLEAN", defaultType:reflect.Bool}
 }
 
 func CharField(maxLength int) Field {
 	n := strconv.Itoa(maxLength)
 	dataType := "VARCHAR(" + n + ")"
 
-	return Field{dbDataType: dataType, maxLength: maxLength}
+	return Field{dbType: dataType, maxLength: maxLength, defaultType:reflect.String}
 }
 
 func DecimalField(maxDigits int, decimalPlaces int) Field {
@@ -45,28 +48,28 @@ func DecimalField(maxDigits int, decimalPlaces int) Field {
 	scale := strconv.Itoa(decimalPlaces)
 	dataType := "NUMERIC(" + precision + ", " + scale + ")"
 
-	return Field{dbDataType: dataType, maxDigits: maxDigits, decimalPlaces: decimalPlaces}
+	return Field{dbType: dataType, maxDigits: maxDigits, decimalPlaces: decimalPlaces, defaultType:reflect.Float64}
 }
 
 func FloatField() Field {
-	return Field{dbDataType: "DOUBLE PRECISION"}
+	return Field{dbType: "DOUBLE PRECISION", defaultType:reflect.Float64}
 }
 
 func ForeignKey(m *Model, onDelete string) Field {
-	return Field{dbDataType: "INTEGER", foreignKey: true, to: m, onDelete: onDelete}
+	return Field{dbType: "INTEGER", foreignKey: true, to: m, onDelete: onDelete, defaultType:reflect.Int}
 }
 
 func IntegerField() Field {
-	return Field{dbDataType: "INTEGER"}
+	return Field{dbType: "INTEGER", defaultType:reflect.Int}
 }
 
 func TextField() Field {
-	return Field{dbDataType: "TEXT"}
+	return Field{dbType: "TEXT", defaultType:reflect.String}
 }
 
 
-func (f Field) createString(dbColumn string) string {
-	s := dbColumn + " " + f.dbDataType
+func (f Field) create() string {
+	s := f.dbColumn + " " + f.dbType
 
 	if f.primaryKey {
 		s += " PRIMARY KEY"
@@ -84,6 +87,10 @@ func (f Field) createString(dbColumn string) string {
 
 		if f.unique {
 			s += " UNIQUE"
+		}
+
+		if f.defaultValue != "" {
+			s += " DEFAULT " + f.defaultValue
 		}
 	}
 

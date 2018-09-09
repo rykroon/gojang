@@ -2,7 +2,7 @@ package models
 
 import (
 	"reflect"
-	"strconv"
+	//"strconv"
 	"strings"
 )
 
@@ -79,51 +79,51 @@ func lookupToSql(fieldLookup string, i interface{}) string {
 }
 
 //Process Right Hand Side
-func valueToSql(v reflect.Value) string {
-	t := v.Type().String()
-	k := v.Kind().String()
-
-	switch k {
-	case "slice":
-		str := "("
-		for idx := 0; idx < v.Len(); idx++ {
-			element := v.Index(idx)
-
-			if t == "[]string" {
-				str += singleQuotes(valueToSql(element)) + ", "
-			} else {
-				str += valueToSql(element) + ", "
-			}
-		}
-
-		return str[0:len(str)-2] + ")"
-
-	case "struct":
-		if t == "models.QuerySet" {
-			subQuery := v.Interface().(QuerySet)
-			return "(" + subQuery.Query[0:len(subQuery.Query)-1] + ")"
-		}
-
-	default: //Primitive Types
-
-		switch t {
-		case "int":
-			return strconv.Itoa(v.Interface().(int))
-
-		case "string":
-			return v.Interface().(string)
-
-		case "bool":
-			if v.Interface().(bool) {
-				return "TRUE"
-			} else {
-				return "FALSE"
-			}
-		}
-	}
-
-	return ""
-}
+// func valueToSql(v reflect.Value) string {
+// 	t := v.Type().String()
+// 	k := v.Kind().String()
+//
+// 	switch k {
+// 	case "slice":
+// 		str := "("
+// 		for idx := 0; idx < v.Len(); idx++ {
+// 			element := v.Index(idx)
+//
+// 			if t == "[]string" {
+// 				str += singleQuotes(valueToSql(element)) + ", "
+// 			} else {
+// 				str += valueToSql(element) + ", "
+// 			}
+// 		}
+//
+// 		return str[0:len(str)-2] + ")"
+//
+// 	case "struct":
+// 		if t == "models.QuerySet" {
+// 			subQuery := v.Interface().(QuerySet)
+// 			return "(" + subQuery.Query[0:len(subQuery.Query)-1] + ")"
+// 		}
+//
+// 	default: //Primitive Types
+//
+// 		switch t {
+// 		case "int":
+// 			return strconv.Itoa(v.Interface().(int))
+//
+// 		case "string":
+// 			return v.Interface().(string)
+//
+// 		case "bool":
+// 			if v.Interface().(bool) {
+// 				return "TRUE"
+// 			} else {
+// 				return "FALSE"
+// 			}
+// 		}
+// 	}
+//
+// 	return ""
+// }
 
 //Helper function for logical operators
 func logicalOperator(v reflect.Value, logOp string) string {
