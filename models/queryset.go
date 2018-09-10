@@ -8,33 +8,32 @@ type QuerySet struct {
 
 	selected []string
 	deferred []string
-	distinct        bool
-	from            string
-	where           []string
+	distinct bool
+	from     string
+	where    []string
 	//groupBy      string
 	//having       string
 	orderBy []string
 }
 
-
 func (q QuerySet) buildQuery() string {
-	s := "SELECT "
+	sql := ""
+	sql += q.processSelect()
+	sql += " FROM " + q.from
+	sql += q.processWhere()
+	sql += q.processOrderBy()
 
-	if q.distinct {
-		s += " DISTINCT"
-	}
-
-	s += q.processSelect()
-	s += " FROM " + q.from
-	s += q.processWhere()
-	s += q.processOrderBy()
-
-	s += ";"
-	return s
+	sql += ";"
+	return sql
 }
 
-
 func (q QuerySet) processSelect() string {
+	sql := "SELECT "
+
+	if q.distinct {
+		sql += " DISTINCT "
+	}
+
 	if len(q.selected) == 0 && len(q.deferred) == 0 {
 		return "*"
 	}
@@ -46,8 +45,6 @@ func (q QuerySet) processSelect() string {
 	} else {
 		selected = q.model.fieldList()
 	}
-
-	sql := ""
 
 	for _, field := range selected {
 		foundDefer := false
@@ -169,9 +166,6 @@ func (q QuerySet) Only(fields ...string) QuerySet {
 	return q
 }
 
-
-
-
 //Functions that do not return Querysets
 
 //Lookup can be empty. Also takes into account previous filters/excludes/etc
@@ -180,6 +174,11 @@ func (q QuerySet) Get() Instance {
 }
 
 func (q QuerySet) Count() int {
+	q.selected = nil
+	q.deferred = nil
+	q.selected = append(q.selected, "COUNT(*)")
+	q.Query = q.buildQuery()
+	//execute
 	return 0
 }
 

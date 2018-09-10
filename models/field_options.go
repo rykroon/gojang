@@ -19,6 +19,23 @@ func (f Field) Unique(value bool) Field {
 //Null Field Option
 func (f Field) Null(value bool) Field {
 	f.null = value
+
+	if f.null {
+		switch f.goType {
+		case "bool":
+			f.goType = "sql.NullBool"
+
+		case "float64":
+			f.goType = "sql.NullFloat64"
+
+		case "int":
+			f.goType = "sql.NullInt64"
+
+		case "string":
+			f.goType = "sql.NullString"
+		}
+	}
+
 	return f
 }
 
