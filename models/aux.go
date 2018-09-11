@@ -1,9 +1,9 @@
 package models
 
 import (
+	"database/sql"
 	"reflect"
 	"strconv"
-	"database/sql"
 )
 
 //auxillary functions used in all programs
@@ -16,7 +16,6 @@ func singleQuotes(s string) string {
 	return "'" + s + "'"
 }
 
-
 func interfaceSliceToSql(slice []interface{}) string {
 	s := "("
 
@@ -24,7 +23,7 @@ func interfaceSliceToSql(slice []interface{}) string {
 		s += interfaceToSql(value) + ", "
 	}
 
-	s = s[0: len(s) - 2] + ")"
+	s = s[0:len(s)-2] + ")"
 	return s
 }
 
@@ -108,7 +107,6 @@ func interfaceToSql(i interface{}) string {
 	return ""
 }
 
-
 func sliceStringToSql(slice []string) string {
 	s := "("
 
@@ -116,7 +114,7 @@ func sliceStringToSql(slice []string) string {
 		s += stringToSql(value) + ", "
 	}
 
-	s = s[0: len(s) - 2] + ")"
+	s = s[0:len(s)-2] + ")"
 
 	return s
 }
@@ -125,7 +123,6 @@ func stringToSql(s string) string {
 	return singleQuotes(s)
 }
 
-
 func sliceIntToSql(slice []int) string {
 	s := "("
 
@@ -133,7 +130,7 @@ func sliceIntToSql(slice []int) string {
 		s += intToSql(value) + ", "
 	}
 
-	s = s[0: len(s) - 2] + ")"
+	s = s[0:len(s)-2] + ")"
 
 	return s
 }
@@ -142,21 +139,17 @@ func intToSql(i int) string {
 	return strconv.Itoa(i)
 }
 
-
 func int32ToSql(i int32) string {
 	return strconv.Itoa(int(i))
 }
-
 
 func int64ToSql(i int64) string {
 	return strconv.Itoa(int(i))
 }
 
-
 func float64ToSql(f float64) string {
 	return strconv.FormatFloat(f, 'f', -1, 64)
 }
-
 
 func boolToSql(b bool) string {
 	if b {
@@ -167,8 +160,3 @@ func boolToSql(b bool) string {
 }
 
 //Constants
-
-const Cascade string = "CASCADE"
-const Protect string = "RESTRICT"
-const SetNull string = "SET NULL"
-const SetDefault string = "SET DEFAULT"

@@ -5,10 +5,12 @@ import (
 	//"reflect"
 )
 
-type Field struct {
-	dbColumn   string
+type Field struct {//Required Attributes
+
+	dbColumn string
 	dbType string
 	goType string
+	model *Model
 
 	//specific for CharField
 	maxLength int
@@ -17,17 +19,36 @@ type Field struct {
 	maxDigits     int
 	decimalPlaces int
 
-	//constraints
+	//Constraint Attributes
 	null       bool
 	primaryKey bool
 	unique     bool
-	//defaultType reflect.Kind
 	defaultValue string
 
-	foreignKey bool
-	to         *Model
-	onDelete   string
+	//Other Attributes
+	autoCreated bool
+	concrete bool
+	hidden bool
+
+	//Relation Attributes
+	isRelation bool
+	manyToMany bool
+	manyToOne bool
+	oneToMany bool
+	oneToOne bool
+	relatedModel *Model
+
+	//foreignKey bool
+	onDelete   onDelete
 }
+
+type onDelete string
+const Cascade onDelete = "CASCADE"
+const Protect onDelete = "RESTRICT"
+const SetNull onDelete = "SET NULL"
+const SetDefault onDelete = "SET DEFAULT"
+
+//Constructors
 
 func AutoField() Field {
 	return Field{dbType: "SERIAL", goType: "int32"}
@@ -41,7 +62,7 @@ func CharField(maxLength int) Field {
 	n := strconv.Itoa(maxLength)
 	dataType := "VARCHAR(" + n + ")"
 
-	return Field{dbType: dataType, maxLength: maxLength, goType: "string"}
+	return Field{dbType: dataType, goType: "string", maxLength: maxLength}
 }
 
 func DecimalField(maxDigits int, decimalPlaces int) Field {
@@ -49,15 +70,14 @@ func DecimalField(maxDigits int, decimalPlaces int) Field {
 	scale := strconv.Itoa(decimalPlaces)
 	dataType := "NUMERIC(" + precision + ", " + scale + ")"
 
-	return Field{dbType: dataType, maxDigits: maxDigits, decimalPlaces: decimalPlaces, goType: "float64"}
+	field := Field{dbType: dataType, goType: "float64"}
+	field.maxDigits = maxDigits
+	field.decimalPlaces = decimalPlaces
+	return field
 }
 
 func FloatField() Field {
 	return Field{dbType: "DOUBLE PRECISION", goType:"float64"}
-}
-
-func ForeignKey(m *Model, onDelete string) Field {
-	return Field{dbType: "INTEGER", foreignKey: true, to: m, onDelete: onDelete, goType:"int32"}
 }
 
 func IntegerField() Field {
@@ -69,6 +89,36 @@ func TextField() Field {
 }
 
 
+
+//Relation Fields
+func ForeignKey(to *Model, onDelete onDelete) Field {
+	field := Field{dbType: "INTEGER", goType:"int32"}
+	field.isRelation = true
+	field.relatedModel = to
+	field.onDelete = onDelete
+	field.manyToOne = true
+	return field
+}
+
+func OneToOneField(to *Model, onDelete onDelete) Field {
+	field := Field{dbType: "INTEGER", goType:"int32"}
+	field.isRelation = true
+	field.relatedModel = to
+	field.onDelete = onDelete
+	field.oneToOne = true
+	return field
+}
+
+func ManyToManyField(to *Model, onDelete onDelete) Field {
+	field := Field{dbType: "INTEGER", goType:"int32"}
+	field.isRelation = true
+	field.relatedModel = to
+	field.onDelete = onDelete
+	field.manyToMany = true
+	return field
+}
+
+
 func (f Field) create() string {
 	s := f.dbColumn + " " + f.dbType
 
@@ -76,8 +126,9 @@ func (f Field) create() string {
 		s += " PRIMARY KEY"
 	} else {
 
-		if f.foreignKey {
-			s += " REFERENCES " + f.to.dbTable + " ON DELETE " + f.onDelete
+		//if f.foreignKey {
+		if f.isRelation {
+			s += " REFERENCES " + f.relatedModel.dbTable + " ON DELETE " + string(f.onDelete)
 		}
 
 		if f.null {

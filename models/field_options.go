@@ -50,7 +50,7 @@ func (f Field) Default(i interface{}) Field {
 	t := reflect.TypeOf(i).String()
 
 	if t == f.goType {
-			f.defaultValue = interfaceToSql(i)
+		f.defaultValue = interfaceToSql(i)
 	}
 
 	return f
