@@ -1,14 +1,14 @@
 package models
 
 import (
-	"reflect"
 	"strconv"
+	//"reflect"
 )
 
 type Field struct {
-	dbColumn string
-	dbType   string
-	goType   string
+	dbColumn   string
+	dbType string
+	goType string
 
 	//specific for CharField
 	maxLength int
@@ -22,7 +22,7 @@ type Field struct {
 	primaryKey bool
 	unique     bool
 	//defaultType reflect.Kind
-	//defaultValue string
+	defaultValue string
 
 	foreignKey bool
 	to         *Model
@@ -30,7 +30,7 @@ type Field struct {
 }
 
 func AutoField() Field {
-	return Field{dbType: "SERIAL", goType: "int"}
+	return Field{dbType: "SERIAL", goType: "int32"}
 }
 
 func BooleanField() Field {
@@ -53,20 +53,21 @@ func DecimalField(maxDigits int, decimalPlaces int) Field {
 }
 
 func FloatField() Field {
-	return Field{dbType: "DOUBLE PRECISION", goType: "float64"}
+	return Field{dbType: "DOUBLE PRECISION", goType:"float64"}
 }
 
 func ForeignKey(m *Model, onDelete string) Field {
-	return Field{dbType: "INTEGER", foreignKey: true, to: m, onDelete: onDelete, defaultType: reflect.Int}
+	return Field{dbType: "INTEGER", foreignKey: true, to: m, onDelete: onDelete, goType:"int32"}
 }
 
 func IntegerField() Field {
-	return Field{dbType: "INTEGER", goType: "int"}
+	return Field{dbType: "INTEGER", goType:"int32"}
 }
 
 func TextField() Field {
-	return Field{dbType: "TEXT", goType: "string"}
+	return Field{dbType: "TEXT", goType:"string"}
 }
+
 
 func (f Field) create() string {
 	s := f.dbColumn + " " + f.dbType

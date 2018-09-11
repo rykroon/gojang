@@ -1,7 +1,7 @@
 package models
 
 import (
-	"strconv"
+	//"strconv"
 )
 
 type lookup struct {
@@ -14,35 +14,49 @@ func (l lookup) toSql() string {
 	return l.lhs + " " + l.lookupName + " " + l.rhs
 }
 
-func ExactNum(field string, value float64) lookup {
+func Exact(field string, value interface{}) lookup {
 	lookup := lookup{lhs: field, lookupName: "="}
-	lookup.rhs = strconv.FormatFloat(value, 'f', -1, 64)
+	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func ExactChar(field string, value string) lookup {
+func ExactInt(field string, value int) lookup {
 	lookup := lookup{lhs: field, lookupName: "="}
-	lookup.rhs = "'" + value + "'"
+	lookup.rhs = intToSql(value)
+	return lookup
+}
+
+func ExactString(field string, value string) lookup {
+	lookup := lookup{lhs: field, lookupName: "="}
+	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
 func Contains(field string, value string) lookup {
 	lookup := lookup{lhs: field, lookupName: "LIKE"}
-	lookup.rhs = "'%" + value + "%'"
+	value = "%" + value + "%"
+	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
 func IContains(field string, value string) lookup {
 	lookup := lookup{lhs: field, lookupName: "ILIKE"}
-	lookup.rhs = "'%" + value + "%'"
+	value = "%" + value + "%"
+	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
-func InNum(field string, values ...int) lookup {
+func In(field string, values ...interface{}) lookup {
+	lookup := lookup{lhs: field, lookupName: "IN"}
+	lookup.rhs = interfaceToSql(values)
+	return lookup
+}
+
+func InInt(field string, values ...int) lookup {
 	return lookup{}
 }
 
-func InChar(field string, values ...string) lookup {
+func InString(field string, values ...string) lookup {
 	return lookup{}
 }
 
@@ -50,51 +64,55 @@ func InQs(field string, qs QuerySet) lookup {
 	return lookup{}
 }
 
-func Gt(field string, value int) lookup {
+func Gt(field string, value interface{}) lookup {
 	lookup := lookup{lhs: field, lookupName: ">"}
-	lookup.rhs = strconv.Itoa(value)
+	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func Gte(field string, value int) lookup {
+func Gte(field string, value interface{}) lookup {
 	lookup := lookup{lhs: field, lookupName: ">="}
-	lookup.rhs = strconv.Itoa(value)
+	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func Lt(field string, value int) lookup {
+func Lt(field string, value interface{}) lookup {
 	lookup := lookup{lhs: field, lookupName: "<"}
-	lookup.rhs = strconv.Itoa(value)
+	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func Lte(field string, value int) lookup {
+func Lte(field string, value interface{}) lookup {
 	lookup := lookup{lhs: field, lookupName: "<="}
-	lookup.rhs = strconv.Itoa(value)
+	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
 func StartsWith(field string, value string) lookup {
 	lookup := lookup{lhs: field, lookupName: "LIKE"}
-	lookup.rhs = "'" + value + "%'"
+	value = value + "%"
+	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
 func IStartsWith(field string, value string) lookup {
 	lookup := lookup{lhs: field, lookupName: "LIKE"}
-	lookup.rhs = "'" + value + "'%"
+	value = value + "%"
+	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
 func EndsWith(field string, value string) lookup {
 	lookup := lookup{lhs: field, lookupName: "LIKE"}
-	lookup.rhs = "'%" + value + "'"
+	value = "%" + value
+	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
 func IEndsWith(field string, value string) lookup {
 	lookup := lookup{lhs: field, lookupName: "LIKE"}
-	lookup.rhs = "'%" + value + "'"
+	value = "%" + value
+	lookup.rhs = stringToSql(value)
 	return lookup
 }
 

@@ -28,7 +28,7 @@ func (f Field) Null(value bool) Field {
 		case "float64":
 			f.goType = "sql.NullFloat64"
 
-		case "int":
+		case "int32":
 			f.goType = "sql.NullInt64"
 
 		case "string":
@@ -47,13 +47,11 @@ func (f Field) DbColumn(name string) Field {
 
 //Default Values
 func (f Field) Default(i interface{}) Field {
-	t := reflect.TypeOf(i)
-	k := t.Kind()
+	t := reflect.TypeOf(i).String()
 
-	if k == f.defaultType {
-		f.defaultValue = valueToSql(i)
-	} else {
-		return f
+	if t == f.goType {
+			f.defaultValue = interfaceToSql(i)
 	}
+
 	return f
 }
