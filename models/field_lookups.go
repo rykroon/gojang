@@ -1,13 +1,6 @@
 package models
 
-import (
-//"strconv"
-	//"strings"
-)
-
-type otherLookup struct {
-	
-}
+import ()
 
 type lookup struct {
 	lhs        string
@@ -15,154 +8,111 @@ type lookup struct {
 	rhs        string
 }
 
-func (l lookup) toSql() string {
+func (l lookup) asSql() string {
 	return l.lhs + " " + l.lookupName + " " + l.rhs
 }
 
-func lookupToOperator(lookup string) string {
-	switch lookup {
-	case "exact":
-		return "="
 
-	case "iexact":
-		return "LIKE"
-
-	case "contains":
-		return "LIKE"
-
-	case "icontains":
-		return "ILIKE"
-
-	case "in":
-		return "IN"
-
-	case "gt":
-		return ">"
-
-	case "gte":
-		return "<="
-
-	case "lt":
-		return "<"
-
-	case "lte":
-		return "<="
-
-	case "startswith":
-		return "LIKE"
-
-	case "istartswith":
-		return "ILIKE"
-
-	case "endswith":
-		return "LIKE"
-
-	case "iendswith":
-		return "ILIKE"
-
-	case "isnull":
-		return "IS"
-	}
-
-	return ""
-
-}
-
-
-
-
-func Exact(field string, value interface{}) lookup {
-	lookup := lookup{lhs: field, lookupName: "="}
+func (f Field) Exact(value interface{}) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "="}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func Contains(field string, value string) lookup {
-	lookup := lookup{lhs: field, lookupName: "LIKE"}
+func (f Field) IExact(value interface{}) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "ILIKE"}
+	lookup.rhs = interfaceToSql(value)
+	return lookup
+}
+
+func (f Field) Contains(value string) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = "%" + value + "%"
 	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
-func IContains(field string, value string) lookup {
-	lookup := lookup{lhs: field, lookupName: "ILIKE"}
+func (f Field) IContains(value string) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "ILIKE"}
 	value = "%" + value + "%"
 	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
-func In(field string, values ...interface{}) lookup {
-	lookup := lookup{lhs: field, lookupName: "IN"}
+func (f Field) In(values ...interface{}) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "IN"}
 	lookup.rhs = interfaceToSql(values)
 	return lookup
 }
 
-// func InInt(field string, values ...int) lookup {
-// 	return lookup{}
-// }
-//
-// func InString(field string, values ...string) lookup {
-// 	return lookup{}
-// }
-//
-// func InQs(field string, qs QuerySet) lookup {
-// 	return lookup{}
-// }
-
-func Gt(field string, value interface{}) lookup {
-	lookup := lookup{lhs: field, lookupName: ">"}
+func (f Field) Gt(value interface{}) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: ">"}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func Gte(field string, value interface{}) lookup {
-	lookup := lookup{lhs: field, lookupName: ">="}
+func (f Field) Gte(value interface{}) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: ">="}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func Lt(field string, value interface{}) lookup {
-	lookup := lookup{lhs: field, lookupName: "<"}
+func (f Field) Lt(value interface{}) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "<"}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func Lte(field string, value interface{}) lookup {
-	lookup := lookup{lhs: field, lookupName: "<="}
+func (f Field) Lte(value interface{}) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "<="}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func StartsWith(field string, value string) lookup {
-	lookup := lookup{lhs: field, lookupName: "LIKE"}
+func (f Field) StartsWith(value string) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = value + "%"
 	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
-func IStartsWith(field string, value string) lookup {
-	lookup := lookup{lhs: field, lookupName: "LIKE"}
+func (f Field) IStartsWith(value string) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = value + "%"
 	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
-func EndsWith(field string, value string) lookup {
-	lookup := lookup{lhs: field, lookupName: "LIKE"}
+func (f Field) EndsWith(value string) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = "%" + value
 	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
-func IEndsWith(field string, value string) lookup {
-	lookup := lookup{lhs: field, lookupName: "LIKE"}
+func (f Field) IEndsWith(value string) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = "%" + value
 	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
-func IsNull(field string, value bool) lookup {
-	lookup := lookup{lhs: field, lookupName: "IS"}
+func (f Field) IsNull(value bool) lookup {
+	fieldName := doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+	lookup := lookup{lhs: fieldName, lookupName: "IS"}
 
 	if value {
 		lookup.rhs = "NULL"

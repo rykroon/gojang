@@ -1,7 +1,6 @@
 package models
 
 import (
-	//"strings"
 )
 
 type QuerySet struct {
@@ -40,7 +39,8 @@ func (q QuerySet) processSelect() string {
 	}
 
 	if len(q.selected) == 0 && len(q.deferred) == 0 {
-		return "*"
+		sql += "*"
+		return sql
 	}
 
 	selected := []string{}
@@ -115,35 +115,18 @@ func (q QuerySet) processOrderBy() string {
 
 //Functions that return QuerySets
 
-// func (q QuerySet) Filter(l lookup) QuerySet {
-// 	q.where = append(q.where, l.toSql())
-// 	q.Query = q.buildQuery()
-// 	return q
-// }
-//
-// func (q QuerySet) Exclude(l lookup) QuerySet {
-// 	sql := "NOT(" + l.toSql() + ")"
-// 	q.where = append(q.where, sql)
-// 	q.Query = q.buildQuery()
-// 	return q
-// }
-
-
-
-func (q QuerySet) Filter(field string, value interface{}) QuerySet {
-	//q.where = append(q.where, l.toSql())
+func (q QuerySet) Filter(l lookup) QuerySet {
+	q.where = append(q.where, l.asSql())
 	q.Query = q.buildQuery()
 	return q
 }
 
-func (q QuerySet) Exclude(field string, value interface{}) QuerySet {
-	//sql := "NOT(" + l.toSql() + ")"
-	//q.where = append(q.where, sql)
+func (q QuerySet) Exclude(l lookup) QuerySet {
+	sql := "NOT(" + l.asSql() + ")"
+	q.where = append(q.where, sql)
 	q.Query = q.buildQuery()
 	return q
 }
-
-
 
 func (q QuerySet) OrderBy(fields ...string) QuerySet {
 	for _, field := range fields {

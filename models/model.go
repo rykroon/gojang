@@ -25,11 +25,11 @@ func (m *Model) AddField(fieldName string, f Field) {
 
 	//if f.foreignKey && (f.dbColumn == "") {
 	if f.isRelation && (f.dbColumn == "") {
-		f.dbColumn = doubleQuotes(fieldName + "_id")
+		f.dbColumn = fieldName + "_id"
 	}
 
 	if f.dbColumn == "" {
-		f.dbColumn = doubleQuotes(fieldName)
+		f.dbColumn = fieldName
 	}
 
 	m.fields[fieldName] = f
