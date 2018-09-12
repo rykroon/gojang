@@ -16,18 +16,9 @@ func singleQuotes(s string) string {
 	return "'" + s + "'"
 }
 
-func interfaceSliceToSql(slice []interface{}) string {
-	s := "("
-
-	for _, value := range slice {
-		s += interfaceToSql(value) + ", "
-	}
-
-	s = s[0:len(s)-2] + ")"
-	return s
-}
-
 func interfaceToSql(i interface{}) string {
+//Process Right-Hand side of Lookup
+//func processRHS(i interface{}) string {
 	t := reflect.TypeOf(i).String()
 	k := reflect.TypeOf(i).Kind()
 
@@ -107,6 +98,18 @@ func interfaceToSql(i interface{}) string {
 	return ""
 }
 
+func interfaceSliceToSql(slice []interface{}) string {
+	s := "("
+
+	for _, value := range slice {
+		s += interfaceToSql(value) + ", "
+	}
+
+	s = s[0:len(s)-2] + ")"
+	return s
+}
+
+
 func sliceStringToSql(slice []string) string {
 	s := "("
 
@@ -122,6 +125,8 @@ func sliceStringToSql(slice []string) string {
 func stringToSql(s string) string {
 	return singleQuotes(s)
 }
+
+
 
 func sliceIntToSql(slice []int) string {
 	s := "("
@@ -139,17 +144,25 @@ func intToSql(i int) string {
 	return strconv.Itoa(i)
 }
 
+
+
 func int32ToSql(i int32) string {
 	return strconv.Itoa(int(i))
 }
+
+
 
 func int64ToSql(i int64) string {
 	return strconv.Itoa(int(i))
 }
 
+
+
 func float64ToSql(f float64) string {
 	return strconv.FormatFloat(f, 'f', -1, 64)
 }
+
+
 
 func boolToSql(b bool) string {
 	if b {
@@ -158,5 +171,3 @@ func boolToSql(b bool) string {
 		return "FALSE"
 	}
 }
-
-//Constants

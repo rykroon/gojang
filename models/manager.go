@@ -15,14 +15,26 @@ func (m Manager) All() QuerySet {
 	return qs
 }
 
-func (m Manager) Filter(l lookup) QuerySet {
+func (m Manager) Filter(fieldLookup string, value interface{}) QuerySet {
 	qs := m.All()
-	qs = qs.Filter(l)
+	qs = qs.Filter(fieldLookup, value)
 	return qs
 }
 
-func (m Manager) Exclude(l lookup) QuerySet {
+func (m Manager) Exclude(fieldLookup string, value interface{}) QuerySet {
 	qs := m.All()
-	qs = qs.Exclude(l)
+	qs = qs.Exclude(fieldLookup, value)
 	return qs
 }
+
+// func (m Manager) Filter(l lookup) QuerySet {
+// 	qs := m.All()
+// 	qs = qs.Filter(l)
+// 	return qs
+// }
+//
+// func (m Manager) Exclude(l lookup) QuerySet {
+// 	qs := m.All()
+// 	qs = qs.Exclude(l)
+// 	return qs
+// }

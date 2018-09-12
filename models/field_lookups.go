@@ -2,6 +2,7 @@ package models
 
 import (
 //"strconv"
+	"strings"
 )
 
 type lookup struct {
@@ -10,25 +11,74 @@ type lookup struct {
 	rhs        string
 }
 
+func newLookup(field string, lookup string, value interface{}) lookup {
+	l := lookup{}
+	l.lhs = field
+	l.lookup = lookupToOperator(lookup)
+	l.rhs = interfaceToSql(value)
+
+	return l
+}
+
 func (l lookup) toSql() string {
 	return l.lhs + " " + l.lookupName + " " + l.rhs
 }
 
+func lookupToOperator(lookup string) string {
+	switch lookup {
+	case "exact":
+		return "="
+
+	case "iexact":
+		return "LIKE"
+
+	case "contains":
+		return "LIKE"
+
+	case "icontains":
+		return "ILIKE"
+
+	case "in":
+		return "IN"
+
+	case "gt":
+		return ">"
+
+	case "gte":
+		return "<="
+
+	case "lt":
+		return "<"
+
+	case "lte":
+		return "<="
+
+	case "startswith":
+		return "LIKE"
+
+	case "istartswith":
+		return "ILIKE"
+
+	case "endswith":
+		return "LIKE"
+
+	case "iendswith":
+		return "ILIKE"
+
+	case "isnull":
+		return "IS"
+	}
+
+	return ""
+
+}
+
+
+
+
 func Exact(field string, value interface{}) lookup {
 	lookup := lookup{lhs: field, lookupName: "="}
 	lookup.rhs = interfaceToSql(value)
-	return lookup
-}
-
-func ExactInt(field string, value int) lookup {
-	lookup := lookup{lhs: field, lookupName: "="}
-	lookup.rhs = intToSql(value)
-	return lookup
-}
-
-func ExactString(field string, value string) lookup {
-	lookup := lookup{lhs: field, lookupName: "="}
-	lookup.rhs = stringToSql(value)
 	return lookup
 }
 
@@ -52,17 +102,17 @@ func In(field string, values ...interface{}) lookup {
 	return lookup
 }
 
-func InInt(field string, values ...int) lookup {
-	return lookup{}
-}
-
-func InString(field string, values ...string) lookup {
-	return lookup{}
-}
-
-func InQs(field string, qs QuerySet) lookup {
-	return lookup{}
-}
+// func InInt(field string, values ...int) lookup {
+// 	return lookup{}
+// }
+//
+// func InString(field string, values ...string) lookup {
+// 	return lookup{}
+// }
+//
+// func InQs(field string, qs QuerySet) lookup {
+// 	return lookup{}
+// }
 
 func Gt(field string, value interface{}) lookup {
 	lookup := lookup{lhs: field, lookupName: ">"}

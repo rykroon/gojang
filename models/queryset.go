@@ -1,8 +1,12 @@
 package models
 
-import ()
+import (
+	"strings"
+)
 
 type QuerySet struct {
+	//Db ...some sort of db connection
+
 	model *Model
 	Query string
 
@@ -13,6 +17,7 @@ type QuerySet struct {
 	where    []string
 	//groupBy      string
 	//having       string
+	Ordered bool
 	orderBy []string
 }
 
@@ -110,18 +115,35 @@ func (q QuerySet) processOrderBy() string {
 
 //Functions that return QuerySets
 
-func (q QuerySet) Filter(l lookup) QuerySet {
-	q.where = append(q.where, l.toSql())
+// func (q QuerySet) Filter(l lookup) QuerySet {
+// 	q.where = append(q.where, l.toSql())
+// 	q.Query = q.buildQuery()
+// 	return q
+// }
+//
+// func (q QuerySet) Exclude(l lookup) QuerySet {
+// 	sql := "NOT(" + l.toSql() + ")"
+// 	q.where = append(q.where, sql)
+// 	q.Query = q.buildQuery()
+// 	return q
+// }
+
+
+
+func (q QuerySet) Filter(field string, lookup string, value interface{}) QuerySet {
+	//q.where = append(q.where, l.toSql())
 	q.Query = q.buildQuery()
 	return q
 }
 
-func (q QuerySet) Exclude(l lookup) QuerySet {
-	sql := "NOT(" + l.toSql() + ")"
-	q.where = append(q.where, sql)
+func (q QuerySet) Exclude(field string, lookup string, value interface{}) QuerySet {
+	//sql := "NOT(" + l.toSql() + ")"
+	//q.where = append(q.where, sql)
 	q.Query = q.buildQuery()
 	return q
 }
+
+
 
 func (q QuerySet) OrderBy(fields ...string) QuerySet {
 	for _, field := range fields {

@@ -46,6 +46,15 @@ func (m Model) NewInstance() Instance {
 	return i
 }
 
+func (m Model) getPrimaryKeyField() Field {
+	for _, field := range m.fields {
+		if field.primaryKey {
+			return field
+		}
+	}
+	return Field{}
+}
+
 //Checks if the Model as a Primary Key Field
 func (m Model) hasPrimaryKey() bool {
 	for _, field := range m.fields {
@@ -53,7 +62,6 @@ func (m Model) hasPrimaryKey() bool {
 			return true
 		}
 	}
-
 	return false
 }
 
@@ -67,6 +75,7 @@ func (m Model) fieldList() []string {
 
 	return list
 }
+
 
 func (m *Model) Migrate() {
 	if !m.hasPrimaryKey() {
