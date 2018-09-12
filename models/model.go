@@ -21,6 +21,8 @@ func NewModel(dbTable string) Model {
 
 //Add a Field to the Model
 func (m *Model) AddField(fieldName string, f Field) {
+	f.model = m
+
 	//if f.foreignKey && (f.dbColumn == "") {
 	if f.isRelation && (f.dbColumn == "") {
 		f.dbColumn = doubleQuotes(fieldName + "_id")
@@ -79,7 +81,9 @@ func (m Model) fieldList() []string {
 
 func (m *Model) Migrate() {
 	if !m.hasPrimaryKey() {
-		m.AddField("id", AutoField().PrimaryKey(true))
+		pkey := AutoField().PrimaryKey(true)
+		pkey.autoCreated = true
+		m.AddField("id", pkey)
 	}
 
 	//sql := m.CreateTable()

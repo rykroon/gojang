@@ -2,22 +2,17 @@ package models
 
 import (
 //"strconv"
-	"strings"
+	//"strings"
 )
+
+type otherLookup struct {
+	
+}
 
 type lookup struct {
 	lhs        string
 	lookupName string
 	rhs        string
-}
-
-func newLookup(field string, lookup string, value interface{}) lookup {
-	l := lookup{}
-	l.lhs = field
-	l.lookup = lookupToOperator(lookup)
-	l.rhs = interfaceToSql(value)
-
-	return l
 }
 
 func (l lookup) toSql() string {

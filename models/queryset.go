@@ -1,7 +1,7 @@
 package models
 
 import (
-	"strings"
+	//"strings"
 )
 
 type QuerySet struct {
@@ -130,13 +130,13 @@ func (q QuerySet) processOrderBy() string {
 
 
 
-func (q QuerySet) Filter(field string, lookup string, value interface{}) QuerySet {
+func (q QuerySet) Filter(field string, value interface{}) QuerySet {
 	//q.where = append(q.where, l.toSql())
 	q.Query = q.buildQuery()
 	return q
 }
 
-func (q QuerySet) Exclude(field string, lookup string, value interface{}) QuerySet {
+func (q QuerySet) Exclude(field string, value interface{}) QuerySet {
 	//sql := "NOT(" + l.toSql() + ")"
 	//q.where = append(q.where, sql)
 	q.Query = q.buildQuery()
