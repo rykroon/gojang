@@ -7,18 +7,32 @@ import (
 //Primary Key Option
 func (f Field) PrimaryKey(value bool) Field {
 	f.primaryKey = value
+	f.null=false
+	f.unique=true
 	return f
 }
 
 //Unique Field Option
-func (f Field) Unique(value bool) Field {
-	f.unique = value
+func (f Field) Unique(unique bool) Field {
+	if (f.manyToMany || f.oneToOne) && unique {
+		panic("Option unique is not valid for ManyToMany and OneToOne Fields")
+	}
+
+	if f.primaryKey && !unique {
+		panic("Primary Key must be unique")
+	}
+
+	f.unique = unique
 	return f
 }
 
 //Null Field Option
-func (f Field) Null(value bool) Field {
-	f.null = value
+func (f Field) Null(null bool) Field {
+	f.null = null
+
+	if f.primaryKey && null {
+		panic("Primary Key cannot be null")
+	}
 
 	if f.null {
 		switch f.goType {
@@ -51,6 +65,8 @@ func (f Field) Default(i interface{}) Field {
 
 	if t == f.goType {
 		f.defaultValue = interfaceToSql(i)
+	} else {
+		panic("Default value is not the same type as the field")
 	}
 
 	return f

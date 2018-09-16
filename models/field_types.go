@@ -92,7 +92,8 @@ func TextField() Field {
 
 //Relation Fields
 func ForeignKey(to *Model, onDelete onDelete) Field {
-	field := Field{dbType: "INTEGER", goType:"int32"}
+	relatedPkey := to.getPrimaryKey()
+	field := Field{dbType: relatedPkey.dbType, goType: relatedPkey.goType}
 	field.isRelation = true
 	field.relatedModel = to
 	field.onDelete = onDelete
@@ -101,7 +102,8 @@ func ForeignKey(to *Model, onDelete onDelete) Field {
 }
 
 func OneToOneField(to *Model, onDelete onDelete) Field {
-	field := Field{dbType: "INTEGER", goType:"int32"}
+	relatedPkey := to.getPrimaryKey()
+	field := Field{dbType: relatedPkey.dbType, goType: relatedPkey.goType}
 	field.isRelation = true
 	field.relatedModel = to
 	field.onDelete = onDelete
@@ -110,7 +112,8 @@ func OneToOneField(to *Model, onDelete onDelete) Field {
 }
 
 func ManyToManyField(to *Model, onDelete onDelete) Field {
-	field := Field{dbType: "INTEGER", goType:"int32"}
+	relatedPkey := to.getPrimaryKey()
+	field := Field{dbType: relatedPkey.dbType, goType: relatedPkey.goType}
 	field.isRelation = true
 	field.relatedModel = to
 	field.onDelete = onDelete
@@ -120,7 +123,7 @@ func ManyToManyField(to *Model, onDelete onDelete) Field {
 
 
 func (f Field) create() string {
-	s := f.dbColumn + " " + f.dbType
+	s := doubleQuotes(f.dbColumn) + " " + f.dbType
 
 	if f.primaryKey {
 		s += " PRIMARY KEY"

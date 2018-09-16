@@ -26,3 +26,9 @@ func (m Manager) Exclude(l lookup) QuerySet {
 	qs = qs.Exclude(l)
 	return qs
 }
+
+//Should the parameter be a lookup or do I create an aggregattion struct?
+func (m Manager) Annotate() QuerySet {
+	qs := m.All()
+	return qs
+}

@@ -20,19 +20,29 @@ func NewModel(dbTable string) Model {
 }
 
 //Add a Field to the Model
-func (m *Model) AddField(fieldName string, f Field) {
-	f.model = m
+func (m *Model) AddField(fieldName string, field Field) {
+	field.model = m
 
-	//if f.foreignKey && (f.dbColumn == "") {
-	if f.isRelation && (f.dbColumn == "") {
-		f.dbColumn = fieldName + "_id"
+	if field.isRelation {
+		if field.dbColumn == "" {
+			field.dbColumn = fieldName + "_id"
+		}
+
+		if field.manyToOne { //Foreign Key
+			//reverseFieldName :+ fieldName + "_set"
+			//reverseField :=
+			//reverseField.concrete = false //should proably set this to true for other situations
+			//field.relatedModel.AddField(reverseFieldName)
+		}
+
 	}
 
-	if f.dbColumn == "" {
-		f.dbColumn = fieldName
+
+	if field.dbColumn == "" {
+		field.dbColumn = fieldName
 	}
 
-	m.fields[fieldName] = f
+	m.fields[fieldName] = field
 }
 
 //Get a Field from the Model
@@ -48,7 +58,7 @@ func (m Model) NewInstance() Instance {
 	return i
 }
 
-func (m Model) getPrimaryKeyField() Field {
+func (m Model) getPrimaryKey() Field {
 	for _, field := range m.fields {
 		if field.primaryKey {
 			return field
@@ -67,12 +77,23 @@ func (m Model) hasPrimaryKey() bool {
 	return false
 }
 
-//returns a list of the Model's field names
-func (m Model) fieldList() []string {
+//returns a list of the Model's field
+func (m Model) fieldList() []Field {
+	list := []Field{}
+
+	for _, field := range m.fields {
+		list = append(list, field)
+	}
+
+	return list
+}
+
+//returns a list of the model's fields in SQL format
+func (m Model) sqlFieldList() []string {
 	list := []string{}
 
-	for key, _ := range m.fields {
-		list = append(list, key)
+	for _, field := range m.fields {
+		list = append(list, field.toSql())
 	}
 
 	return list
