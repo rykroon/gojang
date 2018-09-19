@@ -16,7 +16,6 @@ func (f Field) toSql() string {
 	return doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
 }
 
-
 func (f Field) Exact(value interface{}) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "="}

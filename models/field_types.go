@@ -5,12 +5,12 @@ import (
 	//"reflect"
 )
 
-type Field struct {//Required Attributes
+type Field struct { //Required Attributes
 
 	dbColumn string
-	dbType string
-	goType string
-	model *Model
+	dbType   string
+	goType   string
+	model    *Model
 
 	//specific for CharField
 	maxLength int
@@ -20,29 +20,30 @@ type Field struct {//Required Attributes
 	decimalPlaces int
 
 	//Constraint Attributes
-	null       bool
-	primaryKey bool
-	unique     bool
+	null         bool
+	primaryKey   bool
+	unique       bool
 	defaultValue string
 
 	//Other Attributes
 	autoCreated bool
-	concrete bool
-	hidden bool
+	concrete    bool
+	hidden      bool
 
 	//Relation Attributes
-	isRelation bool
-	manyToMany bool
-	manyToOne bool
-	oneToMany bool
-	oneToOne bool
+	isRelation   bool
+	manyToMany   bool
+	manyToOne    bool
+	oneToMany    bool
+	oneToOne     bool
 	relatedModel *Model
 
 	//foreignKey bool
-	onDelete   onDelete
+	onDelete onDelete
 }
 
 type onDelete string
+
 const Cascade onDelete = "CASCADE"
 const Protect onDelete = "RESTRICT"
 const SetNull onDelete = "SET NULL"
@@ -77,18 +78,16 @@ func DecimalField(maxDigits int, decimalPlaces int) Field {
 }
 
 func FloatField() Field {
-	return Field{dbType: "DOUBLE PRECISION", goType:"float64"}
+	return Field{dbType: "DOUBLE PRECISION", goType: "float64"}
 }
 
 func IntegerField() Field {
-	return Field{dbType: "INTEGER", goType:"int32"}
+	return Field{dbType: "INTEGER", goType: "int32"}
 }
 
 func TextField() Field {
-	return Field{dbType: "TEXT", goType:"string"}
+	return Field{dbType: "TEXT", goType: "string"}
 }
-
-
 
 //Relation Fields
 func ForeignKey(to *Model, onDelete onDelete) Field {
@@ -120,7 +119,6 @@ func ManyToManyField(to *Model, onDelete onDelete) Field {
 	field.manyToMany = true
 	return field
 }
-
 
 func (f Field) create() string {
 	s := doubleQuotes(f.dbColumn) + " " + f.dbType

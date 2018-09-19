@@ -9,8 +9,8 @@ func (f Field) PrimaryKey(value bool) Field {
 	f.primaryKey = value
 
 	if f.primaryKey {
-		f.null=false
-		f.unique=true
+		f.null = false
+		f.unique = true
 	}
 
 	return f

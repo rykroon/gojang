@@ -43,7 +43,6 @@ func (m *Model) AddField(fieldName string, field Field) {
 
 	}
 
-
 	if field.dbColumn == "" {
 		field.dbColumn = fieldName
 	}
@@ -104,7 +103,6 @@ func (m Model) sqlFieldList() []string {
 
 	return list
 }
-
 
 func (m *Model) Migrate() {
 	if !m.hasPrimaryKey() {

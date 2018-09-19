@@ -9,12 +9,12 @@ type dbDataType string
 const bigInt dbDataType = "BIGINT"
 const bigSerial dbDataType = "BIGSERIAL"
 const boolean dbDataType = "BOOLEAN"
-const varChar dbDataType ="VARCHAR"
-const doublPrecision dbDataType ="DOUBLE PRECISION"
-const integer dbDataType ="INTEGER"
-const numeric dbDataType ="NUMERIC"
-const serial dbDataType ="SERIAL"
-const text dbDataType ="TEXT"
+const varChar dbDataType = "VARCHAR"
+const doublPrecision dbDataType = "DOUBLE PRECISION"
+const integer dbDataType = "INTEGER"
+const numeric dbDataType = "NUMERIC"
+const serial dbDataType = "SERIAL"
+const text dbDataType = "TEXT"
 
 func (d dbDataType) addParms(parms ...int) dbDataType {
 	str := "("
@@ -27,13 +27,12 @@ func (d dbDataType) addParms(parms ...int) dbDataType {
 	}
 
 	if str != "(" {
-		str = str[0: len(str) - 2]
+		str = str[0 : len(str)-2]
 		d += dbDataType(str)
 	}
 
 	return d
 }
-
 
 // type dbDataType struct {
 // 	dataType  string
