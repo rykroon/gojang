@@ -7,15 +7,19 @@ import (
 //Primary Key Option
 func (f Field) PrimaryKey(value bool) Field {
 	f.primaryKey = value
-	f.null=false
-	f.unique=true
+
+	if f.primaryKey {
+		f.null=false
+		f.unique=true
+	}
+
 	return f
 }
 
 //Unique Field Option
 func (f Field) Unique(unique bool) Field {
 	if (f.manyToMany || f.oneToOne) && unique {
-		panic("Option unique is not valid for ManyToMany and OneToOne Fields")
+		panic("Unique option is not valid for ManyToMany and OneToOne Fields")
 	}
 
 	if f.primaryKey && !unique {

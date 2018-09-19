@@ -9,9 +9,11 @@ type QuerySet struct {
 	model *Model
 	Query string
 
+	distinct bool
 	selected []string
 	deferred []string
-	distinct bool
+	annotated []string //add some logic
+
 	from     string
 	where    []string
 	//groupBy      string
@@ -42,10 +44,10 @@ func (q QuerySet) processSelect() string {
 	sql := "SELECT "
 
 	if q.distinct {
-		sql += " DISTINCT "
+		sql += "DISTINCT "
 	}
 
-	if len(q.selected) == 0 && len(q.deferred) == 0 {
+	if len(q.selected) == 0 && len(q.deferred) == 0 && len(q.annotated) == 0 {
 		sql += "*"
 		return sql
 	}
@@ -75,6 +77,12 @@ func (q QuerySet) processSelect() string {
 		}
 
 		sql += field + ", "
+	}
+
+	if len(q.annotated) != 0 {
+		for _,annotation := range q.annotated {
+			sql += annotation + ", "
+		}
 	}
 
 	sql = sql[0 : len(sql)-2]
@@ -145,10 +153,11 @@ func (q QuerySet) Exclude(l lookup) QuerySet {
 }
 
 func (q QuerySet) Annotate(a aggregate) QuerySet {
-	q.selected = append(q.selected, a.asSql())
+	q.annotated = append(q.annotated, a.asSql())
 	q.Query = q.buildQuery()
 	return q
 }
+
 
 func (q QuerySet) OrderBy(sortExpressions ...sortExpression) QuerySet {
 	for _, sortExpression := range sortExpressions {
@@ -158,6 +167,7 @@ func (q QuerySet) OrderBy(sortExpressions ...sortExpression) QuerySet {
 	q.Query = q.buildQuery()
 	return q
 }
+
 
 func (q QuerySet) Distinct(fields ...Field) QuerySet {
 	q.distinct = true
@@ -169,6 +179,7 @@ func (q QuerySet) Distinct(fields ...Field) QuerySet {
 	q.Query = q.buildQuery()
 	return q
 }
+
 
 //add fields to the deferred list
 func (q QuerySet) Defer(fields ...Field) QuerySet {

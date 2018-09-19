@@ -1,6 +1,8 @@
 package models
 
-import ()
+import (
+  "strings"
+)
 
 
 type aggregate struct {
@@ -10,7 +12,7 @@ type aggregate struct {
 }
 
 func (a aggregate) asSql() string {
-  name := doubleQuotes(a.field.dbColumn + "__" + a.function)
+  name := doubleQuotes(a.field.dbColumn + "__" + strings.ToLower(a.function))
   return a.function + "(" + a.field.toSql() + ") as " + name
 }
 

@@ -23,6 +23,12 @@ func NewModel(dbTable string) Model {
 func (m *Model) AddField(fieldName string, field Field) {
 	field.model = m
 
+	if field.primaryKey {
+		if m.hasPrimaryKey() {
+			panic("Model already has a primary key")
+		}
+	}
+
 	if field.isRelation {
 		if field.dbColumn == "" {
 			field.dbColumn = fieldName + "_id"
@@ -77,7 +83,7 @@ func (m Model) hasPrimaryKey() bool {
 	return false
 }
 
-//returns a list of the Model's field
+//returns a list of the Model's fields
 func (m Model) fieldList() []Field {
 	list := []Field{}
 
