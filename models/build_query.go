@@ -6,7 +6,7 @@ func (q QuerySet) buildQuery() string {
 	sql := ""
 	sql += q.processSelect()
 	//sql += " FROM " + q.from
-  sql += q.processFrom()
+	sql += q.processFrom()
 	sql += q.processWhere()
 	sql += q.processOrderBy()
 
@@ -21,45 +21,51 @@ func (q QuerySet) processSelect() string {
 		sql += "DISTINCT "
 	}
 
-	if len(q.selected) == 0 && len(q.deferred) == 0 && len(q.annotated) == 0 {
+	if q.select_ == "" {
 		sql += "*"
-		return sql
-	}
-
-	selected := []string{}
-
-	if len(q.selected) != 0 {
-		selected = q.selected
 	} else {
-		selected = q.model.sqlFieldList()
+		sql += q.select_
 	}
 
-	for _, field := range selected {
-		foundDefer := false
+	// if len(q.selected) == 0 && len(q.deferred) == 0 && len(q.annotated) == 0 {
+	// 	sql += "*"
+	// 	return sql
+	// }
 
-		if len(q.deferred) != 0 {
-			for _, deferredField := range q.deferred {
-				if field == deferredField {
-					foundDefer = true
-					break
-				}
-			}
+	// selected := []string{}
+	//
+	// if len(q.selected) != 0 {
+	// 	selected = q.selected
+	// } else {
+	// 	selected = q.model.sqlFieldList()
+	// }
 
-			if foundDefer {
-				continue
-			}
-		}
-
-		sql += field + ", "
-	}
-
-	if len(q.annotated) != 0 {
-		for _, annotation := range q.annotated {
-			sql += annotation + ", "
-		}
-	}
-
-	sql = sql[0 : len(sql)-2]
+	// for _, field := range selected {
+	// 	foundDefer := false
+	//
+	// 	if len(q.deferred) != 0 {
+	// 		for _, deferredField := range q.deferred {
+	// 			if field == deferredField {
+	// 				foundDefer = true
+	// 				break
+	// 			}
+	// 		}
+	//
+	// 		if foundDefer {
+	// 			continue
+	// 		}
+	// 	}
+	//
+	// 	sql += field + ", "
+	// }
+	//
+	// if len(q.annotated) != 0 {
+	// 	for _, annotation := range q.annotated {
+	// 		sql += annotation + ", "
+	// 	}
+	// }
+	//
+	// sql = sql[0 : len(sql)-2]
 	return sql
 }
 
@@ -70,14 +76,14 @@ func (q QuerySet) processFrom() string {
 
 	for _, field := range q.model.fieldList() {
 		if field.isRelation {
-      joinModel := field.relatedModel
-      joinTable := joinModel.dbTable
-      joinField := joinModel.getPrimaryKey().toSql()
-      sql += " JOIN " + joinTable + " ON " + field.toSql() + " = " + joinField
-    }
+			joinModel := field.relatedModel
+			joinTable := joinModel.dbTable
+			joinField := joinModel.getPrimaryKey().toSql()
+			sql += " JOIN " + joinTable + " ON " + field.toSql() + " = " + joinField
+		}
 	}
 
-  return sql
+	return sql
 }
 
 func (q QuerySet) processWhere() string {

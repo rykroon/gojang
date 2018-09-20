@@ -16,6 +16,14 @@ func singleQuotes(s string) string {
 	return "'" + s + "'"
 }
 
+func (l lookup) toSql() string {
+	return l.lhs + " " + l.lookupName + " " + l.rhs
+}
+
+func (f Field) toSql() string {
+	return doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+}
+
 func interfaceToSql(i interface{}) string {
 	//Process Right-Hand side of Lookup
 	//func processRHS(i interface{}) string {

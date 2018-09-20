@@ -16,6 +16,10 @@ func NewModel(dbTable string) Model {
 	m := Model{dbTable: dbTable}
 	m.Objects.model = &m
 	m.fields = make(map[string]Field)
+
+	pkey := AutoField().PrimaryKey(true)
+	pkey.autoCreated = true
+	m.AddField("id", pkey)
 	return m
 }
 
@@ -23,9 +27,21 @@ func NewModel(dbTable string) Model {
 func (m *Model) AddField(fieldName string, field Field) {
 	field.model = m
 
+	_, found := m.fields[fieldName]
+
+	if found { //check for duplicate field
+		panic("Field name already exists")
+	}
+
 	if field.primaryKey {
 		if m.hasPrimaryKey() {
-			panic("Model already has a primary key")
+			pkey := m.getPrimaryKey()
+
+			if pkey.autoCreated {
+				delete(m.fields, "id")
+			} else {
+				panic("Model already has a primary key")
+			}
 		}
 	}
 
@@ -40,7 +56,6 @@ func (m *Model) AddField(fieldName string, field Field) {
 			//reverseField.concrete = false //should proably set this to true for other situations
 			//field.relatedModel.AddField(reverseFieldName)
 		}
-
 	}
 
 	if field.dbColumn == "" {
@@ -105,13 +120,6 @@ func (m Model) sqlFieldList() []string {
 }
 
 func (m *Model) Migrate() {
-	if !m.hasPrimaryKey() {
-		pkey := AutoField().PrimaryKey(true)
-		pkey.autoCreated = true
-		m.AddField("id", pkey)
-	}
-
-	//sql := m.CreateTable()
 
 }
 

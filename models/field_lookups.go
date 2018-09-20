@@ -1,19 +1,13 @@
 package models
 
-import ()
+import (
+	"reflect"
+)
 
 type lookup struct {
 	lhs        string
 	lookupName string
 	rhs        string
-}
-
-func (l lookup) asSql() string {
-	return l.lhs + " " + l.lookupName + " " + l.rhs
-}
-
-func (f Field) toSql() string {
-	return doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
 }
 
 func (f Field) Exact(value interface{}) lookup {
@@ -110,6 +104,17 @@ func (f Field) IEndsWith(value string) lookup {
 	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = "%" + value
 	lookup.rhs = stringToSql(value)
+	return lookup
+}
+
+func (f Field) Range(from interface{}, to interface{}) lookup {
+	if reflect.TypeOf(from) != reflect.TypeOf(to) {
+		panic("Values have mismatching types")
+	}
+
+	fieldName := f.toSql()
+	lookup := lookup{lhs: fieldName, lookupName: "BETWEEN"}
+	lookup.rhs = interfaceToSql(from) + " AND " + interfaceToSql(to)
 	return lookup
 }
 
