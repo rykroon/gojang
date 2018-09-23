@@ -1,11 +1,15 @@
 package models
 
-import ()
+import (
+	"database/sql"
+)
 
 type Model struct {
 	dbTable string
 	Objects Manager
 	fields  map[string]field
+
+	db sql.DB
 
 	//Meta
 	//uniqueTogether []string

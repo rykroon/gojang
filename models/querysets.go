@@ -1,15 +1,17 @@
 package models
 
-import ()
+import (
+	"database/sql"
+)
 
 type QuerySet struct {
 	//Db ...some sort of db connection
+	db        sql.DB
+	model     *Model
+	Query     string
+	evaluated bool
 
-	model *Model
-	Query string
-
-	distinct bool
-	//select_  string
+	distinct  bool
 	selected  []string
 	deferred  []string
 	annotated []string
@@ -20,6 +22,8 @@ type QuerySet struct {
 	//having       string
 	Ordered bool
 	orderBy []sortExpression
+
+	rows sql.Rows
 }
 
 type sortExpression struct {
@@ -76,6 +80,12 @@ func (q QuerySet) Distinct(fields ...field) QuerySet {
 	return q
 }
 
+func (q QuerySet) All() QuerySet {
+	q.evaluated = false
+	//maybe do other stuff?
+	return q
+}
+
 //add fields to the deferred list
 func (q QuerySet) Defer(fields ...field) QuerySet {
 	for _, field := range fields {
@@ -102,6 +112,7 @@ func (q QuerySet) Only(fields ...field) QuerySet {
 //Functions that do not return Querysets
 
 func (q QuerySet) Get() Instance {
+	//row := q.queryRow()
 	return Instance{}
 }
 
@@ -112,7 +123,15 @@ func (q QuerySet) Count() int {
 
 	q.selected = append(q.selected, "COUNT(*)")
 	q.Query = q.buildQuery()
-	return 0
+
+	var count int
+	err := q.queryRow().Scan(&count)
+
+	if err != nil {
+		return count
+	}
+
+	return -1
 }
 
 func (q QuerySet) First() Instance {
@@ -139,4 +158,18 @@ func (q QuerySet) Exists() bool {
 
 func (q QuerySet) Delete() {
 
+}
+
+//database/sql wrappers
+
+func (q QuerySet) exec() (sql.Result, error) {
+	return q.db.Exec(q.Query)
+}
+
+func (q QuerySet) query() (*sql.Rows, error) {
+	return q.db.Query(q.Query)
+}
+
+func (q QuerySet) queryRow() *sql.Row {
+	return q.db.QueryRow(q.Query)
 }
