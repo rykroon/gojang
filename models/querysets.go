@@ -9,10 +9,10 @@ type QuerySet struct {
 	Query string
 
 	distinct bool
-	select_  string
-	//selected  []string
-	//deferred  []string
-	//annotated []string
+	//select_  string
+	selected  []string
+	deferred  []string
+	annotated []string
 
 	from  string
 	where []string
@@ -50,11 +50,11 @@ func (q QuerySet) Exclude(l lookup) QuerySet {
 	return q
 }
 
-// func (q QuerySet) Annotate(a aggregate) QuerySet {
-// 	q.annotated = append(q.annotated, a.asSql())
-// 	q.Query = q.buildQuery()
-// 	return q
-// }
+func (q QuerySet) Annotate(a aggregate) QuerySet {
+	q.annotated = append(q.annotated, a.asSql())
+	q.Query = q.buildQuery()
+	return q
+}
 
 func (q QuerySet) OrderBy(sortExpressions ...sortExpression) QuerySet {
 	for _, sortExpression := range sortExpressions {
@@ -65,45 +65,39 @@ func (q QuerySet) OrderBy(sortExpressions ...sortExpression) QuerySet {
 	return q
 }
 
-func (q QuerySet) Distinct() QuerySet {
+func (q QuerySet) Distinct(fields ...Field) QuerySet {
 	q.distinct = true
+
+	for _, field := range fields {
+		q.selected = append(q.selected, field.toSql())
+	}
+
 	q.Query = q.buildQuery()
 	return q
 }
 
-// func (q QuerySet) Distinct(fields ...Field) QuerySet {
-// 	q.distinct = true
-//
-// 	for _, field := range fields {
-// 		q.selected = append(q.selected, field.toSql())
-// 	}
-//
-// 	q.Query = q.buildQuery()
-// 	return q
-// }
-
 //add fields to the deferred list
-// func (q QuerySet) Defer(fields ...Field) QuerySet {
-// 	for _, field := range fields {
-// 		q.deferred = append(q.deferred, field.toSql())
-// 	}
-//
-// 	q.Query = q.buildQuery()
-// 	return q
-// }
-//
-// //clear current array of select fields and deffered fields
-// func (q QuerySet) Only(fields ...Field) QuerySet {
-// 	q.selected = nil
-// 	q.deferred = nil
-//
-// 	for _, field := range fields {
-// 		q.selected = append(q.selected, field.toSql())
-// 	}
-//
-// 	q.Query = q.buildQuery()
-// 	return q
-// }
+func (q QuerySet) Defer(fields ...Field) QuerySet {
+	for _, field := range fields {
+		q.deferred = append(q.deferred, field.toSql())
+	}
+
+	q.Query = q.buildQuery()
+	return q
+}
+
+//clear current array of select fields and deffered fields
+func (q QuerySet) Only(fields ...Field) QuerySet {
+	q.selected = nil
+	q.deferred = nil
+
+	for _, field := range fields {
+		q.selected = append(q.selected, field.toSql())
+	}
+
+	q.Query = q.buildQuery()
+	return q
+}
 
 //Functions that do not return Querysets
 

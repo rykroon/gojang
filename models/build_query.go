@@ -21,51 +21,46 @@ func (q QuerySet) processSelect() string {
 		sql += "DISTINCT "
 	}
 
-	if q.select_ == "" {
+	if len(q.selected) == 0 && len(q.deferred) == 0 && len(q.annotated) == 0 {
 		sql += "*"
-	} else {
-		sql += q.select_
+		return sql
 	}
 
-	// if len(q.selected) == 0 && len(q.deferred) == 0 && len(q.annotated) == 0 {
-	// 	sql += "*"
-	// 	return sql
-	// }
+	selected := []string{}
 
-	// selected := []string{}
-	//
-	// if len(q.selected) != 0 {
-	// 	selected = q.selected
-	// } else {
-	// 	selected = q.model.sqlFieldList()
-	// }
+	if len(q.selected) != 0 {
+		selected = q.selected
+	} else {
+		selected = q.model.sqlFieldList()
+	}
 
-	// for _, field := range selected {
-	// 	foundDefer := false
-	//
-	// 	if len(q.deferred) != 0 {
-	// 		for _, deferredField := range q.deferred {
-	// 			if field == deferredField {
-	// 				foundDefer = true
-	// 				break
-	// 			}
-	// 		}
-	//
-	// 		if foundDefer {
-	// 			continue
-	// 		}
-	// 	}
-	//
-	// 	sql += field + ", "
-	// }
-	//
-	// if len(q.annotated) != 0 {
-	// 	for _, annotation := range q.annotated {
-	// 		sql += annotation + ", "
-	// 	}
-	// }
-	//
-	// sql = sql[0 : len(sql)-2]
+	for _, field := range selected {
+		foundDefer := false
+
+		if len(q.deferred) != 0 {
+			for _, deferredField := range q.deferred {
+				if field == deferredField {
+					foundDefer = true
+					break
+				}
+			}
+
+			if foundDefer {
+				continue
+			}
+		}
+
+		sql += field + ", "
+	}
+
+	if len(q.annotated) != 0 {
+		for _, annotation := range q.annotated {
+			sql += annotation + ", "
+		}
+	}
+
+	sql = sql[0 : len(sql)-2]
+
 	return sql
 }
 
@@ -74,14 +69,14 @@ func (q QuerySet) processFrom() string {
 
 	sql += q.model.dbTable
 
-	for _, field := range q.model.fieldList() {
-		if field.isRelation {
-			joinModel := field.relatedModel
-			joinTable := joinModel.dbTable
-			joinField := joinModel.getPrimaryKey().toSql()
-			sql += " JOIN " + joinTable + " ON " + field.toSql() + " = " + joinField
-		}
-	}
+	// for _, field := range q.model.fieldList() {
+	// 	if field.isRelation {
+	// 		joinModel := field.relatedModel
+	// 		joinTable := joinModel.dbTable
+	// 		joinField := joinModel.getPrimaryKey().toSql()
+	// 		sql += " JOIN " + joinTable + " ON " + field.toSql() + " = " + joinField
+	// 	}
+	// }
 
 	return sql
 }
