@@ -23,15 +23,15 @@ type QuerySet struct {
 }
 
 type sortExpression struct {
-	field       Field
+	field       field
 	orderOption string
 }
 
-func (f Field) Asc() sortExpression {
+func (f field) Asc() sortExpression {
 	return sortExpression{field: f, orderOption: "ASC"}
 }
 
-func (f Field) Desc() sortExpression {
+func (f field) Desc() sortExpression {
 	return sortExpression{field: f, orderOption: "DESC"}
 }
 
@@ -65,7 +65,7 @@ func (q QuerySet) OrderBy(sortExpressions ...sortExpression) QuerySet {
 	return q
 }
 
-func (q QuerySet) Distinct(fields ...Field) QuerySet {
+func (q QuerySet) Distinct(fields ...field) QuerySet {
 	q.distinct = true
 
 	for _, field := range fields {
@@ -77,7 +77,7 @@ func (q QuerySet) Distinct(fields ...Field) QuerySet {
 }
 
 //add fields to the deferred list
-func (q QuerySet) Defer(fields ...Field) QuerySet {
+func (q QuerySet) Defer(fields ...field) QuerySet {
 	for _, field := range fields {
 		q.deferred = append(q.deferred, field.toSql())
 	}
@@ -87,7 +87,7 @@ func (q QuerySet) Defer(fields ...Field) QuerySet {
 }
 
 //clear current array of select fields and deffered fields
-func (q QuerySet) Only(fields ...Field) QuerySet {
+func (q QuerySet) Only(fields ...field) QuerySet {
 	q.selected = nil
 	q.deferred = nil
 
@@ -106,6 +106,12 @@ func (q QuerySet) Get() Instance {
 }
 
 func (q QuerySet) Count() int {
+	q.selected = nil
+	q.deferred = nil
+	q.annotated = nil
+
+	q.selected = append(q.selected, "COUNT(*)")
+	q.Query = q.buildQuery()
 	return 0
 }
 
@@ -118,6 +124,12 @@ func (q QuerySet) Last() Instance {
 }
 
 func (q QuerySet) Aggregate(a aggregate) Instance {
+	q.selected = nil
+	q.deferred = nil
+	q.annotated = nil
+
+	q.annotated = append(q.annotated, a.asSql())
+	q.Query = q.buildQuery()
 	return Instance{}
 }
 

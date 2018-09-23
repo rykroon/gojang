@@ -10,21 +10,21 @@ type lookup struct {
 	rhs        string
 }
 
-func (f Field) Exact(value interface{}) lookup {
+func (f field) Exact(value interface{}) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "="}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func (f Field) IExact(value interface{}) lookup {
+func (f field) IExact(value interface{}) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "ILIKE"}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func (f Field) Contains(value string) lookup {
+func (f field) Contains(value string) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = "%" + value + "%"
@@ -32,7 +32,7 @@ func (f Field) Contains(value string) lookup {
 	return lookup
 }
 
-func (f Field) IContains(value string) lookup {
+func (f field) IContains(value string) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "ILIKE"}
 	value = "%" + value + "%"
@@ -40,42 +40,42 @@ func (f Field) IContains(value string) lookup {
 	return lookup
 }
 
-func (f Field) In(values ...interface{}) lookup {
+func (f field) In(values ...interface{}) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "IN"}
 	lookup.rhs = interfaceToSql(values)
 	return lookup
 }
 
-func (f Field) Gt(value interface{}) lookup {
+func (f field) Gt(value interface{}) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: ">"}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func (f Field) Gte(value interface{}) lookup {
+func (f field) Gte(value interface{}) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: ">="}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func (f Field) Lt(value interface{}) lookup {
+func (f field) Lt(value interface{}) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "<"}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func (f Field) Lte(value interface{}) lookup {
+func (f field) Lte(value interface{}) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "<="}
 	lookup.rhs = interfaceToSql(value)
 	return lookup
 }
 
-func (f Field) StartsWith(value string) lookup {
+func (f field) StartsWith(value string) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = value + "%"
@@ -83,7 +83,7 @@ func (f Field) StartsWith(value string) lookup {
 	return lookup
 }
 
-func (f Field) IStartsWith(value string) lookup {
+func (f field) IStartsWith(value string) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = value + "%"
@@ -91,7 +91,7 @@ func (f Field) IStartsWith(value string) lookup {
 	return lookup
 }
 
-func (f Field) EndsWith(value string) lookup {
+func (f field) EndsWith(value string) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = "%" + value
@@ -99,7 +99,7 @@ func (f Field) EndsWith(value string) lookup {
 	return lookup
 }
 
-func (f Field) IEndsWith(value string) lookup {
+func (f field) IEndsWith(value string) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "LIKE"}
 	value = "%" + value
@@ -107,7 +107,7 @@ func (f Field) IEndsWith(value string) lookup {
 	return lookup
 }
 
-func (f Field) Range(from interface{}, to interface{}) lookup {
+func (f field) Range(from interface{}, to interface{}) lookup {
 	if reflect.TypeOf(from) != reflect.TypeOf(to) {
 		panic("Values have mismatching types")
 	}
@@ -118,7 +118,7 @@ func (f Field) Range(from interface{}, to interface{}) lookup {
 	return lookup
 }
 
-func (f Field) IsNull(value bool) lookup {
+func (f field) IsNull(value bool) lookup {
 	fieldName := f.toSql()
 	lookup := lookup{lhs: fieldName, lookupName: "IS"}
 

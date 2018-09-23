@@ -5,7 +5,7 @@ import (
 )
 
 //Primary Key Option
-func (f Field) PrimaryKey(value bool) Field {
+func (f field) PrimaryKey(value bool) field {
 	f.primaryKey = value
 
 	if f.primaryKey {
@@ -17,7 +17,7 @@ func (f Field) PrimaryKey(value bool) Field {
 }
 
 //Unique Field Option
-func (f Field) Unique(unique bool) Field {
+func (f field) Unique(unique bool) field {
 	if (f.manyToMany || f.oneToOne) && unique {
 		panic("Unique option is not valid for ManyToMany and OneToOne Fields")
 	}
@@ -31,7 +31,7 @@ func (f Field) Unique(unique bool) Field {
 }
 
 //Null Field Option
-func (f Field) Null(null bool) Field {
+func (f field) Null(null bool) field {
 	f.null = null
 
 	if f.primaryKey && null {
@@ -58,13 +58,14 @@ func (f Field) Null(null bool) Field {
 }
 
 //DbColumn Field Option - So the user can choose a seperate db name
-func (f Field) DbColumn(name string) Field {
+func (f field) DbColumn(name string) field {
 	f.dbColumn = name
+	//check if dbcolumn already exists in another field
 	return f
 }
 
 //Default Values
-func (f Field) Default(i interface{}) Field {
+func (f field) Default(i interface{}) field {
 	t := reflect.TypeOf(i).String()
 
 	if t == f.goType {

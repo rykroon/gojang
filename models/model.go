@@ -5,7 +5,7 @@ import ()
 type Model struct {
 	dbTable string
 	Objects Manager
-	fields  map[string]Field
+	fields  map[string]field
 
 	//Meta
 	//uniqueTogether []string
@@ -15,7 +15,7 @@ type Model struct {
 func NewModel(dbTable string) Model {
 	m := Model{dbTable: dbTable}
 	m.Objects.model = &m
-	m.fields = make(map[string]Field)
+	m.fields = make(map[string]field)
 
 	pkey := AutoField().PrimaryKey(true)
 	pkey.autoCreated = true
@@ -24,7 +24,7 @@ func NewModel(dbTable string) Model {
 }
 
 //Add a Field to the Model
-func (m *Model) AddField(fieldName string, field Field) {
+func (m *Model) AddField(fieldName string, field field) {
 	field.model = m
 
 	_, found := m.fields[fieldName]
@@ -66,7 +66,7 @@ func (m *Model) AddField(fieldName string, field Field) {
 }
 
 //Get a Field from the Model
-func (m Model) Field(fieldName string) (Field, bool) {
+func (m Model) Field(fieldName string) (field, bool) {
 	field, ok := m.fields[fieldName]
 	return field, ok
 }
@@ -78,16 +78,23 @@ func (m Model) NewInstance() Instance {
 	return i
 }
 
-func (m Model) getPrimaryKey() Field {
+func (m Model) getPrimaryKey() field {
 	for _, field := range m.fields {
 		if field.primaryKey {
 			return field
 		}
 	}
-	return Field{}
+
+	panic("Primary Key was not found")
 }
 
-//Checks if the Model as a Primary Key Field
+//alias for getPrimaryKey()
+func (m Model) PK() field {
+	return m.getPrimaryKey()
+}
+
+//Checks if the Model has a Primary Key field
+// ** Technically there should never be a reason why a model has no Primary Key
 func (m Model) hasPrimaryKey() bool {
 	for _, field := range m.fields {
 		if field.primaryKey {
@@ -98,8 +105,8 @@ func (m Model) hasPrimaryKey() bool {
 }
 
 //returns a list of the Model's fields
-func (m Model) fieldList() []Field {
-	list := []Field{}
+func (m Model) fieldList() []field {
+	list := []field{}
 
 	for _, field := range m.fields {
 		list = append(list, field)

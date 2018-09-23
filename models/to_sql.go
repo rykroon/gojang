@@ -20,7 +20,7 @@ func (l lookup) toSql() string {
 	return l.lhs + " " + l.lookupName + " " + l.rhs
 }
 
-func (f Field) toSql() string {
+func (f field) toSql() string {
 	return doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
 }
 
