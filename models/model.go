@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 type Model struct {
@@ -9,15 +10,21 @@ type Model struct {
 	Objects Manager
 	fields  map[string]field
 
-	db sql.DB
+	db *sql.DB
 
 	//Meta
 	//uniqueTogether []string
 }
 
 //Create a new Model
-func NewModel(dbTable string) Model {
-	m := Model{dbTable: dbTable}
+func NewModel(dbTable string, db Database) Model {
+	sqlDB, err := db.toDB()
+
+	if err != nil{
+		panic(err)
+	}
+
+	m := Model{dbTable: dbTable, db: sqlDB}
 	m.Objects.model = &m
 	m.fields = make(map[string]field)
 
@@ -130,19 +137,26 @@ func (m Model) sqlFieldList() []string {
 	return list
 }
 
-func (m *Model) Migrate() {
-
-}
-
-//Returns an SQL Query that will create a new table
-func (m Model) CreateTable() string {
-	s := "CREATE TABLE " + m.dbTable + "("
+//Creates a table
+func (m Model) CreateTable() {
+	sql := "CREATE TABLE IF NOT EXISTS " + m.dbTable + "("
 
 	for _, field := range m.fields {
-		s += field.create() + ", "
+		sql += field.create() + ", "
 	}
 
-	s = s[0:len(s)-2] + ");"
+	sql = sql[0:len(sql)-2] + ");"
 
-	return s
+	//return s
+	fmt.Println(sql)
+	result, err := m.db.Exec(sql)
+
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Println(result.LastInsertId())
+		fmt.Println(result.RowsAffected())
+	}
+
+
 }

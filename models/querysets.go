@@ -2,11 +2,10 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 type QuerySet struct {
-	//Db ...some sort of db connection
-	db        sql.DB
 	model     *Model
 	Query     string
 	evaluated bool
@@ -15,6 +14,13 @@ type QuerySet struct {
 	selected  []string
 	deferred  []string
 	annotated []string
+
+	insert bool
+	update bool
+	delete bool
+
+	columns []string
+	values []string
 
 	from  string
 	where []string
@@ -89,6 +95,10 @@ func (q QuerySet) All() QuerySet {
 //add fields to the deferred list
 func (q QuerySet) Defer(fields ...field) QuerySet {
 	for _, field := range fields {
+		if field.primaryKey {
+			panic("Cannot defer the primary key")
+		}
+
 		q.deferred = append(q.deferred, field.toSql())
 	}
 
@@ -101,8 +111,18 @@ func (q QuerySet) Only(fields ...field) QuerySet {
 	q.selected = nil
 	q.deferred = nil
 
+	foundPrimaryKey := false
+
 	for _, field := range fields {
+		if field.primaryKey {
+			foundPrimaryKey = true
+		}
+
 		q.selected = append(q.selected, field.toSql())
+	}
+
+	if !foundPrimaryKey {
+		q.selected = append(q.selected, q.model.getPrimaryKey().toSql())
 	}
 
 	q.Query = q.buildQuery()
@@ -149,6 +169,8 @@ func (q QuerySet) Aggregate(a aggregate) Instance {
 
 	q.annotated = append(q.annotated, a.asSql())
 	q.Query = q.buildQuery()
+
+	//q.queryRow()
 	return Instance{}
 }
 
@@ -156,20 +178,58 @@ func (q QuerySet) Exists() bool {
 	return false
 }
 
-func (q QuerySet) Delete() {
+func (q QuerySet) Update() {
+	q.insert = true
+	q.Query = q.buildQuery()
+	//q.exec()
+}
 
+func (q QuerySet) Delete() {
+	q.delete = true
+	q.Query = q.buildQuery()
+	//q.exec()
 }
 
 //database/sql wrappers
 
+func (q QuerySet) Evaluate() {
+	rows, err := q.query()
+
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	cols, err := rows.Columns()
+
+
+	for rows.Next() {
+		vals := make([]interface{}, len(cols))
+
+		for i, _ := range cols {
+			fmt.Println(cols[i])
+			//get type from q.model.Field() // need reverse lookup on dbcolumn
+			vals[i] = new(sql.RawBytes)
+		}
+
+		err := rows.Scan(vals...)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(vals)
+	}
+
+
+}
+
 func (q QuerySet) exec() (sql.Result, error) {
-	return q.db.Exec(q.Query)
+	return q.model.db.Exec(q.Query)
 }
 
 func (q QuerySet) query() (*sql.Rows, error) {
-	return q.db.Query(q.Query)
+	return q.model.db.Query(q.Query)
 }
 
 func (q QuerySet) queryRow() *sql.Row {
-	return q.db.QueryRow(q.Query)
+	return q.model.db.QueryRow(q.Query)
 }
