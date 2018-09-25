@@ -213,9 +213,11 @@ func (q QuerySet) Evaluate() {
 		}
 
 		err := rows.Scan(vals...)
+
 		if err != nil {
 			panic(err)
 		}
+		
 		fmt.Println(vals)
 	}
 
