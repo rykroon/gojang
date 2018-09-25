@@ -28,14 +28,6 @@ func newInstance(m *Model) Instance {
 	return i
 }
 
-//Maybe
-// func (i Instance) SetInt(fieldName string, number int ) {
-// 	field,_ := i.model.Field(fieldName)
-// 	if field.defaultType != reflect.Int {
-// 		//thats a problem
-// 	}
-// }
-
 func (i Instance) Save() {
 
 }

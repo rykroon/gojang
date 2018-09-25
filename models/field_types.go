@@ -1,7 +1,7 @@
 package models
 
 import (
-	"strconv"
+	//"strconv"
 	//"reflect"
 )
 
@@ -52,37 +52,37 @@ const SetDefault onDelete = "SET DEFAULT"
 //Constructors
 
 func AutoField() field {
-	return field{dbType: "SERIAL", goType: "int32"}
+	return field{dbType: "SERIAL4", goType: "int32"}
 }
 
 func BooleanField() field {
-	return field{dbType: "BOOLEAN", goType: "bool"}
+	return field{dbType: "BOOL", goType: "bool"}
 }
 
-func CharField(maxLength int) field {
-	n := strconv.Itoa(maxLength)
-	dataType := "VARCHAR(" + n + ")"
+// func CharField(maxLength int) field {
+// 	n := strconv.Itoa(maxLength)
+// 	dataType := "VARCHAR(" + n + ")"
+//
+// 	return field{dbType: dataType, goType: "string", maxLength: maxLength}
+// }
 
-	return field{dbType: dataType, goType: "string", maxLength: maxLength}
-}
-
-func DecimalField(maxDigits int, decimalPlaces int) field {
-	precision := strconv.Itoa(maxDigits)
-	scale := strconv.Itoa(decimalPlaces)
-	dataType := "NUMERIC(" + precision + ", " + scale + ")"
-
-	field := field{dbType: dataType, goType: "float64"}
-	field.maxDigits = maxDigits
-	field.decimalPlaces = decimalPlaces
-	return field
-}
+// func DecimalField(maxDigits int, decimalPlaces int) field {
+// 	precision := strconv.Itoa(maxDigits)
+// 	scale := strconv.Itoa(decimalPlaces)
+// 	dataType := "DECIMAL(" + precision + ", " + scale + ")"
+//
+// 	field := field{dbType: dataType, goType: "float64"}
+// 	field.maxDigits = maxDigits
+// 	field.decimalPlaces = decimalPlaces
+// 	return field
+// }
 
 func FloatField() field {
-	return field{dbType: "DOUBLE PRECISION", goType: "float64"}
+	return field{dbType: "FLOAT8", goType: "float64"}
 }
 
 func IntegerField() field {
-	return field{dbType: "INTEGER", goType: "int32"}
+	return field{dbType: "INT4", goType: "int32"}
 }
 
 func TextField() field {
@@ -100,25 +100,25 @@ func ForeignKey(to *Model, onDelete onDelete) field {
 	return field
 }
 
-func OneToOneField(to *Model, onDelete onDelete) field {
-	relatedPkey := to.getPrimaryKey()
-	field := field{dbType: relatedPkey.dbType, goType: relatedPkey.goType}
-	field.isRelation = true
-	field.relatedModel = to
-	field.onDelete = onDelete
-	field.oneToOne = true
-	return field
-}
-
-func ManyToManyField(to *Model, onDelete onDelete) field {
-	relatedPkey := to.getPrimaryKey()
-	field := field{dbType: relatedPkey.dbType, goType: relatedPkey.goType}
-	field.isRelation = true
-	field.relatedModel = to
-	field.onDelete = onDelete
-	field.manyToMany = true
-	return field
-}
+// func OneToOneField(to *Model, onDelete onDelete) field {
+// 	relatedPkey := to.getPrimaryKey()
+// 	field := field{dbType: relatedPkey.dbType, goType: relatedPkey.goType}
+// 	field.isRelation = true
+// 	field.relatedModel = to
+// 	field.onDelete = onDelete
+// 	field.oneToOne = true
+// 	return field
+// }
+//
+// func ManyToManyField(to *Model, onDelete onDelete) field {
+// 	relatedPkey := to.getPrimaryKey()
+// 	field := field{dbType: relatedPkey.dbType, goType: relatedPkey.goType}
+// 	field.isRelation = true
+// 	field.relatedModel = to
+// 	field.onDelete = onDelete
+// 	field.manyToMany = true
+// 	return field
+// }
 
 func (f field) create() string {
 	s := doubleQuotes(f.dbColumn) + " " + f.dbType

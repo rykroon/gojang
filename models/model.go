@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
+	//"fmt"
 )
 
 type Model struct {
@@ -148,14 +148,14 @@ func (m Model) CreateTable() {
 	sql = sql[0:len(sql)-2] + ");"
 
 	//return s
-	fmt.Println(sql)
-	result, err := m.db.Exec(sql)
+	//fmt.Println(sql)
+	_, err := m.db.Exec(sql)
 
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Println(result.LastInsertId())
-		fmt.Println(result.RowsAffected())
+		//fmt.Println(result.LastInsertId())
+		//fmt.Println(result.RowsAffected())
 	}
 
 
