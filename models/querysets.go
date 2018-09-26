@@ -172,10 +172,16 @@ func (q QuerySet) Exists() bool {
 	return false
 }
 
-func (q QuerySet) Update() {
+func (q QuerySet) Update() (int64, error) {
 	q.insert = true
 	q.Query = q.buildQuery()
-	//q.exec()
+	result, err := q.exec()
+
+	if err != nil {
+		panic(err)
+	}
+
+	return result.RowsAffected()
 }
 
 func (q QuerySet) Delete() (int64, error) {
@@ -188,7 +194,6 @@ func (q QuerySet) Delete() (int64, error) {
 	}
 
 	return result.RowsAffected()
-
 }
 
 //database/sql wrappers
@@ -220,7 +225,7 @@ func (q QuerySet) Evaluate() {
 
 		for i, _ := range cols {
 			fmt.Println(cols[i])
-			//get type from q.model.Field() // need reverse lookup on dbcolumn
+			
 			vals[i] = new(sql.RawBytes)
 		}
 

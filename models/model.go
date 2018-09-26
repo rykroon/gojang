@@ -82,13 +82,6 @@ func (m Model) Field(fieldName string) (field, bool) {
 	return field, ok
 }
 
-//Create a new Instance of this Model
-func (m Model) NewInstance() Instance {
-	i := Instance{}
-	i.model = &m
-	return i
-}
-
 func (m Model) getPrimaryKey() field {
 	for _, field := range m.fields {
 		if field.primaryKey {

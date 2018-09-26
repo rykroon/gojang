@@ -5,6 +5,10 @@ import (
 	//"reflect"
 )
 
+type fld interface {
+
+}
+
 type field struct { //Required Attributes
 
 	dbColumn string
