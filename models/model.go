@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	//"fmt"
 )
 
 type Model struct {
@@ -129,6 +128,30 @@ func (m Model) sqlFieldList() []string {
 
 	return list
 }
+
+//Returns a map with attribute names as the keys and database columns as the values
+func (m Model) attrToDBColumnMap() map[string]string {
+	result := make(map[string]string)
+
+	for key, field := range m.fields {
+		result[key] = field.dbColumn
+	}
+
+	return result
+}
+
+//Returns a map of database columns as the keys and attribute names as the values
+func (m Model) dbColumnToAttrMap() map[string]string {
+	result := make(map[string]string)
+
+	for key, field := range m.fields {
+		result[field.dbColumn] = key
+	}
+
+	return result
+}
+
+
 
 //Creates a table
 func (m Model) CreateTable() {

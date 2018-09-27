@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
+	"reflect"
 )
 
 type QuerySet struct {
@@ -132,9 +132,9 @@ func (q QuerySet) OrderBy(sortExpressions ...sortExpression) QuerySet {
 
 //Functions that do not return Querysets
 
-func (q QuerySet) Get() Instance {
+func (q QuerySet) Get() modelInstance {
 	//row := q.queryRow()
-	return Instance{}
+	return modelInstance{}
 }
 
 func (q QuerySet) Count() int {
@@ -155,7 +155,7 @@ func (q QuerySet) Count() int {
 	return -1
 }
 
-func (q QuerySet) Aggregate(a aggregate) Instance {
+func (q QuerySet) Aggregate(a aggregate) modelInstance {
 	q.selected = nil
 	//q.deferred = nil
 	//q.annotated = nil
@@ -165,7 +165,7 @@ func (q QuerySet) Aggregate(a aggregate) Instance {
 	q.Query = q.buildQuery()
 
 	//q.queryRow()
-	return Instance{}
+	return modelInstance{}
 }
 
 func (q QuerySet) Exists() bool {
@@ -198,7 +198,7 @@ func (q QuerySet) Delete() (int64, error) {
 
 //database/sql wrappers
 
-func (q QuerySet) Evaluate() {
+func (q QuerySet) Evaluate() []modelInstance{
 	rows, err := q.query()
 
 	if err != nil {
@@ -206,39 +206,35 @@ func (q QuerySet) Evaluate() {
 	}
 	defer rows.Close()
 
-	cols, err := rows.Columns()
-
-	colTypes, err := rows.ColumnTypes()
-
-	for _,col := range colTypes {
-		fmt.Println(col.Name())
-		fmt.Println(col.DatabaseTypeName())
-		fmt.Println(col.ScanType())
-		fmt.Println()
-	}
-
-
-
+	columnTypes, err := rows.ColumnTypes()
+	objects := make([]modelInstance, 0)
+	dbColumnMap := q.model.dbColumnToAttrMap()
 
 	for rows.Next() {
-		vals := make([]interface{}, len(cols))
+		pointers := make([]interface{}, len(columnTypes))
 
-		for i, _ := range cols {
-			fmt.Println(cols[i])
-			
-			vals[i] = new(sql.RawBytes)
+		for i, _ := range columnTypes {
+			pointers[i] = new(interface{})
 		}
 
-		err := rows.Scan(vals...)
+		err := rows.Scan(pointers...)
 
 		if err != nil {
 			panic(err)
 		}
 
-		fmt.Println(vals)
+		obj := q.model.NewInstance()
+
+		for idx, ptr := range pointers {
+			attr := dbColumnMap[columnTypes[idx].Name()]
+			val := reflect.ValueOf(ptr).Elem().Interface()
+			obj.Set(attr, val)
+		}
+
+		objects = append(objects, obj)
 	}
 
-
+	return objects
 }
 
 func (q QuerySet) exec() (sql.Result, error) {

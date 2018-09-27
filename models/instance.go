@@ -4,7 +4,7 @@ import (
 	//"reflect"
 )
 
-type Instance struct {
+type modelInstance struct {
 	model  *Model
 	values map[string]fieldInstance
 }
@@ -32,13 +32,14 @@ type fieldInstance struct {
 
 
 
-func (i Instance) buildQuery() string {
+func (i modelInstance) buildQuery() string {
 	return ""
 }
 
-func (m *Model) NewInstance() Instance {
-	i := Instance{}
+func (m *Model) NewInstance() modelInstance {
+	i := modelInstance{}
 	i.model = m
+	i.values = make(map[string]fieldInstance)
 
 	for key, field := range m.fields {
 		field := fieldInstance{dbColumn:field.dbColumn, goType:field.goType, primaryKey: field.primaryKey}
@@ -48,7 +49,7 @@ func (m *Model) NewInstance() Instance {
 	return i
 }
 
-func (i *Instance) Get(attr string) (interface{}, bool) {
+func (i *modelInstance) Get(attr string) (interface{}, bool) {
 	field, ok := i.values[attr]
 
 	if ok {
@@ -58,7 +59,7 @@ func (i *Instance) Get(attr string) (interface{}, bool) {
 	return 0, ok
 }
 
-func (i *Instance) Set(attr string, value interface{}) bool {
+func (i *modelInstance) Set(attr string, value interface{}) bool {
 	field, ok := i.values[attr]
 
 	if ok {
@@ -70,14 +71,14 @@ func (i *Instance) Set(attr string, value interface{}) bool {
 }
 
 
-func (i Instance) Save() {
+func (i modelInstance) Save() {
 
 }
 
-func (i Instance) insert() {
+func (i modelInstance) insert() {
 
 }
 
-func (i Instance) update() {
+func (i modelInstance) update() {
 
 }
