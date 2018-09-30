@@ -1,20 +1,21 @@
 package models
 
 import (
-	//"reflect"
+//"reflect"
 )
 
 type modelInstance struct {
 	model  *Model
-	values map[string]fieldInstance
+	values map[string]instanceField
+	pkAttr string
 }
 
-type fieldInstance struct {
+type instanceField struct {
 	dbColumn string
 	//dbType string
-	goType string
+	goType     string
 	primaryKey bool
-	value interface{} //?
+	value      interface{} //?
 }
 
 // type fieldInstance struct {
@@ -26,12 +27,6 @@ type fieldInstance struct {
 // 	boolValue   bool
 // }
 
-
-
-
-
-
-
 func (i modelInstance) buildQuery() string {
 	return ""
 }
@@ -39,16 +34,21 @@ func (i modelInstance) buildQuery() string {
 func (m *Model) NewInstance() modelInstance {
 	i := modelInstance{}
 	i.model = m
-	i.values = make(map[string]fieldInstance)
+	i.values = make(map[string]instanceField)
 
 	for key, field := range m.fields {
-		field := fieldInstance{dbColumn:field.dbColumn, goType:field.goType, primaryKey: field.primaryKey}
+		field := instanceField{dbColumn: field.dbColumn, goType: field.goType, primaryKey: field.primaryKey}
 		i.values[key] = field
+
+		if field.primaryKey {
+			i.pkAttr = key
+		}
 	}
 
 	return i
 }
 
+//Get the value of an attribute
 func (i *modelInstance) Get(attr string) (interface{}, bool) {
 	field, ok := i.values[attr]
 
@@ -59,6 +59,19 @@ func (i *modelInstance) Get(attr string) (interface{}, bool) {
 	return 0, ok
 }
 
+
+//Get Value of PrimaryKey
+func (i *modelInstance) GetPK() (interface{}, bool) {
+	value, ok := i.Get(i.pkAttr)
+
+	if ok {
+		return value, ok
+	}
+
+	return 0, ok
+}
+
+//Set a value of an attribute
 func (i *modelInstance) Set(attr string, value interface{}) bool {
 	field, ok := i.values[attr]
 
@@ -70,15 +83,19 @@ func (i *modelInstance) Set(attr string, value interface{}) bool {
 	return ok
 }
 
+func (i *modelInstance) SetPK(value interface{}) bool {
+	return i.Set(i.pkAttr, value)
+}
 
-func (i modelInstance) Save() {
+func (i *modelInstance) Save() {
+	//check if primary key is 0 value
+	
+}
+
+func (i *modelInstance) insert() {
 
 }
 
-func (i modelInstance) insert() {
-
-}
-
-func (i modelInstance) update() {
+func (i *modelInstance) update() {
 
 }

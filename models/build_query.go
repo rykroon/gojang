@@ -28,8 +28,7 @@ func (q QuerySet) buildQuery() string {
 		sql += q.processWhere()
 	}
 
-
-	if !q.update && !q.delete && !q.insert{
+	if !q.update && !q.delete && !q.insert {
 		sql += q.processOrderBy()
 	}
 
@@ -44,13 +43,13 @@ func (q QuerySet) processInsert() string {
 		sql += col + ", "
 	}
 
-	sql = sql[1:len(sql) - 2] + ") VALUES ("
+	sql = sql[1:len(sql)-2] + ") VALUES ("
 
 	for _, value := range q.values {
 		sql += value + ", "
 	}
 
-	sql = sql[1:len(sql) - 2] + ")"
+	sql = sql[1:len(sql)-2] + ")"
 
 	return sql
 }
@@ -59,7 +58,6 @@ func (q QuerySet) processUpdate() string {
 	sql := " SET "
 	return sql
 }
-
 
 func (q QuerySet) processSelect() string {
 	sql := "SELECT "
@@ -121,7 +119,6 @@ func (q QuerySet) processFrom() string {
 	if !q.update && !q.delete && !q.insert {
 		sql += "FROM "
 	}
-
 
 	sql += q.model.dbTable
 

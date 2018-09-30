@@ -11,7 +11,7 @@ type QuerySet struct {
 	evaluated bool
 
 	//distinct  bool
-	selected  []string
+	selected []string
 	//deferred  []string
 	//annotated []string
 
@@ -20,7 +20,7 @@ type QuerySet struct {
 	delete bool
 
 	columns []string
-	values []string
+	values  []string
 
 	from  string
 	where []string
@@ -44,7 +44,6 @@ func (f field) Asc() sortExpression {
 func (f field) Desc() sortExpression {
 	return sortExpression{field: f, orderOption: "DESC"}
 }
-
 
 //Functions that return QuerySets
 
@@ -198,7 +197,7 @@ func (q QuerySet) Delete() (int64, error) {
 
 //database/sql wrappers
 
-func (q QuerySet) Evaluate() []modelInstance{
+func (q QuerySet) Evaluate() []modelInstance {
 	rows, err := q.query()
 
 	if err != nil {

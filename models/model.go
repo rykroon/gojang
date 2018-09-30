@@ -19,7 +19,7 @@ type Model struct {
 func NewModel(dbTable string, db Database) Model {
 	sqlDB, err := db.toDB()
 
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 
@@ -151,8 +151,6 @@ func (m Model) dbColumnToAttrMap() map[string]string {
 	return result
 }
 
-
-
 //Creates a table
 func (m Model) CreateTable() {
 	sql := "CREATE TABLE IF NOT EXISTS " + m.dbTable + "("
@@ -173,6 +171,5 @@ func (m Model) CreateTable() {
 		//fmt.Println(result.LastInsertId())
 		//fmt.Println(result.RowsAffected())
 	}
-
 
 }

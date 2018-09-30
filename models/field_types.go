@@ -1,12 +1,11 @@
 package models
 
 import (
-	//"strconv"
-	//"reflect"
+//"strconv"
+//"reflect"
 )
 
 type fld interface {
-
 }
 
 type field struct { //Required Attributes
