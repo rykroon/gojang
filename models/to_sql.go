@@ -20,9 +20,9 @@ func (l lookup) toSql() string {
 	return l.lhs + " " + l.lookupName + " " + l.rhs
 }
 
-func (f field) toSql() string {
-	return doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
-}
+// func (f field) toSql() string {
+// 	return doubleQuotes(f.model.dbTable) + "." + doubleQuotes(f.dbColumn)
+// }
 
 func interfaceToSql(i interface{}) string {
 	//Process Right-Hand side of Lookup
@@ -39,11 +39,11 @@ func interfaceToSql(i interface{}) string {
 
 		case "[]string":
 			slice := i.([]string)
-			return sliceStringToSql(slice)
+			return stringSliceToSql(slice)
 
 		case "[]int":
 			slice := i.([]int)
-			return sliceIntToSql(slice)
+			return intSliceToSql(slice)
 		}
 	}
 
@@ -117,7 +117,7 @@ func interfaceSliceToSql(slice []interface{}) string {
 	return s
 }
 
-func sliceStringToSql(slice []string) string {
+func stringSliceToSql(slice []string) string {
 	s := "("
 
 	for _, value := range slice {
@@ -133,7 +133,7 @@ func stringToSql(s string) string {
 	return singleQuotes(s)
 }
 
-func sliceIntToSql(slice []int) string {
+func intSliceToSql(slice []int) string {
 	s := "("
 
 	for _, value := range slice {
@@ -157,8 +157,32 @@ func int64ToSql(i int64) string {
 	return strconv.Itoa(int(i))
 }
 
+func float64SliceToSql(slice []float64) string {
+	s := "("
+
+	for _, value := range slice {
+		s += float64ToSql(value) + ", "
+	}
+
+	s = s[0:len(s)-2] + ")"
+
+	return s
+}
+
 func float64ToSql(f float64) string {
 	return strconv.FormatFloat(f, 'f', -1, 64)
+}
+
+func boolSliceToSql(slice []bool) string {
+	s := "("
+
+	for _, value := range slice {
+		s += boolToSql(value) + ", "
+	}
+
+	s = s[0:len(s)-2] + ")"
+
+	return s
 }
 
 func boolToSql(b bool) string {

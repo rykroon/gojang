@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"reflect"
+	//"reflect"
 )
 
 type QuerySet struct {
@@ -27,22 +27,9 @@ type QuerySet struct {
 	//groupBy      string
 	//having       string
 	Ordered bool
-	orderBy []sortExpression
+	orderBy []orderByExpression
 
 	rows sql.Rows
-}
-
-type sortExpression struct {
-	field       field
-	orderOption string
-}
-
-func (f field) Asc() sortExpression {
-	return sortExpression{field: f, orderOption: "ASC"}
-}
-
-func (f field) Desc() sortExpression {
-	return sortExpression{field: f, orderOption: "DESC"}
 }
 
 //Functions that return QuerySets
@@ -66,9 +53,9 @@ func (q QuerySet) Exclude(l lookup) QuerySet {
 // 	return q
 // }
 
-func (q QuerySet) OrderBy(sortExpressions ...sortExpression) QuerySet {
-	for _, sortExpression := range sortExpressions {
-		q.orderBy = append(q.orderBy, sortExpression)
+func (q QuerySet) OrderBy(orderBys ...orderByExpression) QuerySet {
+	for _, orderBy := range orderBys {
+		q.orderBy = append(q.orderBy, orderBy)
 	}
 
 	q.Query = q.buildQuery()
@@ -154,18 +141,18 @@ func (q QuerySet) Count() int {
 	return -1
 }
 
-func (q QuerySet) Aggregate(a aggregate) modelInstance {
-	q.selected = nil
-	//q.deferred = nil
-	//q.annotated = nil
-
-	//q.annotated = append(q.annotated, a.asSql())
-	q.selected = append(q.selected, a.asSql())
-	q.Query = q.buildQuery()
-
-	//q.queryRow()
-	return modelInstance{}
-}
+// func (q QuerySet) Aggregate(a aggregate) modelInstance {
+// 	q.selected = nil
+// 	//q.deferred = nil
+// 	//q.annotated = nil
+//
+// 	//q.annotated = append(q.annotated, a.asSql())
+// 	q.selected = append(q.selected, a.asSql())
+// 	q.Query = q.buildQuery()
+//
+// 	//q.queryRow()
+// 	return modelInstance{}
+// }
 
 func (q QuerySet) Exists() bool {
 	return false
@@ -197,44 +184,44 @@ func (q QuerySet) Delete() (int64, error) {
 
 //database/sql wrappers
 
-func (q QuerySet) Evaluate() []modelInstance {
-	rows, err := q.query()
-
-	if err != nil {
-		panic(err)
-	}
-	defer rows.Close()
-
-	columnTypes, err := rows.ColumnTypes()
-	objects := make([]modelInstance, 0)
-	dbColumnMap := q.model.dbColumnToAttrMap()
-
-	for rows.Next() {
-		pointers := make([]interface{}, len(columnTypes))
-
-		for i, _ := range columnTypes {
-			pointers[i] = new(interface{})
-		}
-
-		err := rows.Scan(pointers...)
-
-		if err != nil {
-			panic(err)
-		}
-
-		obj := q.model.NewInstance()
-
-		for idx, ptr := range pointers {
-			attr := dbColumnMap[columnTypes[idx].Name()]
-			val := reflect.ValueOf(ptr).Elem().Interface()
-			obj.Set(attr, val)
-		}
-
-		objects = append(objects, obj)
-	}
-
-	return objects
-}
+// func (q QuerySet) Evaluate() []modelInstance {
+// 	rows, err := q.query()
+//
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer rows.Close()
+//
+// 	columnTypes, err := rows.ColumnTypes()
+// 	objects := make([]modelInstance, 0)
+// 	dbColumnMap := q.model.dbColumnToAttrMap()
+//
+// 	for rows.Next() {
+// 		pointers := make([]interface{}, len(columnTypes))
+//
+// 		for i, _ := range columnTypes {
+// 			pointers[i] = new(interface{})
+// 		}
+//
+// 		err := rows.Scan(pointers...)
+//
+// 		if err != nil {
+// 			panic(err)
+// 		}
+//
+// 		obj := q.model.NewInstance()
+//
+// 		for idx, ptr := range pointers {
+// 			attr := dbColumnMap[columnTypes[idx].Name()]
+// 			val := reflect.ValueOf(ptr).Elem().Interface()
+// 			obj.Set(attr, val)
+// 		}
+//
+// 		objects = append(objects, obj)
+// 	}
+//
+// 	return objects
+// }
 
 func (q QuerySet) exec() (sql.Result, error) {
 	return q.model.db.Exec(q.Query)

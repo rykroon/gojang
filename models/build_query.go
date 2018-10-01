@@ -159,7 +159,7 @@ func (q QuerySet) processOrderBy() string {
 		sql += " ORDER BY "
 
 		for _, expr := range q.orderBy {
-			sql += expr.field.toSql() + " " + expr.orderOption + ", "
+			sql += string(expr) + ", "
 		}
 
 		sql = sql[0 : len(sql)-2]
