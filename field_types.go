@@ -56,6 +56,19 @@ const Protect onDelete = "RESTRICT"
 const SetNull onDelete = "SET NULL"
 const SetDefault onDelete = "SET DEFAULT"
 
+
+type BigIntegerField struct {
+	dbColumn string
+	dbType   string
+
+	null       bool
+	unique     bool
+	primaryKey bool
+
+	pointer *int64
+	value int64
+}
+
 type BooleanField struct {
 	dbColumn string
 	dbType   string
@@ -64,8 +77,8 @@ type BooleanField struct {
 	unique     bool
 	primaryKey bool
 
-	Pointer *bool
-	Value bool
+	pointer *bool
+	value bool
 }
 
 type FloatField struct {
@@ -76,8 +89,8 @@ type FloatField struct {
 	unique     bool
 	primaryKey bool
 
-	Pointer *float64
-	Value float64
+	pointer *float64
+	value float64
 }
 
 type IntegerField struct {
@@ -88,8 +101,8 @@ type IntegerField struct {
 	unique     bool
 	primaryKey bool
 
-	Pointer *int
-	Value int
+	pointer *int32
+	value int32
 }
 
 type TextField struct {
@@ -100,8 +113,8 @@ type TextField struct {
 	unique     bool
 	primaryKey bool
 
-	Pointer *string
-	Value string
+	pointer *string
+	value string
 }
 
 //Constructors
@@ -127,7 +140,7 @@ func NewBooleanField(constraints ...constraint) BooleanField {
 	}
 
 	if !field.null {
-		field.Pointer = &field.Value
+		field.pointer = &field.value
 	}
 
 	return field
@@ -150,7 +163,7 @@ func NewFloatField(constraints ...constraint) FloatField {
 	}
 
 	if !field.null {
-		field.Pointer = &field.Value
+		field.pointer = &field.value
 	}
 
 	return field
@@ -173,7 +186,7 @@ func NewIntegerField(constraints ...constraint) IntegerField {
 	}
 
 	if !field.null {
-		field.Pointer = &field.Value
+		field.pointer = &field.value
 	}
 
 	return field
@@ -196,65 +209,65 @@ func NewTextField(constraints ...constraint) TextField {
 	}
 
 	if !field.null {
-		field.Pointer = &field.Value
+		field.pointer = &field.value
 	}
 
 	return field
 }
 
 func (f BooleanField) Val() bool {
-	return f.Value
+	return f.value
 }
 
 func (f FloatField) Val() float64 {
-	return f.Value
+	return f.value
 }
 
 func (f IntegerField) Val() int {
-	return f.Value
+	return int(f.value)
 }
 
 func (f TextField) Val() string {
-	return f.Value
+	return f.value
 }
 
 func (f *BooleanField) Set(value bool) {
-	if f.Pointer == nil {
-		f.Pointer = &f.Value
+	if f.pointer == nil {
+		f.pointer = &f.value
 	}
 
-	f.Value = value
+	f.value = value
 }
 
 func (f *FloatField) Set(value float64) {
-	if f.Pointer == nil {
-		f.Pointer = &f.Value
+	if f.pointer == nil {
+		f.pointer = &f.value
 	}
 
-	f.Value = value
+	f.value = value
 }
 
-func (f *IntegerField) Set(value int) {
-	if f.Pointer == nil {
-		f.Pointer = &f.Value
+func (f *IntegerField) Set(value int32) {
+	if f.pointer == nil {
+		f.pointer = &f.value
 	}
 
-	f.Value = value
+	f.value = value
 }
 
 func (f *TextField) Set(value string) {
-	if f.Pointer == nil {
-		f.Pointer = &f.Value
+	if f.pointer == nil {
+		f.pointer = &f.value
 	}
 
-	f.Value = value
+	f.value = value
 }
 
 
 func (f *BooleanField) SetNil() error {
 	if f.HasNullConstraint() {
-		f.Pointer = nil
-		f.Value = false
+		f.pointer = nil
+		f.value = false
 		return nil
 	} else {
 		return errors.New("Cannot set field with NOT NULL constraint to nil")
@@ -263,8 +276,8 @@ func (f *BooleanField) SetNil() error {
 
 func (f *FloatField) SetNil() error {
 	if f.HasNullConstraint() {
-		f.Pointer = nil
-		f.Value = 0
+		f.pointer = nil
+		f.value = 0
 		return nil
 	} else {
 		return errors.New("Cannot set field with NOT NULL constraint to nil")
@@ -273,8 +286,8 @@ func (f *FloatField) SetNil() error {
 
 func (f *IntegerField) SetNil() error {
 	if f.HasNullConstraint() {
-		f.Pointer = nil
-		f.Value = 0
+		f.pointer = nil
+		f.value = 0
 		return nil
 	} else {
 		return errors.New("Cannot set field with NOT NULL constraint to nil")
@@ -283,8 +296,8 @@ func (f *IntegerField) SetNil() error {
 
 func (f *TextField) SetNil() error {
 	if f.HasNullConstraint() {
-		f.Pointer = nil
-		f.Value = ""
+		f.pointer = nil
+		f.value = ""
 		return nil
 	} else {
 		return errors.New("Cannot set field with NOT NULL constraint to nil")

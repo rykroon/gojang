@@ -104,26 +104,26 @@ func (f *TextField) getDBType() string {
 
 
 func (f BooleanField) IsNil() bool {
-	return f.Pointer == nil
+	return f.pointer == nil
 }
 
 func (f FloatField) IsNil() bool {
-	return f.Pointer == nil
+	return f.pointer == nil
 }
 
 func (f *IntegerField) IsNil() bool {
-	return f.Pointer == nil
+	return f.pointer == nil
 }
 
 func (f *TextField) IsNil() bool {
-	return f.Pointer == nil
+	return f.pointer == nil
 }
 
 func (f BooleanField) sqlValue() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return boolToSql(f.Value)
+		return boolToSql(f.value)
 	}
 }
 
@@ -131,7 +131,7 @@ func (f FloatField) sqlValue() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return float64ToSql(f.Value)
+		return float64ToSql(f.value)
 	}
 }
 
@@ -139,7 +139,7 @@ func (f *IntegerField) sqlValue() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return intToSql(f.Value)
+		return int32ToSql(f.value)
 	}
 }
 
@@ -147,7 +147,7 @@ func (f *TextField) sqlValue() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return stringToSql(f.Value)
+		return stringToSql(f.value)
 	}
 }
 

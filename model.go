@@ -13,7 +13,6 @@ type Model struct {
 	DBTable string
 	Objects Manager
 	Fields  map[string]field
-	//Pointers map[string]unsafe.Pointer
 
 	db *sql.DB
 
@@ -24,7 +23,6 @@ type Model struct {
 func NewModel() Model {
 	m := Model{}
 	m.Fields = make(map[string]field)
-	//m.Pointers = make(map[string]unsafe.Pointer)
 	return m
 }
 
@@ -56,11 +54,9 @@ func MakeModel(i interface{}) error {
 	dbTableValue.SetString(tableName)
 
 	var fieldsMap reflect.Value
-	//var pointerMap reflect.Value
 
 	if modelValue.Type() == reflect.TypeOf(Model{}) {
 		fieldsMap = modelValue.FieldByName("Fields")
-		//pointerMap = modelValue.FieldByName("Pointers")
 
 	} else {
 		return errors.New("Struct is not a model")
@@ -88,11 +84,6 @@ func MakeModel(i interface{}) error {
 
 		if isAField {
 			fieldsMap.SetMapIndex(reflect.ValueOf(fieldType.Name), fieldValue.Addr())
-
-			// valueField := fieldValue.FieldByName("Value")
-			// unsafeValue := reflect.ValueOf(unsafe.Pointer(valueField.Addr().Pointer()))
-			// pointerMap.SetMapIndex(reflect.ValueOf(fieldType.Name), unsafeValue)
-
 		}
 	}
 
@@ -145,52 +136,6 @@ func (m *Model) update() {
 
 }
 
-
-
-
-
-//Get a Field from the Model
-// func (m Model) Field(fieldName string) (field, bool) {
-// 	field, ok := m.fields[fieldName]
-// 	return field, ok
-// }
-
-// func (m Model) getPrimaryKey() field {
-// 	for _, field := range m.fields {
-// 		if field.primaryKey {
-// 			return field
-// 		}
-// 	}
-//
-// 	panic("Primary Key was not found")
-// }
-
-//alias for getPrimaryKey()
-// func (m Model) PK() field {
-// 	return m.getPrimaryKey()
-// }
-
-//Checks if the Model has a Primary Key field
-// ** Technically there should never be a reason why a model has no Primary Key
-// func (m Model) hasPrimaryKey() bool {
-// 	for _, field := range m.fields {
-// 		if field.primaryKey {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
-
-//returns a list of the Model's fields
-// func (m Model) fieldList() []field {
-// 	list := []field{}
-//
-// 	for _, field := range m.fields {
-// 		list = append(list, field)
-// 	}
-//
-// 	return list
-// }
 
 //returns a list of the model's fields in SQL format
 // func (m Model) sqlFieldList() []string {
