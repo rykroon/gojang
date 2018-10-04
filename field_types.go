@@ -144,22 +144,22 @@ type TextField struct {
 
 //Constructors
 
-func NewAutoField(constraints ...constraint) AutoField {
-	field := AutoField{dbType: "SERIAL4"}
+func NewAutoField(constraints ...constraint) *AutoField {
+	field := &AutoField{dbType: "SERIAL4"}
 	field.pointer = &field.value
 	field.primaryKey = true
 	return field
 }
 
-func NewBigAutoField() BigAutoField {
-	field := BigAutoField{dbType: "SERIAL8"}
+func NewBigAutoField() *BigAutoField {
+	field := &BigAutoField{dbType: "SERIAL8"}
 	field.pointer = &field.value
 	field.primaryKey = true
 	return field
 }
 
-func NewBigIntegerField(constraints ...constraint) BigIntegerField {
-	field := BigIntegerField{dbType: "INT8"}
+func NewBigIntegerField(constraints ...constraint) *BigIntegerField {
+	field := &BigIntegerField{dbType: "INT8"}
 
 	for _, constraint := range constraints {
 		switch constraint {
@@ -178,8 +178,8 @@ func NewBigIntegerField(constraints ...constraint) BigIntegerField {
 	return field
 }
 
-func NewBooleanField(constraints ...constraint) BooleanField {
-	field := BooleanField{dbType: "BOOL"}
+func NewBooleanField(constraints ...constraint) *BooleanField {
+	field := &BooleanField{dbType: "BOOL"}
 
 	for _, constraint := range constraints {
 		switch constraint {
@@ -198,8 +198,8 @@ func NewBooleanField(constraints ...constraint) BooleanField {
 	return field
 }
 
-func NewFloatField(constraints ...constraint) FloatField {
-	field := FloatField{dbType: "FLOAT8"}
+func NewFloatField(constraints ...constraint) *FloatField {
+	field := &FloatField{dbType: "FLOAT8"}
 
 	for _, constraint := range constraints {
 		switch constraint {
@@ -218,8 +218,8 @@ func NewFloatField(constraints ...constraint) FloatField {
 	return field
 }
 
-func NewIntegerField(constraints ...constraint) IntegerField {
-	field := IntegerField{dbType: "INT4"}
+func NewIntegerField(constraints ...constraint) *IntegerField {
+	field := &IntegerField{dbType: "INT4"}
 
 	for _, constraint := range constraints {
 		switch constraint {
@@ -238,8 +238,8 @@ func NewIntegerField(constraints ...constraint) IntegerField {
 	return field
 }
 
-func NewTextField(constraints ...constraint) TextField {
-	field := TextField{dbType: "TEXT"}
+func NewTextField(constraints ...constraint) *TextField {
+	field := &TextField{dbType: "TEXT"}
 
 	for _, constraint := range constraints {
 		switch constraint {
@@ -412,7 +412,7 @@ func (f *TextField) SetNil() error {
 
 
 func create(f field) string {
-	s := doubleQuotes(f.getDBColumn()) + " " + f.getDBType()
+	s := doubleQuotes(f.DBColumn()) + " " + f.getDBType()
 
 	if f.hasPrimaryKeyConstraint() {
 		s += " PRIMARY KEY"

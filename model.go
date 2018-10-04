@@ -32,83 +32,72 @@ func MakeModel(i interface{}) error {
 	v := reflect.ValueOf(i)
 
 	if v.Kind() != reflect.Ptr {
-		return errors.New("Value is not a pointer")
+		panic("Value is not a pointer")
+		//return errors.New("Value is not a pointer")
 	}
 
 	v = v.Elem()
 
 	if v.Kind() != reflect.Struct {
-		return errors.New("Value is not a struct")
+		return errors.New("Value does not point to a struct")
 	}
 
-	if !v.CanSet() {
-		return errors.New("value is not settable")
+	// if !v.CanSet() {
+	// 	return errors.New("value is not settable")
+	// }
+
+	modelVal := v.FieldByName("Model")
+
+	if modelVal.Type() != reflect.TypeOf(Model{}) {
+		panic("Value does not have an embedded Model")
 	}
 
 	tableName := v.Type().String()
-	dotIndex := strings.Index(tableName, ".") + 1
-	tableName = tableName[dotIndex:]
+	dotIdx := strings.Index(tableName, ".") + 1
+	tableName = strings.ToLower(tableName[dotIdx:])
 
-	modelValue := v.FieldByName("Model")
+	dbTableVal := modelVal.FieldByName("DBTable")
+	dbTableVal.SetString(tableName)
 
-	dbTableValue := modelValue.FieldByName("DBTable")
-	dbTableValue.SetString(tableName)
+	//var fieldsMap reflect.Value
 
-	var fieldsMap reflect.Value
-
-	if modelValue.Type() == reflect.TypeOf(Model{}) {
-		fieldsMap = modelValue.FieldByName("Fields")
-
-	} else {
-		return errors.New("Struct is not a model")
-	}
-
-	var validTypes []reflect.Type
-
-	validTypes = append(validTypes, reflect.TypeOf(AutoField{}))
-	validTypes = append(validTypes, reflect.TypeOf(BooleanField{}))
-	validTypes = append(validTypes, reflect.TypeOf(FloatField{}))
-	validTypes = append(validTypes, reflect.TypeOf(IntegerField{}))
-	validTypes = append(validTypes, reflect.TypeOf(TextField{}))
+	fieldsMap := modelVal.FieldByName("Fields")
+	numOfPKs := 0
 
 	for idx := 0; idx < v.NumField(); idx++ {
-		fieldValue := v.Field(idx)
+		fieldVal := v.Field(idx)
 		fieldType := v.Type().Field(idx)
 
-		isAField := false
-
-		//Just check if it implements the field interface
-
-		for _, validType := range validTypes {
-			if fieldValue.Type() == validType {
-				isAField = true
-				break
-			}
-		}
+		_, isAField := fieldVal.Interface().(field)
 
 		if isAField {
-			//keep track of primary key fields with hasPrimaryKeyConstraint
-			//panic if there is more or less than one primary key
-			fieldsMap.SetMapIndex(reflect.ValueOf(fieldType.Name), fieldValue.Addr())
+			if fieldVal.Interface().(field).hasPrimaryKeyConstraint() {
+				numOfPKs += 1
+
+				if numOfPKs > 1 {
+					panic("Model cannot have more than one primary key")
+				}
+			}
+
+			fieldVal.Interface().(field).setDBColumn(strings.ToLower(fieldType.Name))
+			fieldsMap.SetMapIndex(reflect.ValueOf(fieldType.Name), fieldVal)
 			//save primaryKey to model.PK
+
 		}
+	}
+
+	if numOfPKs < 1 {
+		panic("Model must have a Primary Key")
 	}
 
 	return nil
 }
 
-// func (m Model) getPrimaryKeyField() field {
-// 	for _, field := range m.Fields {
-// 		if field.hasPrimaryKeyConstraint() {
-// 			return field
-// 		}
-// 	}
-// 	return nil
-// }
 
 func (m *Model) Save() string {
 	return m.insert()
 }
+
 
 func (m *Model) insert() string {
 	sql := "INSERT INTO " + dbq(m.DBTable) + " "
@@ -118,13 +107,13 @@ func (m *Model) insert() string {
 
 	//var pkField field
 
-	for key, field := range m.Fields {
+	for _, field := range m.Fields {
 		if field.hasPrimaryKeyConstraint() {
 			//pkField = field
 			continue
 		}
 
-		columns += dbq(key) + ", "
+		columns += dbq(field.DBColumn()) + ", "
 		values += field.sqlValue() + ", "
 	}
 
