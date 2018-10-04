@@ -5,9 +5,9 @@ import (
 )
 
 type field interface {
-	HasNullConstraint() bool
-	HasUniqueConstraint() bool
-	HasPrimaryKeyConstraint() bool
+	hasNullConstraint() bool
+	hasUniqueConstraint() bool
+	hasPrimaryKeyConstraint() bool
 	getDBColumn() string
 	getDBType() string
 	IsNil() bool
@@ -16,56 +16,102 @@ type field interface {
 	sqlValue() string
 }
 
-func (f BooleanField) HasNullConstraint() bool {
+func (f AutoField) hasNullConstraint() bool {
 	return f.null
 }
 
-func (f FloatField) HasNullConstraint() bool {
+func (f BigAutoField) hasNullConstraint() bool {
 	return f.null
 }
 
-func (f *IntegerField) HasNullConstraint() bool {
+func (f BigIntegerField) hasNullConstraint() bool {
 	return f.null
 }
 
-func (f *TextField) HasNullConstraint() bool {
+func (f BooleanField) hasNullConstraint() bool {
+	return f.null
+}
+
+func (f FloatField) hasNullConstraint() bool {
+	return f.null
+}
+
+func (f *IntegerField) hasNullConstraint() bool {
+	return f.null
+}
+
+func (f *TextField) hasNullConstraint() bool {
 	return f.null
 }
 
 
-
-func (f BooleanField) HasUniqueConstraint() bool {
+func (f AutoField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
-func (f FloatField) HasUniqueConstraint() bool {
+func (f BigAutoField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
-func (f *IntegerField) HasUniqueConstraint() bool {
+func (f BigIntegerField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
-func (f *TextField) HasUniqueConstraint() bool {
+func (f BooleanField) hasUniqueConstraint() bool {
+	return f.unique
+}
+
+func (f FloatField) hasUniqueConstraint() bool {
+	return f.unique
+}
+
+func (f *IntegerField) hasUniqueConstraint() bool {
+	return f.unique
+}
+
+func (f *TextField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
 
-
-func (f BooleanField) HasPrimaryKeyConstraint() bool {
-	return f.primaryKey
+func (f AutoField) hasPrimaryKeyConstraint() bool {
+	return true
 }
 
-func (f FloatField) HasPrimaryKeyConstraint() bool {
-	return f.primaryKey
+func (f BigAutoField) hasPrimaryKeyConstraint() bool {
+	return true
 }
 
-func (f *IntegerField) HasPrimaryKeyConstraint() bool {
-	return f.primaryKey
+func (f BigIntegerField) hasPrimaryKeyConstraint() bool {
+	return false
 }
 
-func (f *TextField) HasPrimaryKeyConstraint() bool {
-	return f.primaryKey
+func (f BooleanField) hasPrimaryKeyConstraint() bool {
+	return false
+}
+
+func (f FloatField) hasPrimaryKeyConstraint() bool {
+	return false
+}
+
+func (f *IntegerField) hasPrimaryKeyConstraint() bool {
+	return false
+}
+
+func (f *TextField) hasPrimaryKeyConstraint() bool {
+	return false
+}
+
+func (f AutoField) getDBColumn() string {
+	return f.dbColumn
+}
+
+func (f BigAutoField) getDBColumn() string {
+	return f.dbColumn
+}
+
+func (f BigIntegerField) getDBColumn() string {
+	return f.dbColumn
 }
 
 func (f BooleanField) getDBColumn() string {
@@ -84,7 +130,17 @@ func (f *TextField) getDBColumn() string {
 	return f.dbColumn
 }
 
+func (f AutoField) getDBType() string {
+	return f.dbType
+}
 
+func (f BigAutoField) getDBType() string {
+	return f.dbType
+}
+
+func (f BigIntegerField) getDBType() string {
+	return f.dbType
+}
 
 func (f BooleanField) getDBType() string {
 	return f.dbType
@@ -102,6 +158,17 @@ func (f *TextField) getDBType() string {
 	return f.dbType
 }
 
+func (f AutoField) IsNil() bool {
+	return f.pointer == nil
+}
+
+func (f BigAutoField) IsNil() bool {
+	return f.pointer == nil
+}
+
+func (f BigIntegerField) IsNil() bool {
+	return f.pointer == nil
+}
 
 func (f BooleanField) IsNil() bool {
 	return f.pointer == nil
@@ -117,6 +184,30 @@ func (f *IntegerField) IsNil() bool {
 
 func (f *TextField) IsNil() bool {
 	return f.pointer == nil
+}
+
+func (f AutoField) sqlValue() string {
+	if f.IsNil() {
+		return "NULL"
+	} else {
+		return int32ToSql(f.value)
+	}
+}
+
+func (f BigAutoField) sqlValue() string {
+	if f.IsNil() {
+		return "NULL"
+	} else {
+		return int64ToSql(f.value)
+	}
+}
+
+func (f BigIntegerField) sqlValue() string {
+	if f.IsNil() {
+		return "NULL"
+	} else {
+		return int64ToSql(f.value)
+	}
 }
 
 func (f BooleanField) sqlValue() string {
@@ -155,6 +246,18 @@ func (f *TextField) sqlValue() string {
 
 type orderByExpression string
 
+func (f AutoField) Asc() orderByExpression {
+	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+}
+
+func (f BigAutoField) Asc() orderByExpression {
+	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+}
+
+func (f BigIntegerField) Asc() orderByExpression {
+	return orderByExpression(dbq(f.dbColumn) + "ASC")
+}
+
 func (f BooleanField) Asc() orderByExpression {
 	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
 }
@@ -171,7 +274,17 @@ func (f *TextField) Asc() orderByExpression {
 	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
 }
 
+func (f AutoField) Desc() orderByExpression {
+	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+}
 
+func (f BigAutoField) Desc() orderByExpression {
+	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+}
+
+func (f BigIntegerField) Desc() orderByExpression {
+	return orderByExpression(dbq(f.dbColumn) + "DESC")
+}
 
 func (f BooleanField) Desc() orderByExpression {
 	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")

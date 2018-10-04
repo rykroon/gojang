@@ -47,7 +47,6 @@ type constraint string
 
 const Null constraint = "NULL"
 const Unique constraint = "UNIQUE"
-const PrimaryKey constraint = "PRIMARY KEY"
 
 type onDelete string
 
@@ -57,13 +56,35 @@ const SetNull onDelete = "SET NULL"
 const SetDefault onDelete = "SET DEFAULT"
 
 
+type AutoField struct {
+	dbColumn string
+	dbType   string
+
+	null       bool
+	unique     bool
+
+	pointer *int32
+	value int32
+}
+
+type BigAutoField struct {
+	dbColumn string
+	dbType   string
+
+	null       bool
+	unique     bool
+
+	pointer *int64
+	value int64
+}
+
+
 type BigIntegerField struct {
 	dbColumn string
 	dbType   string
 
 	null       bool
 	unique     bool
-	primaryKey bool
 
 	pointer *int64
 	value int64
@@ -75,7 +96,6 @@ type BooleanField struct {
 
 	null       bool
 	unique     bool
-	primaryKey bool
 
 	pointer *bool
 	value bool
@@ -87,7 +107,6 @@ type FloatField struct {
 
 	null       bool
 	unique     bool
-	primaryKey bool
 
 	pointer *float64
 	value float64
@@ -99,7 +118,6 @@ type IntegerField struct {
 
 	null       bool
 	unique     bool
-	primaryKey bool
 
 	pointer *int32
 	value int32
@@ -111,7 +129,6 @@ type TextField struct {
 
 	null       bool
 	unique     bool
-	primaryKey bool
 
 	pointer *string
 	value string
@@ -119,9 +136,37 @@ type TextField struct {
 
 //Constructors
 
-// func AutoField() field {
-// 	return field{dbType: "SERIAL4", goType: "int32"}
-// }
+func NewAutoField(constraints ...constraint) AutoField {
+	field := AutoField{dbType: "SERIAL4"}
+	field.pointer = &field.value
+	return field
+}
+
+func NewBigAutoField() BigAutoField {
+	field := BigAutoField{dbType: "SERIAL8"}
+	field.pointer = &field.value
+	return field
+}
+
+func NewBigIntegerField(constraints ...constraint) BigIntegerField {
+	field := BigIntegerField{dbType: "INT8"}
+
+	for _, constraint := range constraints {
+		switch constraint {
+		case "NULL":
+			field.null = true
+
+		case "UNIQUE":
+			field.unique = true
+		}
+	}
+
+	if !field.null {
+		field.pointer = &field.value
+	}
+
+	return field
+}
 
 func NewBooleanField(constraints ...constraint) BooleanField {
 	field := BooleanField{dbType: "BOOL"}
@@ -133,9 +178,6 @@ func NewBooleanField(constraints ...constraint) BooleanField {
 
 		case "UNIQUE":
 			field.unique = true
-
-		case "PRIMARY KEY":
-			field.primaryKey = true
 		}
 	}
 
@@ -156,9 +198,6 @@ func NewFloatField(constraints ...constraint) FloatField {
 
 		case "UNIQUE":
 			field.unique = true
-
-		case "PRIMARY KEY":
-			field.primaryKey = true
 		}
 	}
 
@@ -179,9 +218,6 @@ func NewIntegerField(constraints ...constraint) IntegerField {
 
 		case "UNIQUE":
 			field.unique = true
-
-		case "PRIMARY KEY":
-			field.primaryKey = true
 		}
 	}
 
@@ -203,8 +239,6 @@ func NewTextField(constraints ...constraint) TextField {
 		case "UNIQUE":
 			field.unique = true
 
-		case "PRIMARY KEY":
-			field.primaryKey = true
 		}
 	}
 
@@ -213,6 +247,18 @@ func NewTextField(constraints ...constraint) TextField {
 	}
 
 	return field
+}
+
+func (f AutoField) Val() int {
+	return int(f.value)
+}
+
+func (f BigAutoField) Val() int {
+	return int(f.value)
+}
+
+func (f BigIntegerField) Val() int {
+	return int(f.value)
 }
 
 func (f BooleanField) Val() bool {
@@ -229,6 +275,14 @@ func (f IntegerField) Val() int {
 
 func (f TextField) Val() string {
 	return f.value
+}
+
+func (f *BigIntegerField) Set(value int64) {
+	if f.pointer == nil {
+		f.pointer = &f.value
+	}
+
+	f.value = value
 }
 
 func (f *BooleanField) Set(value bool) {
@@ -263,9 +317,18 @@ func (f *TextField) Set(value string) {
 	f.value = value
 }
 
+func (f *BigIntegerField) SetNil() error {
+	if f.hasNullConstraint() {
+		f.pointer = nil
+		f.value = 0
+		return nil
+	} else {
+		return errors.New("Cannot set field with NOT NULL constraint to nil")
+	}
+}
 
 func (f *BooleanField) SetNil() error {
-	if f.HasNullConstraint() {
+	if f.hasNullConstraint() {
 		f.pointer = nil
 		f.value = false
 		return nil
@@ -275,7 +338,7 @@ func (f *BooleanField) SetNil() error {
 }
 
 func (f *FloatField) SetNil() error {
-	if f.HasNullConstraint() {
+	if f.hasNullConstraint() {
 		f.pointer = nil
 		f.value = 0
 		return nil
@@ -285,7 +348,7 @@ func (f *FloatField) SetNil() error {
 }
 
 func (f *IntegerField) SetNil() error {
-	if f.HasNullConstraint() {
+	if f.hasNullConstraint() {
 		f.pointer = nil
 		f.value = 0
 		return nil
@@ -295,7 +358,7 @@ func (f *IntegerField) SetNil() error {
 }
 
 func (f *TextField) SetNil() error {
-	if f.HasNullConstraint() {
+	if f.hasNullConstraint() {
 		f.pointer = nil
 		f.value = ""
 		return nil
@@ -322,7 +385,7 @@ func (f *TextField) SetNil() error {
 func create(f field) string {
 	s := doubleQuotes(f.getDBColumn()) + " " + f.getDBType()
 
-	if f.HasPrimaryKeyConstraint() {
+	if f.hasPrimaryKeyConstraint() {
 		s += " PRIMARY KEY"
 	} else {
 
@@ -331,19 +394,15 @@ func create(f field) string {
 		// 	s += " REFERENCES " + f.relatedModel.dbTable + " ON DELETE " + string(f.onDelete)
 		// }
 
-		if f.HasNullConstraint() {
+		if f.hasNullConstraint() {
 			s += " NULL"
 		} else {
 			s += " NOT NULL"
 		}
 
-		if f.HasUniqueConstraint() {
+		if f.hasUniqueConstraint() {
 			s += " UNIQUE"
 		}
-
-		// if f.defaultValue != "" {
-		// 	s += " DEFAULT " + f.defaultValue
-		// }
 	}
 
 	return s

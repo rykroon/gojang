@@ -5,7 +5,7 @@ import (
 	"reflect"
 	//"unsafe"
 	"errors"
-	"fmt"
+	//"fmt"
 	"strings"
 )
 
@@ -75,6 +75,8 @@ func MakeModel(i interface{}) error {
 
 		isAField := false
 
+		//Just check if it can cast interface 'field'
+
 		for _, validType := range validTypes {
 			if fieldValue.Type() == validType {
 				isAField = true
@@ -83,6 +85,8 @@ func MakeModel(i interface{}) error {
 		}
 
 		if isAField {
+			//keep track of primary key fields with hasPrimaryKeyConstraint
+			//panic if there is more or less than one primary key
 			fieldsMap.SetMapIndex(reflect.ValueOf(fieldType.Name), fieldValue.Addr())
 		}
 	}
@@ -92,7 +96,7 @@ func MakeModel(i interface{}) error {
 
 func (m Model) getPrimaryKeyField() field {
 	for _, field := range m.Fields {
-		if field.HasPrimaryKeyConstraint() {
+		if field.hasPrimaryKeyConstraint() {
 			return field
 		}
 	}
@@ -100,16 +104,7 @@ func (m Model) getPrimaryKeyField() field {
 }
 
 func (m *Model) Save() string {
-	pkField := m.getPrimaryKeyField()
-	pkIntField := pkField.(*IntegerField)
-	fmt.Println(pkIntField)
-
-	if pkIntField.Val() == 0 {
-		return m.insert()
-	}
-
-	return ""
-
+	return m.insert()
 }
 
 func (m *Model) insert() string {
