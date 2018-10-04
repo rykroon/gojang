@@ -36,11 +36,11 @@ func (f FloatField) hasNullConstraint() bool {
 	return f.null
 }
 
-func (f *IntegerField) hasNullConstraint() bool {
+func (f IntegerField) hasNullConstraint() bool {
 	return f.null
 }
 
-func (f *TextField) hasNullConstraint() bool {
+func (f TextField) hasNullConstraint() bool {
 	return f.null
 }
 
@@ -65,41 +65,41 @@ func (f FloatField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
-func (f *IntegerField) hasUniqueConstraint() bool {
+func (f IntegerField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
-func (f *TextField) hasUniqueConstraint() bool {
+func (f TextField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
 
 func (f AutoField) hasPrimaryKeyConstraint() bool {
-	return true
+	return f.primaryKey
 }
 
 func (f BigAutoField) hasPrimaryKeyConstraint() bool {
-	return true
+	return f.primaryKey
 }
 
 func (f BigIntegerField) hasPrimaryKeyConstraint() bool {
-	return false
+	return f.primaryKey
 }
 
 func (f BooleanField) hasPrimaryKeyConstraint() bool {
-	return false
+	return f.primaryKey
 }
 
 func (f FloatField) hasPrimaryKeyConstraint() bool {
-	return false
+	return f.primaryKey
 }
 
-func (f *IntegerField) hasPrimaryKeyConstraint() bool {
-	return false
+func (f IntegerField) hasPrimaryKeyConstraint() bool {
+	return f.primaryKey
 }
 
-func (f *TextField) hasPrimaryKeyConstraint() bool {
-	return false
+func (f TextField) hasPrimaryKeyConstraint() bool {
+	return f.primaryKey
 }
 
 func (f AutoField) getDBColumn() string {
@@ -122,11 +122,11 @@ func (f FloatField) getDBColumn() string {
 	return f.dbColumn
 }
 
-func (f *IntegerField) getDBColumn() string {
+func (f IntegerField) getDBColumn() string {
 	return f.dbColumn
 }
 
-func (f *TextField) getDBColumn() string {
+func (f TextField) getDBColumn() string {
 	return f.dbColumn
 }
 
@@ -150,11 +150,11 @@ func (f FloatField) getDBType() string {
 	return f.dbType
 }
 
-func (f *IntegerField) getDBType() string {
+func (f IntegerField) getDBType() string {
 	return f.dbType
 }
 
-func (f *TextField) getDBType() string {
+func (f TextField) getDBType() string {
 	return f.dbType
 }
 
@@ -178,11 +178,11 @@ func (f FloatField) IsNil() bool {
 	return f.pointer == nil
 }
 
-func (f *IntegerField) IsNil() bool {
+func (f IntegerField) IsNil() bool {
 	return f.pointer == nil
 }
 
-func (f *TextField) IsNil() bool {
+func (f TextField) IsNil() bool {
 	return f.pointer == nil
 }
 
@@ -226,7 +226,7 @@ func (f FloatField) sqlValue() string {
 	}
 }
 
-func (f *IntegerField) sqlValue() string {
+func (f IntegerField) sqlValue() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -234,7 +234,7 @@ func (f *IntegerField) sqlValue() string {
 	}
 }
 
-func (f *TextField) sqlValue() string {
+func (f TextField) sqlValue() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {

@@ -62,6 +62,8 @@ type AutoField struct {
 
 	null       bool
 	unique     bool
+	primaryKey bool
+
 
 	pointer *int32
 	value int32
@@ -73,6 +75,7 @@ type BigAutoField struct {
 
 	null       bool
 	unique     bool
+	primaryKey bool
 
 	pointer *int64
 	value int64
@@ -85,6 +88,7 @@ type BigIntegerField struct {
 
 	null       bool
 	unique     bool
+	primaryKey bool
 
 	pointer *int64
 	value int64
@@ -96,6 +100,7 @@ type BooleanField struct {
 
 	null       bool
 	unique     bool
+	primaryKey bool
 
 	pointer *bool
 	value bool
@@ -107,6 +112,7 @@ type FloatField struct {
 
 	null       bool
 	unique     bool
+	primaryKey bool
 
 	pointer *float64
 	value float64
@@ -118,6 +124,7 @@ type IntegerField struct {
 
 	null       bool
 	unique     bool
+	primaryKey bool
 
 	pointer *int32
 	value int32
@@ -129,6 +136,7 @@ type TextField struct {
 
 	null       bool
 	unique     bool
+	primaryKey bool
 
 	pointer *string
 	value string
@@ -139,12 +147,14 @@ type TextField struct {
 func NewAutoField(constraints ...constraint) AutoField {
 	field := AutoField{dbType: "SERIAL4"}
 	field.pointer = &field.value
+	field.primaryKey = true
 	return field
 }
 
 func NewBigAutoField() BigAutoField {
 	field := BigAutoField{dbType: "SERIAL8"}
 	field.pointer = &field.value
+	field.primaryKey = true
 	return field
 }
 
@@ -276,6 +286,25 @@ func (f IntegerField) Val() int {
 func (f TextField) Val() string {
 	return f.value
 }
+
+//The client can not set the value of the primary key
+func (f *AutoField) set(value int32) {
+	if f.pointer == nil { //pointer should never be nil for Auto and BigAuto fields
+		f.pointer = &f.value
+	}
+
+	f.value = value
+}
+
+//The client can not set the value of the primary key
+func (f *BigAutoField) set(value int64) {
+	if f.pointer == nil {
+		f.pointer = &f.value
+	}
+
+	f.value = value
+}
+
 
 func (f *BigIntegerField) Set(value int64) {
 	if f.pointer == nil {

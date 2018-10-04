@@ -13,6 +13,7 @@ type Model struct {
 	DBTable string
 	Objects Manager
 	Fields  map[string]field
+	PK field
 
 	db *sql.DB
 
@@ -64,6 +65,7 @@ func MakeModel(i interface{}) error {
 
 	var validTypes []reflect.Type
 
+	validTypes = append(validTypes, reflect.TypeOf(AutoField{}))
 	validTypes = append(validTypes, reflect.TypeOf(BooleanField{}))
 	validTypes = append(validTypes, reflect.TypeOf(FloatField{}))
 	validTypes = append(validTypes, reflect.TypeOf(IntegerField{}))
@@ -75,7 +77,7 @@ func MakeModel(i interface{}) error {
 
 		isAField := false
 
-		//Just check if it can cast interface 'field'
+		//Just check if it implements the field interface
 
 		for _, validType := range validTypes {
 			if fieldValue.Type() == validType {
@@ -88,20 +90,21 @@ func MakeModel(i interface{}) error {
 			//keep track of primary key fields with hasPrimaryKeyConstraint
 			//panic if there is more or less than one primary key
 			fieldsMap.SetMapIndex(reflect.ValueOf(fieldType.Name), fieldValue.Addr())
+			//save primaryKey to model.PK
 		}
 	}
 
 	return nil
 }
 
-func (m Model) getPrimaryKeyField() field {
-	for _, field := range m.Fields {
-		if field.hasPrimaryKeyConstraint() {
-			return field
-		}
-	}
-	return nil
-}
+// func (m Model) getPrimaryKeyField() field {
+// 	for _, field := range m.Fields {
+// 		if field.hasPrimaryKeyConstraint() {
+// 			return field
+// 		}
+// 	}
+// 	return nil
+// }
 
 func (m *Model) Save() string {
 	return m.insert()
@@ -113,7 +116,14 @@ func (m *Model) insert() string {
 	columns := "("
 	values := "("
 
+	//var pkField field
+
 	for key, field := range m.Fields {
+		if field.hasPrimaryKeyConstraint() {
+			//pkField = field
+			continue
+		}
+
 		columns += dbq(key) + ", "
 		values += field.sqlValue() + ", "
 	}
@@ -124,6 +134,9 @@ func (m *Model) insert() string {
 	sql += columns + " VALUES " + values + ";"
 
 	return sql
+
+	//execute sql and then store lastInsertId into the primary key value
+	//pkField.set(lastInsertId)
 }
 
 func (m *Model) update() {
@@ -166,7 +179,7 @@ func (m *Model) update() {
 // }
 
 //Creates a table
-func (m Model) CreateTable() {
+func (m Model) CreateTable() string {
 	sql := "CREATE TABLE IF NOT EXISTS " + m.DBTable + "("
 
 	for _, field := range m.Fields {
@@ -174,16 +187,17 @@ func (m Model) CreateTable() {
 	}
 
 	sql = sql[0:len(sql)-2] + ");"
+	return sql
 
 	//return s
 	//fmt.Println(sql)
-	_, err := m.db.Exec(sql)
-
-	if err != nil {
-		panic(err)
-	} else {
-		//fmt.Println(result.LastInsertId())
-		//fmt.Println(result.RowsAffected())
-	}
+	// _, err := m.db.Exec(sql)
+	//
+	// if err != nil {
+	// 	panic(err)
+	// } else {
+	// 	//fmt.Println(result.LastInsertId())
+	// 	//fmt.Println(result.RowsAffected())
+	// }
 
 }
