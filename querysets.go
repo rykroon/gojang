@@ -118,10 +118,10 @@ func (q QuerySet) OrderBy(orderBys ...orderByExpression) QuerySet {
 
 //Functions that do not return Querysets
 
-func (q QuerySet) Get() modelInstance {
-	//row := q.queryRow()
-	return modelInstance{}
-}
+// func (q QuerySet) Get() modelInstance {
+// 	//row := q.queryRow()
+// 	return modelInstance{}
+// }
 
 func (q QuerySet) Count() int {
 	q.selected = nil
