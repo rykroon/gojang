@@ -1,7 +1,7 @@
 package gojang
 
 import (
-	//"reflect"
+//"reflect"
 )
 
 type lookup struct {

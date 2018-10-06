@@ -13,7 +13,7 @@ type Model struct {
 	DBTable string
 	Objects Manager
 	Fields  map[string]field
-	PK field
+	PK      field
 
 	db *sql.DB
 
@@ -21,12 +21,12 @@ type Model struct {
 	//uniqueTogether []string
 }
 
-func NewModel() Model {
+func NewModel(db Database) Model {
 	m := Model{}
 	m.Fields = make(map[string]field)
+	m.db, _ = db.toDB()
 	return m
 }
-
 
 func MakeModel(i interface{}) error {
 	v := reflect.ValueOf(i)
@@ -93,11 +93,57 @@ func MakeModel(i interface{}) error {
 	return nil
 }
 
+func (m Model) getPKField() primaryKeyField {
+	for _, field := range m.Fields {
+		if field.hasPrimaryKeyConstraint() {
+			pk, _ := field.(primaryKeyField)
+			return pk
+		}
+	}
 
-func (m *Model) Save() string {
-	return m.insert()
+	return NewAutoField()
 }
 
+// func (m Model) getPK() int {
+// 	pkField := m.getPKField()
+//
+// 	//var i interface{} = pkField
+// 	typ := reflect.TypeOf(pkField)
+//
+// 	if typ == reflect.TypeOf(*AutoField{}) {
+// 		autoField := pkField.
+// 	}
+//
+//
+//
+//
+// 	return 0
+//
+// }
+
+func (m *Model) Save() error {
+	pk := m.getPKField()
+
+	if pk.id() == 0 {
+		var id int
+
+		err := m.db.QueryRow(m.insert()).Scan(&id)
+		if err != nil {
+			return err
+		}
+
+		pk.setId(id)
+
+	} else {
+		_, err := m.db.Exec(m.update())
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 func (m *Model) insert() string {
 	sql := "INSERT INTO " + dbq(m.DBTable) + " "
@@ -106,10 +152,11 @@ func (m *Model) insert() string {
 	values := "("
 
 	//var pkField field
+	var pkFieldName string
 
 	for _, field := range m.Fields {
 		if field.hasPrimaryKeyConstraint() {
-			//pkField = field
+			pkFieldName = field.DBColumn()
 			continue
 		}
 
@@ -117,10 +164,10 @@ func (m *Model) insert() string {
 		values += field.sqlValue() + ", "
 	}
 
-	columns = columns[:len(columns) - 2] + ")"
-	values = values[:len(values) - 2] + ")"
+	columns = columns[:len(columns)-2] + ")"
+	values = values[:len(values)-2] + ")"
 
-	sql += columns + " VALUES " + values + ";"
+	sql += columns + " VALUES " + values + " RETURNING " + dbq(pkFieldName) + ";"
 
 	return sql
 
@@ -128,47 +175,37 @@ func (m *Model) insert() string {
 	//pkField.set(lastInsertId)
 }
 
-func (m *Model) update() {
-	return
 
+func (m *Model) update() string {
+	sql := "UPDATE " + dbq(m.DBTable) + " SET "
+
+	var pk field
+
+	for _, field := range m.Fields {
+		if field.hasPrimaryKeyConstraint() {
+			pk = field
+			continue
+		}
+
+		sql += dbq(field.DBColumn()) + " = " + field.sqlValue() + ", "
+	}
+
+	sql = sql[:len(sql)-2]
+
+	sql += " WHERE " + dbq(pk.DBColumn()) + " = " + pk.sqlValue()
+
+	return sql
 }
 
+//Creates the table
+func (m Model) Migrate() (sql.Result, error) {
+	sql := m.createTable()
+	result, err := m.db.Exec(sql)
+	return result, err
+}
 
-//returns a list of the model's fields in SQL format
-// func (m Model) sqlFieldList() []string {
-// 	list := []string{}
-//
-// 	for _, field := range m.fields {
-// 		list = append(list, field.toSql())
-// 	}
-//
-// 	return list
-// }
-
-//Returns a map with attribute names as the keys and database columns as the values
-// func (m Model) attrToDBColumnMap() map[string]string {
-// 	result := make(map[string]string)
-//
-// 	for key, field := range m.fields {
-// 		result[key] = field.dbColumn
-// 	}
-//
-// 	return result
-// }
-
-//Returns a map of database columns as the keys and attribute names as the values
-// func (m Model) dbColumnToAttrMap() map[string]string {
-// 	result := make(map[string]string)
-//
-// 	for key, field := range m.fields {
-// 		result[field.dbColumn] = key
-// 	}
-//
-// 	return result
-// }
-
-//Creates a table
-func (m Model) CreateTable() string {
+//Creates an SQL statement that will create the table
+func (m Model) createTable() string {
 	sql := "CREATE TABLE IF NOT EXISTS " + m.DBTable + "("
 
 	for _, field := range m.Fields {
@@ -177,16 +214,4 @@ func (m Model) CreateTable() string {
 
 	sql = sql[0:len(sql)-2] + ");"
 	return sql
-
-	//return s
-	//fmt.Println(sql)
-	// _, err := m.db.Exec(sql)
-	//
-	// if err != nil {
-	// 	panic(err)
-	// } else {
-	// 	//fmt.Println(result.LastInsertId())
-	// 	//fmt.Println(result.RowsAffected())
-	// }
-
 }

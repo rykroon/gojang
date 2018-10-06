@@ -1,8 +1,8 @@
 package gojang
 
 import (
-//"strconv"
-//"reflect"
+	//"strconv"
+	//"reflect"
 	"errors"
 )
 
@@ -55,7 +55,6 @@ const Protect onDelete = "RESTRICT"
 const SetNull onDelete = "SET NULL"
 const SetDefault onDelete = "SET DEFAULT"
 
-
 type AutoField struct {
 	dbColumn string
 	dbType   string
@@ -64,9 +63,8 @@ type AutoField struct {
 	unique     bool
 	primaryKey bool
 
-
 	pointer *int32
-	value int32
+	value   int32
 }
 
 type BigAutoField struct {
@@ -78,9 +76,8 @@ type BigAutoField struct {
 	primaryKey bool
 
 	pointer *int64
-	value int64
+	value   int64
 }
-
 
 type BigIntegerField struct {
 	dbColumn string
@@ -91,7 +88,7 @@ type BigIntegerField struct {
 	primaryKey bool
 
 	pointer *int64
-	value int64
+	value   int64
 }
 
 type BooleanField struct {
@@ -103,7 +100,7 @@ type BooleanField struct {
 	primaryKey bool
 
 	pointer *bool
-	value bool
+	value   bool
 }
 
 type FloatField struct {
@@ -115,7 +112,7 @@ type FloatField struct {
 	primaryKey bool
 
 	pointer *float64
-	value float64
+	value   float64
 }
 
 type IntegerField struct {
@@ -127,7 +124,7 @@ type IntegerField struct {
 	primaryKey bool
 
 	pointer *int32
-	value int32
+	value   int32
 }
 
 type TextField struct {
@@ -139,7 +136,20 @@ type TextField struct {
 	primaryKey bool
 
 	pointer *string
-	value string
+	value   string
+}
+
+type ForeignKeyField struct {
+	dbColumn string
+	dbType   string
+
+	null           bool
+	unique         bool
+	primaryKey     bool
+	manyToOneField bool
+
+	pointer *int64
+	value   int64
 }
 
 //Constructors
@@ -259,6 +269,12 @@ func NewTextField(constraints ...constraint) *TextField {
 	return field
 }
 
+func NewForeignKeyField() *ForeignKeyField {
+	field := &ForeignKeyField{dbType: "INT8"}
+
+	return field
+}
+
 func (f AutoField) Val() int {
 	return int(f.value)
 }
@@ -304,7 +320,6 @@ func (f *BigAutoField) set(value int64) {
 
 	f.value = value
 }
-
 
 func (f *BigIntegerField) Set(value int64) {
 	if f.pointer == nil {
@@ -396,8 +411,6 @@ func (f *TextField) SetNil() error {
 	}
 }
 
-
-
 //Relation Fields
 // func ForeignKey(to *Model, onDelete onDelete) field {
 // 	relatedPkey := to.getPrimaryKey()
@@ -408,8 +421,6 @@ func (f *TextField) SetNil() error {
 // 	field.manyToOne = true
 // 	return field
 // }
-
-
 
 func create(f field) string {
 	s := doubleQuotes(f.DBColumn()) + " " + f.getDBType()

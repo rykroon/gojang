@@ -1,7 +1,7 @@
 package gojang
 
 import (
-//"reflect"
+	//"reflect"
 )
 
 type field interface {
@@ -15,6 +15,27 @@ type field interface {
 	Asc() orderByExpression
 	Desc() orderByExpression
 	sqlValue() string
+}
+
+type primaryKeyField interface {
+	id() int
+	setId(int)
+}
+
+func (f *AutoField) id() int {
+	return int(f.value)
+}
+
+func (f *BigAutoField) id() int {
+	return int(f.value)
+}
+
+func (f *AutoField) setId(value int) {
+	f.value = int32(value)
+}
+
+func (f *BigAutoField) setId(value int) {
+	f.value = int64(value)
 }
 
 func (f *AutoField) hasNullConstraint() bool {
@@ -45,7 +66,6 @@ func (f *TextField) hasNullConstraint() bool {
 	return f.null
 }
 
-
 func (f *AutoField) hasUniqueConstraint() bool {
 	return f.unique
 }
@@ -73,7 +93,6 @@ func (f *IntegerField) hasUniqueConstraint() bool {
 func (f *TextField) hasUniqueConstraint() bool {
 	return f.unique
 }
-
 
 func (f *AutoField) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
@@ -131,8 +150,7 @@ func (f *TextField) DBColumn() string {
 	return f.dbColumn
 }
 
-
-func (f *AutoField) setDBColumn(columnName string)  {
+func (f *AutoField) setDBColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
@@ -159,7 +177,6 @@ func (f *IntegerField) setDBColumn(columnName string) {
 func (f *TextField) setDBColumn(columnName string) {
 	f.dbColumn = columnName
 }
-
 
 func (f *AutoField) getDBType() string {
 	return f.dbType
@@ -272,8 +289,6 @@ func (f *TextField) sqlValue() string {
 		return stringToSql(f.value)
 	}
 }
-
-
 
 type orderByExpression string
 
