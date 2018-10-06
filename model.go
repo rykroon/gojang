@@ -3,8 +3,6 @@ package gojang
 import (
 	"database/sql"
 	"reflect"
-	//"unsafe"
-	"errors"
 	//"fmt"
 	"strings"
 )
@@ -21,6 +19,7 @@ type Model struct {
 	//uniqueTogether []string
 }
 
+//Returns a New Model
 func NewModel(db Database) Model {
 	m := Model{}
 	m.Fields = make(map[string]field)
@@ -28,27 +27,23 @@ func NewModel(db Database) Model {
 	return m
 }
 
+//
 func MakeModel(i interface{}) error {
 	v := reflect.ValueOf(i)
 
 	if v.Kind() != reflect.Ptr {
 		panic("Value is not a pointer")
-		//return errors.New("Value is not a pointer")
 	}
 
 	v = v.Elem()
 
 	if v.Kind() != reflect.Struct {
-		return errors.New("Value does not point to a struct")
+		panic("Value does not point to a struct")
 	}
 
-	// if !v.CanSet() {
-	// 	return errors.New("value is not settable")
-	// }
+	model := v.FieldByName("Model")
 
-	modelVal := v.FieldByName("Model")
-
-	if modelVal.Type() != reflect.TypeOf(Model{}) {
+	if model.Type() != reflect.TypeOf(Model{}) {
 		panic("Value does not have an embedded Model")
 	}
 
@@ -56,12 +51,10 @@ func MakeModel(i interface{}) error {
 	dotIdx := strings.Index(tableName, ".") + 1
 	tableName = strings.ToLower(tableName[dotIdx:])
 
-	dbTableVal := modelVal.FieldByName("DBTable")
-	dbTableVal.SetString(tableName)
+	dbTable := model.FieldByName("DBTable")
+	dbTable.SetString(tableName)
 
-	//var fieldsMap reflect.Value
-
-	fieldsMap := modelVal.FieldByName("Fields")
+	fieldsMap := model.FieldByName("Fields")
 	numOfPKs := 0
 
 	for idx := 0; idx < v.NumField(); idx++ {
@@ -81,8 +74,6 @@ func MakeModel(i interface{}) error {
 
 			fieldVal.Interface().(field).setDBColumn(strings.ToLower(fieldType.Name))
 			fieldsMap.SetMapIndex(reflect.ValueOf(fieldType.Name), fieldVal)
-			//save primaryKey to model.PK
-
 		}
 	}
 
@@ -104,30 +95,15 @@ func (m Model) getPKField() primaryKeyField {
 	return NewAutoField()
 }
 
-// func (m Model) getPK() int {
-// 	pkField := m.getPKField()
-//
-// 	//var i interface{} = pkField
-// 	typ := reflect.TypeOf(pkField)
-//
-// 	if typ == reflect.TypeOf(*AutoField{}) {
-// 		autoField := pkField.
-// 	}
-//
-//
-//
-//
-// 	return 0
-//
-// }
-
+//If instance does not have a primary key then it will insert into the database
+//Otherwise it updates the record
 func (m *Model) Save() error {
 	pk := m.getPKField()
 
 	if pk.id() == 0 {
 		var id int
-
 		err := m.db.QueryRow(m.insert()).Scan(&id)
+
 		if err != nil {
 			return err
 		}
@@ -147,11 +123,8 @@ func (m *Model) Save() error {
 
 func (m *Model) insert() string {
 	sql := "INSERT INTO " + dbq(m.DBTable) + " "
-
 	columns := "("
 	values := "("
-
-	//var pkField field
 	var pkFieldName string
 
 	for _, field := range m.Fields {
@@ -166,19 +139,14 @@ func (m *Model) insert() string {
 
 	columns = columns[:len(columns)-2] + ")"
 	values = values[:len(values)-2] + ")"
-
 	sql += columns + " VALUES " + values + " RETURNING " + dbq(pkFieldName) + ";"
 
 	return sql
-
-	//execute sql and then store lastInsertId into the primary key value
-	//pkField.set(lastInsertId)
 }
 
 
 func (m *Model) update() string {
 	sql := "UPDATE " + dbq(m.DBTable) + " SET "
-
 	var pk field
 
 	for _, field := range m.Fields {
@@ -191,13 +159,12 @@ func (m *Model) update() string {
 	}
 
 	sql = sql[:len(sql)-2]
-
 	sql += " WHERE " + dbq(pk.DBColumn()) + " = " + pk.sqlValue()
 
 	return sql
 }
 
-//Creates the table
+//Creates the Database table
 func (m Model) Migrate() (sql.Result, error) {
 	sql := m.createTable()
 	result, err := m.db.Exec(sql)
