@@ -8,12 +8,17 @@ type field interface {
 	hasNullConstraint() bool
 	hasUniqueConstraint() bool
 	hasPrimaryKeyConstraint() bool
+	hasRelation() bool
+
 	DBColumn() string
 	setDBColumn(string)
 	getDBType() string
+
 	IsNil() bool
+
 	Asc() orderByExpression
 	Desc() orderByExpression
+
 	sqlValue() string
 }
 
@@ -21,6 +26,7 @@ type primaryKeyField interface {
 	id() int
 	setId(int)
 }
+
 
 func (f *AutoField) id() int {
 	return int(f.value)
@@ -66,6 +72,10 @@ func (f *TextField) hasNullConstraint() bool {
 	return f.null
 }
 
+func (f *ForeignKeyField) hasNullConstraint() bool {
+	return f.null
+}
+
 func (f *AutoField) hasUniqueConstraint() bool {
 	return f.unique
 }
@@ -91,6 +101,10 @@ func (f *IntegerField) hasUniqueConstraint() bool {
 }
 
 func (f *TextField) hasUniqueConstraint() bool {
+	return f.unique
+}
+
+func (f *ForeignKeyField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
@@ -122,6 +136,42 @@ func (f *TextField) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
 }
 
+func (f *ForeignKeyField) hasPrimaryKeyConstraint() bool {
+	return f.primaryKey
+}
+
+func (f *AutoField) hasRelation() bool {
+	return f.primaryKey
+}
+
+func (f *BigAutoField) hasRelation() bool {
+	return f.isRelation
+}
+
+func (f *BigIntegerField) hasRelation() bool {
+	return f.isRelation
+}
+
+func (f *BooleanField) hasRelation() bool {
+	return f.isRelation
+}
+
+func (f *FloatField) hasRelation() bool {
+	return f.isRelation
+}
+
+func (f *IntegerField) hasRelation() bool {
+	return f.isRelation
+}
+
+func (f *TextField) hasRelation() bool {
+	return f.isRelation
+}
+
+func (f *ForeignKeyField) hasRelation() bool {
+	return f.isRelation
+}
+
 func (f *AutoField) DBColumn() string {
 	return f.dbColumn
 }
@@ -147,6 +197,10 @@ func (f *IntegerField) DBColumn() string {
 }
 
 func (f *TextField) DBColumn() string {
+	return f.dbColumn
+}
+
+func (f *ForeignKeyField) DBColumn() string {
 	return f.dbColumn
 }
 
@@ -178,6 +232,10 @@ func (f *TextField) setDBColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
+func (f *ForeignKeyField) setDBColumn(columnName string) {
+	f.dbColumn = columnName
+}
+
 func (f *AutoField) getDBType() string {
 	return f.dbType
 }
@@ -206,6 +264,10 @@ func (f *TextField) getDBType() string {
 	return f.dbType
 }
 
+func (f *ForeignKeyField) getDBType() string {
+	return f.dbType
+}
+
 func (f *AutoField) IsNil() bool {
 	return f.pointer == nil
 }
@@ -231,6 +293,10 @@ func (f *IntegerField) IsNil() bool {
 }
 
 func (f *TextField) IsNil() bool {
+	return f.pointer == nil
+}
+
+func (f *ForeignKeyField) IsNil() bool {
 	return f.pointer == nil
 }
 
@@ -290,6 +356,14 @@ func (f *TextField) sqlValue() string {
 	}
 }
 
+func (f *ForeignKeyField) sqlValue() string {
+	if f.IsNil() {
+		return "NULL"
+	} else {
+		return int64ToSql(f.value)
+	}
+}
+
 type orderByExpression string
 
 func (f *AutoField) Asc() orderByExpression {
@@ -320,6 +394,10 @@ func (f *TextField) Asc() orderByExpression {
 	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
 }
 
+func (f *ForeignKeyField) Asc() orderByExpression {
+	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+}
+
 func (f *AutoField) Desc() orderByExpression {
 	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
 }
@@ -344,6 +422,10 @@ func (f *IntegerField) Desc() orderByExpression {
 	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
 }
 
-func (f TextField) Desc() orderByExpression {
+func (f *TextField) Desc() orderByExpression {
+	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+}
+
+func (f *ForeignKeyField) Desc() orderByExpression {
 	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
 }

@@ -4,44 +4,8 @@ import (
 	//"strconv"
 	//"reflect"
 	"errors"
+	//"fmt"
 )
-
-// type field struct { //Required Attributes
-//
-// 	dbColumn string
-// 	dbType   string
-// 	goType   string
-// 	model    *Model
-//
-// 	//specific for CharField
-// 	maxLength int
-//
-// 	//specfic for DecimalField
-// 	maxDigits     int
-// 	decimalPlaces int
-//
-// 	//Constraint Attributes
-// 	null         bool
-// 	primaryKey   bool
-// 	unique       bool
-// 	defaultValue string
-//
-// 	//Other Attributes
-// 	autoCreated bool
-// 	concrete    bool
-// 	hidden      bool
-//
-// 	//Relation Attributes
-// 	isRelation   bool
-// 	manyToMany   bool
-// 	manyToOne    bool
-// 	oneToMany    bool
-// 	oneToOne     bool
-// 	relatedModel *Model
-//
-// 	//foreignKey bool
-// 	onDelete onDelete
-// }
 
 type constraint string
 
@@ -62,6 +26,7 @@ type AutoField struct {
 	null       bool
 	unique     bool
 	primaryKey bool
+	isRelation bool
 
 	pointer *int32
 	value   int32
@@ -74,6 +39,7 @@ type BigAutoField struct {
 	null       bool
 	unique     bool
 	primaryKey bool
+	isRelation bool
 
 	pointer *int64
 	value   int64
@@ -86,6 +52,7 @@ type BigIntegerField struct {
 	null       bool
 	unique     bool
 	primaryKey bool
+	isRelation bool
 
 	pointer *int64
 	value   int64
@@ -98,6 +65,7 @@ type BooleanField struct {
 	null       bool
 	unique     bool
 	primaryKey bool
+	isRelation bool
 
 	pointer *bool
 	value   bool
@@ -110,6 +78,7 @@ type FloatField struct {
 	null       bool
 	unique     bool
 	primaryKey bool
+	isRelation bool
 
 	pointer *float64
 	value   float64
@@ -122,6 +91,7 @@ type IntegerField struct {
 	null       bool
 	unique     bool
 	primaryKey bool
+	isRelation bool
 
 	pointer *int32
 	value   int32
@@ -134,6 +104,7 @@ type TextField struct {
 	null       bool
 	unique     bool
 	primaryKey bool
+	isRelation bool
 
 	pointer *string
 	value   string
@@ -146,7 +117,15 @@ type ForeignKeyField struct {
 	null           bool
 	unique         bool
 	primaryKey     bool
-	manyToOneField bool
+	isRelation     bool
+
+	//specific for related fields
+	manyToMany		 bool
+	manyToOne			 bool
+	oneToMany			 bool
+	oneToOne			 bool
+	relatedModel		Model
+	onDelete 				onDelete
 
 	pointer *int64
 	value   int64
@@ -258,7 +237,6 @@ func NewTextField(constraints ...constraint) *TextField {
 
 		case "UNIQUE":
 			field.unique = true
-
 		}
 	}
 
@@ -269,8 +247,26 @@ func NewTextField(constraints ...constraint) *TextField {
 	return field
 }
 
-func NewForeignKeyField() *ForeignKeyField {
+func NewForeignKeyField(to Model, onDelete onDelete, constraints ...constraint) *ForeignKeyField {
 	field := &ForeignKeyField{dbType: "INT8"}
+	field.isRelation = true
+	field.manyToOne = true
+	field.relatedModel = to
+	field.onDelete = onDelete
+
+	for _, constraint := range constraints {
+		switch constraint {
+		case "NULL":
+			field.null = true
+
+		case "UNIQUE":
+			field.unique = true
+		}
+	}
+
+	if !field.null {
+		field.pointer = &field.value
+	}
 
 	return field
 }
@@ -301,6 +297,10 @@ func (f IntegerField) Val() int {
 
 func (f TextField) Val() string {
 	return f.value
+}
+
+func (f ForeignKeyField) Val() int {
+	return int(f.value)
 }
 
 //The client can not set the value of the primary key
@@ -361,6 +361,14 @@ func (f *TextField) Set(value string) {
 	f.value = value
 }
 
+func (f *ForeignKeyField) Set(value int64) {
+	if f.pointer == nil {
+		f.pointer = &f.value
+	}
+
+	f.value = value
+}
+
 func (f *BigIntegerField) SetNil() error {
 	if f.hasNullConstraint() {
 		f.pointer = nil
@@ -411,28 +419,27 @@ func (f *TextField) SetNil() error {
 	}
 }
 
-//Relation Fields
-// func ForeignKey(to *Model, onDelete onDelete) field {
-// 	relatedPkey := to.getPrimaryKey()
-// 	field := field{dbType: relatedPkey.dbType, goType: relatedPkey.goType}
-// 	field.isRelation = true
-// 	field.relatedModel = to
-// 	field.onDelete = onDelete
-// 	field.manyToOne = true
-// 	return field
-// }
+func (f *ForeignKeyField) SetNil() error {
+	if f.hasNullConstraint() {
+		f.pointer = nil
+		f.value = 0
+		return nil
+	} else {
+		return errors.New("Cannot set field with NOT NULL constraint to nil")
+	}
+}
 
 func create(f field) string {
-	s := doubleQuotes(f.DBColumn()) + " " + f.getDBType()
+	s := dbq(f.DBColumn()) + " " + f.getDBType()
 
 	if f.hasPrimaryKeyConstraint() {
 		s += " PRIMARY KEY"
 	} else {
 
-		//if f.foreignKey {
-		// if f.isRelation {
-		// 	s += " REFERENCES " + f.relatedModel.dbTable + " ON DELETE " + string(f.onDelete)
-		// }
+		if f.hasRelation() {
+			fkey := f.(relatedField)
+			s += " REFERENCES " + fkey.getRelatedModel().DBTable + " ON DELETE " + fkey.getOnDelete()
+		}
 
 		if f.hasNullConstraint() {
 			s += " NULL"

@@ -3,7 +3,7 @@ package gojang
 import (
 	"database/sql"
 	"reflect"
-	//"fmt"
+	"fmt"
 	"strings"
 )
 
@@ -167,6 +167,7 @@ func (m *Model) update() string {
 //Creates the Database table
 func (m Model) Migrate() (sql.Result, error) {
 	sql := m.createTable()
+	fmt.Println(sql)
 	result, err := m.db.Exec(sql)
 	return result, err
 }
