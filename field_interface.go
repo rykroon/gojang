@@ -1,7 +1,8 @@
 package gojang
 
 import (
-	//"reflect"
+	"reflect"
+	"unsafe"
 )
 
 type field interface {
@@ -10,15 +11,17 @@ type field interface {
 	hasPrimaryKeyConstraint() bool
 	hasRelation() bool
 
-	DBColumn() string
+	getDbColumn() string
 	setDBColumn(string)
 	getDBType() string
+	getGoType() string
 
 	IsNil() bool
 
 	Asc() orderByExpression
 	Desc() orderByExpression
 
+	getPtr() unsafe.Pointer
 	sqlValue() string
 }
 
@@ -26,7 +29,6 @@ type primaryKeyField interface {
 	id() int
 	setId(int)
 }
-
 
 func (f *AutoField) id() int {
 	return int(f.value)
@@ -172,35 +174,35 @@ func (f *ForeignKeyField) hasRelation() bool {
 	return f.isRelation
 }
 
-func (f *AutoField) DBColumn() string {
+func (f *AutoField) getDbColumn() string {
 	return f.dbColumn
 }
 
-func (f *BigAutoField) DBColumn() string {
+func (f *BigAutoField) getDbColumn() string {
 	return f.dbColumn
 }
 
-func (f *BigIntegerField) DBColumn() string {
+func (f *BigIntegerField) getDbColumn() string {
 	return f.dbColumn
 }
 
-func (f *BooleanField) DBColumn() string {
+func (f *BooleanField) getDbColumn() string {
 	return f.dbColumn
 }
 
-func (f *FloatField) DBColumn() string {
+func (f *FloatField) getDbColumn() string {
 	return f.dbColumn
 }
 
-func (f *IntegerField) DBColumn() string {
+func (f *IntegerField) getDbColumn() string {
 	return f.dbColumn
 }
 
-func (f *TextField) DBColumn() string {
+func (f *TextField) getDbColumn() string {
 	return f.dbColumn
 }
 
-func (f *ForeignKeyField) DBColumn() string {
+func (f *ForeignKeyField) getDbColumn() string {
 	return f.dbColumn
 }
 
@@ -268,6 +270,38 @@ func (f *ForeignKeyField) getDBType() string {
 	return f.dbType
 }
 
+func (f *AutoField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *BigAutoField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *BigIntegerField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *BooleanField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *FloatField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *IntegerField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *TextField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *ForeignKeyField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
 func (f *AutoField) IsNil() bool {
 	return f.pointer == nil
 }
@@ -298,6 +332,38 @@ func (f *TextField) IsNil() bool {
 
 func (f *ForeignKeyField) IsNil() bool {
 	return f.pointer == nil
+}
+
+func (f *AutoField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *BigAutoField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *BigIntegerField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *BooleanField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *FloatField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *IntegerField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *TextField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *ForeignKeyField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
 }
 
 func (f *AutoField) sqlValue() string {

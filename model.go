@@ -3,7 +3,7 @@ package gojang
 import (
 	"database/sql"
 	"reflect"
-	"fmt"
+	//"fmt"
 	"strings"
 )
 
@@ -84,6 +84,18 @@ func MakeModel(i interface{}) error {
 	return nil
 }
 
+//Perfect this later
+// func (m *Model) Set(newModel Model) error {
+// 	//check if models are of some type
+// 	//are probably a few way to do this
+//
+// 	for key, _ := range m.Fields {
+// 		m.Fields[key], _ = newModel.Fields[key]
+// 	}
+//
+// 	return nil
+// }
+
 func (m Model) getPKField() primaryKeyField {
 	for _, field := range m.Fields {
 		if field.hasPrimaryKeyConstraint() {
@@ -93,6 +105,36 @@ func (m Model) getPKField() primaryKeyField {
 	}
 
 	return NewAutoField()
+}
+
+func (m Model) getPointers(columns []string) []interface{} {
+	result := make([]interface{}, 0)
+
+	for _, col := range columns {
+		field := m.getFieldByDbColumn(col)
+		if field != nil {
+			goType := field.getGoType()
+
+			switch goType {
+			case "int32":
+				result = append(result, (*int32)(field.getPtr()))
+			case "string":
+				result = append(result, (*string)(field.getPtr()))
+			}
+		}
+	}
+
+	return result
+}
+
+func (m Model) getFieldByDbColumn(dbColumn string) field {
+	for _, field := range m.Fields {
+		if field.getDbColumn() == dbColumn {
+			return field
+		}
+	}
+
+	return nil
 }
 
 //If instance does not have a primary key then it will insert into the database
@@ -129,11 +171,11 @@ func (m *Model) insert() string {
 
 	for _, field := range m.Fields {
 		if field.hasPrimaryKeyConstraint() {
-			pkFieldName = field.DBColumn()
+			pkFieldName = field.getDbColumn()
 			continue
 		}
 
-		columns += dbq(field.DBColumn()) + ", "
+		columns += dbq(field.getDbColumn()) + ", "
 		values += field.sqlValue() + ", "
 	}
 
@@ -143,7 +185,6 @@ func (m *Model) insert() string {
 
 	return sql
 }
-
 
 func (m *Model) update() string {
 	sql := "UPDATE " + dbq(m.DBTable) + " SET "
@@ -155,11 +196,11 @@ func (m *Model) update() string {
 			continue
 		}
 
-		sql += dbq(field.DBColumn()) + " = " + field.sqlValue() + ", "
+		sql += dbq(field.getDbColumn()) + " = " + field.sqlValue() + ", "
 	}
 
 	sql = sql[:len(sql)-2]
-	sql += " WHERE " + dbq(pk.DBColumn()) + " = " + pk.sqlValue()
+	sql += " WHERE " + dbq(pk.getDbColumn()) + " = " + pk.sqlValue()
 
 	return sql
 }
@@ -167,7 +208,6 @@ func (m *Model) update() string {
 //Creates the Database table
 func (m Model) Migrate() (sql.Result, error) {
 	sql := m.createTable()
-	fmt.Println(sql)
 	result, err := m.db.Exec(sql)
 	return result, err
 }

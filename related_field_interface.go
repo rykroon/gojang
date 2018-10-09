@@ -1,14 +1,16 @@
 package gojang
 
-import ()
+import (
+//"fmt"
+)
 
 type relatedField interface {
 	isManyToMany() bool
 	isManyToOne() bool
 	isOneToMany() bool
 	isOneToOne() bool
-  getRelatedModel() Model
-  getOnDelete() string
+	getRelatedModel() *Model
+	getOnDelete() string
 }
 
 func (f *ForeignKeyField) isManyToMany() bool {
@@ -27,7 +29,7 @@ func (f *ForeignKeyField) isOneToOne() bool {
 	return f.oneToOne
 }
 
-func (f *ForeignKeyField) getRelatedModel() Model {
+func (f *ForeignKeyField) getRelatedModel() *Model {
 	return f.relatedModel
 }
 
@@ -35,10 +37,30 @@ func (f *ForeignKeyField) getOnDelete() string {
 	return string(f.onDelete)
 }
 
-func (f *ForeignKeyField) Fetch() string {
-  model := f.relatedModel
-  pkField := dbq(model.getPKField().(field).DBColumn())
-  sql := "SELECT * FROM " + dbq(model.DBTable) + " WHERE " + pkField + " = " + f.sqlValue()
+func (f *ForeignKeyField) Fetch() error {
+	model := f.relatedModel
+	pkField := dbq(model.getPKField().(field).getDbColumn())
+	sql := "SELECT * FROM " + dbq(model.DBTable) + " WHERE " + pkField + " = " + f.sqlValue() + ";"
+	rows, err := model.db.Query(sql)
 
-  return sql
+	if err != nil {
+		return err
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+
+	pointers := model.getPointers(columns)
+
+	for rows.Next() {
+		err := rows.Scan(pointers...)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

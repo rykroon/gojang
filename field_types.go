@@ -29,6 +29,7 @@ type AutoField struct {
 	isRelation bool
 
 	pointer *int32
+	Ptr     *int32
 	value   int32
 }
 
@@ -107,6 +108,7 @@ type TextField struct {
 	isRelation bool
 
 	pointer *string
+	Ptr     *string
 	value   string
 }
 
@@ -114,18 +116,19 @@ type ForeignKeyField struct {
 	dbColumn string
 	dbType   string
 
-	null           bool
-	unique         bool
-	primaryKey     bool
-	isRelation     bool
+	null       bool
+	unique     bool
+	primaryKey bool
+	isRelation bool
 
 	//specific for related fields
-	manyToMany		 bool
-	manyToOne			 bool
-	oneToMany			 bool
-	oneToOne			 bool
-	relatedModel		Model
-	onDelete 				onDelete
+	manyToMany   bool
+	manyToOne    bool
+	oneToMany    bool
+	oneToOne     bool
+	relatedModel *Model
+	RelatedModel *Model //temp
+	onDelete     onDelete
 
 	pointer *int64
 	value   int64
@@ -247,11 +250,12 @@ func NewTextField(constraints ...constraint) *TextField {
 	return field
 }
 
-func NewForeignKeyField(to Model, onDelete onDelete, constraints ...constraint) *ForeignKeyField {
+func NewForeignKeyField(to *Model, onDelete onDelete, constraints ...constraint) *ForeignKeyField {
 	field := &ForeignKeyField{dbType: "INT8"}
 	field.isRelation = true
 	field.manyToOne = true
 	field.relatedModel = to
+	field.RelatedModel = to
 	field.onDelete = onDelete
 
 	for _, constraint := range constraints {
@@ -430,7 +434,7 @@ func (f *ForeignKeyField) SetNil() error {
 }
 
 func create(f field) string {
-	s := dbq(f.DBColumn()) + " " + f.getDBType()
+	s := dbq(f.getDbColumn()) + " " + f.getDBType()
 
 	if f.hasPrimaryKeyConstraint() {
 		s += " PRIMARY KEY"
@@ -438,7 +442,7 @@ func create(f field) string {
 
 		if f.hasRelation() {
 			fkey := f.(relatedField)
-			s += " REFERENCES " + fkey.getRelatedModel().DBTable + " ON DELETE " + fkey.getOnDelete()
+			s += " REFERENCES " + dbq(fkey.getRelatedModel().DBTable) + " ON DELETE " + fkey.getOnDelete()
 		}
 
 		if f.hasNullConstraint() {
