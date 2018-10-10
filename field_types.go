@@ -434,7 +434,7 @@ func (f *ForeignKeyField) SetNil() error {
 }
 
 func create(f field) string {
-	s := dbq(f.getDbColumn()) + " " + f.getDBType()
+	s := dbq(f.getDbColumn()) + " " + f.getDbType()
 
 	if f.hasPrimaryKeyConstraint() {
 		s += " PRIMARY KEY"
@@ -442,7 +442,7 @@ func create(f field) string {
 
 		if f.hasRelation() {
 			fkey := f.(relatedField)
-			s += " REFERENCES " + dbq(fkey.getRelatedModel().DBTable) + " ON DELETE " + fkey.getOnDelete()
+			s += " REFERENCES " + dbq(fkey.getRelatedModel().getDbTable()) + " ON DELETE " + fkey.getOnDelete()
 		}
 
 		if f.hasNullConstraint() {

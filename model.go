@@ -3,15 +3,15 @@ package gojang
 import (
 	"database/sql"
 	"reflect"
-	//"fmt"
+	"fmt"
 	"strings"
 )
 
 type Model struct {
-	DBTable string
+	dbTable string
 	Objects Manager
-	Fields  map[string]field
-	PK      field
+	fields  map[string]field
+	Pk      primaryKeyfield
 
 	db *sql.DB
 
@@ -22,12 +22,12 @@ type Model struct {
 //Returns a New Model
 func NewModel(db Database) Model {
 	m := Model{}
-	m.Fields = make(map[string]field)
+	m.fields = make(map[string]field)
 	m.db, _ = db.toDB()
 	return m
 }
 
-//
+//initializes a Model
 func MakeModel(i interface{}) error {
 	v := reflect.ValueOf(i)
 
@@ -41,30 +41,34 @@ func MakeModel(i interface{}) error {
 		panic("Value does not point to a struct")
 	}
 
-	model := v.FieldByName("Model")
+	modelVal := v.FieldByName("Model")
 
-	if model.Type() != reflect.TypeOf(Model{}) {
+	if modelVal.Type() != reflect.TypeOf(Model{}) {
 		panic("Value does not have an embedded Model")
 	}
 
+	model := modelVal.Addr().Interface().(*Model)
+
 	tableName := v.Type().String()
 	dotIdx := strings.Index(tableName, ".") + 1
-	tableName = strings.ToLower(tableName[dotIdx:])
+	tableName = snakeCase(tableName[dotIdx:])
 
-	dbTable := model.FieldByName("DBTable")
-	dbTable.SetString(tableName)
+	//dbTable := modelVal.FieldByName("dbTable")
+	//dbTable.SetString(tableName)
+	model.setDbTable(tableName)
 
-	fieldsMap := model.FieldByName("Fields")
+	//fieldsMap := modelVal.FieldByName("Fields")
 	numOfPKs := 0
 
 	for idx := 0; idx < v.NumField(); idx++ {
 		fieldVal := v.Field(idx)
 		fieldType := v.Type().Field(idx)
 
-		_, isAField := fieldVal.Interface().(field)
+		field, isAField := fieldVal.Interface().(field)
 
 		if isAField {
-			if fieldVal.Interface().(field).hasPrimaryKeyConstraint() {
+			//if fieldVal.Interface().(field).hasPrimaryKeyConstraint() {
+			if field.hasPrimaryKeyConstraint() {
 				numOfPKs += 1
 
 				if numOfPKs > 1 {
@@ -72,8 +76,10 @@ func MakeModel(i interface{}) error {
 				}
 			}
 
-			fieldVal.Interface().(field).setDBColumn(strings.ToLower(fieldType.Name))
-			fieldsMap.SetMapIndex(reflect.ValueOf(fieldType.Name), fieldVal)
+			//fieldVal.Interface().(field).setDbColumn(strings.ToLower(fieldType.Name))
+			field.setDbColumn(snakeCase(fieldType.Name))
+			model.addField(fieldType.Name, field)
+			//fieldsMap.SetMapIndex(reflect.ValueOf(fieldType.Name), fieldVal)
 		}
 	}
 
@@ -82,6 +88,39 @@ func MakeModel(i interface{}) error {
 	}
 
 	return nil
+}
+
+//Adds a field to a Model's map of fields
+func (m *Model) addField(key string, value field) {
+	m.fields[key] = value
+}
+
+//Transforms a 'CamelCase' string into a 'snake_case' string
+func snakeCase(s string) string {
+	result := ""
+
+	for idx, byte := range s {
+		char := string(byte)
+		lowerChar := strings.ToLower(char)
+
+		if char != lowerChar && idx != 0 {
+			result += "_" + lowerChar
+		} else {
+			result += lowerChar
+		}
+	}
+
+	return result
+}
+
+//Set the name of the Database Table
+func (m *Model) setDbTable(tableName string) {
+	m.dbTable = tableName
+}
+
+//Get the name of the Database table
+func (m *Model) getDbTable() string {
+	return m.dbTable
 }
 
 //Perfect this later
@@ -97,7 +136,7 @@ func MakeModel(i interface{}) error {
 // }
 
 func (m Model) getPKField() primaryKeyField {
-	for _, field := range m.Fields {
+	for _, field := range m.fields {
 		if field.hasPrimaryKeyConstraint() {
 			pk, _ := field.(primaryKeyField)
 			return pk
@@ -128,7 +167,7 @@ func (m Model) getPointers(columns []string) []interface{} {
 }
 
 func (m Model) getFieldByDbColumn(dbColumn string) field {
-	for _, field := range m.Fields {
+	for _, field := range m.fields {
 		if field.getDbColumn() == dbColumn {
 			return field
 		}
@@ -164,12 +203,12 @@ func (m *Model) Save() error {
 }
 
 func (m *Model) insert() string {
-	sql := "INSERT INTO " + dbq(m.DBTable) + " "
+	sql := "INSERT INTO " + dbq(m.dbTable) + " "
 	columns := "("
 	values := "("
 	var pkFieldName string
 
-	for _, field := range m.Fields {
+	for _, field := range m.fields {
 		if field.hasPrimaryKeyConstraint() {
 			pkFieldName = field.getDbColumn()
 			continue
@@ -187,10 +226,10 @@ func (m *Model) insert() string {
 }
 
 func (m *Model) update() string {
-	sql := "UPDATE " + dbq(m.DBTable) + " SET "
+	sql := "UPDATE " + dbq(m.dbTable) + " SET "
 	var pk field
 
-	for _, field := range m.Fields {
+	for _, field := range m.fields {
 		if field.hasPrimaryKeyConstraint() {
 			pk = field
 			continue
@@ -214,12 +253,14 @@ func (m Model) Migrate() (sql.Result, error) {
 
 //Creates an SQL statement that will create the table
 func (m Model) createTable() string {
-	sql := "CREATE TABLE IF NOT EXISTS " + m.DBTable + "("
+	sql := "CREATE TABLE IF NOT EXISTS " + dbq(m.dbTable) + " ("
 
-	for _, field := range m.Fields {
+	for _, field := range m.fields {
 		sql += create(field) + ", "
 	}
 
 	sql = sql[0:len(sql)-2] + ");"
+
+	fmt.Println(sql)
 	return sql
 }

@@ -40,7 +40,7 @@ func (f *ForeignKeyField) getOnDelete() string {
 func (f *ForeignKeyField) Fetch() error {
 	model := f.relatedModel
 	pkField := dbq(model.getPKField().(field).getDbColumn())
-	sql := "SELECT * FROM " + dbq(model.DBTable) + " WHERE " + pkField + " = " + f.sqlValue() + ";"
+	sql := "SELECT * FROM " + dbq(model.getDbTable()) + " WHERE " + pkField + " = " + f.sqlValue() + ";"
 	rows, err := model.db.Query(sql)
 
 	if err != nil {
@@ -48,7 +48,8 @@ func (f *ForeignKeyField) Fetch() error {
 	}
 
 	columns, err := rows.Columns()
-	if err != nil {
+
+  if err != nil {
 		return err
 	}
 
@@ -60,6 +61,8 @@ func (f *ForeignKeyField) Fetch() error {
 		if err != nil {
 			return err
 		}
+
+    break
 	}
 
 	return nil

@@ -12,8 +12,8 @@ type field interface {
 	hasRelation() bool
 
 	getDbColumn() string
-	setDBColumn(string)
-	getDBType() string
+	setDbColumn(string)
+	getDbType() string
 	getGoType() string
 
 	IsNil() bool
@@ -206,67 +206,67 @@ func (f *ForeignKeyField) getDbColumn() string {
 	return f.dbColumn
 }
 
-func (f *AutoField) setDBColumn(columnName string) {
+func (f *AutoField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
-func (f *BigAutoField) setDBColumn(columnName string) {
+func (f *BigAutoField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
-func (f *BigIntegerField) setDBColumn(columnName string) {
+func (f *BigIntegerField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
-func (f *BooleanField) setDBColumn(columnName string) {
+func (f *BooleanField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
-func (f *FloatField) setDBColumn(columnName string) {
+func (f *FloatField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
-func (f *IntegerField) setDBColumn(columnName string) {
+func (f *IntegerField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
-func (f *TextField) setDBColumn(columnName string) {
+func (f *TextField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
-func (f *ForeignKeyField) setDBColumn(columnName string) {
+func (f *ForeignKeyField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
-func (f *AutoField) getDBType() string {
+func (f *AutoField) getDbType() string {
 	return f.dbType
 }
 
-func (f *BigAutoField) getDBType() string {
+func (f *BigAutoField) getDbType() string {
 	return f.dbType
 }
 
-func (f *BigIntegerField) getDBType() string {
+func (f *BigIntegerField) getDbType() string {
 	return f.dbType
 }
 
-func (f *BooleanField) getDBType() string {
+func (f *BooleanField) getDbType() string {
 	return f.dbType
 }
 
-func (f *FloatField) getDBType() string {
+func (f *FloatField) getDbType() string {
 	return f.dbType
 }
 
-func (f *IntegerField) getDBType() string {
+func (f *IntegerField) getDbType() string {
 	return f.dbType
 }
 
-func (f *TextField) getDBType() string {
+func (f *TextField) getDbType() string {
 	return f.dbType
 }
 
-func (f *ForeignKeyField) getDBType() string {
+func (f *ForeignKeyField) getDbType() string {
 	return f.dbType
 }
 
