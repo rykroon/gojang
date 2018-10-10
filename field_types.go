@@ -127,7 +127,27 @@ type ForeignKeyField struct {
 	oneToMany    bool
 	oneToOne     bool
 	relatedModel *Model
-	RelatedModel *Model //temp
+	onDelete     onDelete
+
+	pointer *int64
+	value   int64
+}
+
+type OneToOneField struct {
+	dbColumn string
+	dbType   string
+
+	null       bool
+	unique     bool
+	primaryKey bool
+	isRelation bool
+
+	//specific for related fields
+	manyToMany   bool
+	manyToOne    bool
+	oneToMany    bool
+	oneToOne     bool
+	relatedModel *Model
 	onDelete     onDelete
 
 	pointer *int64
@@ -255,7 +275,6 @@ func NewForeignKeyField(to *Model, onDelete onDelete, constraints ...constraint)
 	field.isRelation = true
 	field.manyToOne = true
 	field.relatedModel = to
-	field.RelatedModel = to
 	field.onDelete = onDelete
 
 	for _, constraint := range constraints {
@@ -267,6 +286,33 @@ func NewForeignKeyField(to *Model, onDelete onDelete, constraints ...constraint)
 			field.unique = true
 		}
 	}
+
+	if !field.null {
+		field.pointer = &field.value
+	}
+
+	return field
+}
+
+func NewOneToOneField(to *Model, onDelete onDelete, constraints ...constraint) *ForeignKeyField {
+	field := &OneToOneField{dbType: "INT8"}
+	field.isRelation = true
+	field.oneToOne = true
+	field.relatedModel = to
+	field.onDelete = onDelete
+
+	for _, constraint := range constraints {
+		switch constraint {
+		case "NULL":
+			field.null = true
+
+		case "UNIQUE":
+			field.unique = true
+		}
+	}
+
+	//unique constraint must be true foe OneToOne Field
+	field.unique = true
 
 	if !field.null {
 		field.pointer = &field.value
@@ -304,6 +350,10 @@ func (f TextField) Val() string {
 }
 
 func (f ForeignKeyField) Val() int {
+	return int(f.value)
+}
+
+func (f OneToOneField) Val() int {
 	return int(f.value)
 }
 
@@ -373,6 +423,14 @@ func (f *ForeignKeyField) Set(value int64) {
 	f.value = value
 }
 
+func (f *OneToOneField) Set(value int64) {
+	if f.pointer == nil {
+		f.pointer = &f.value
+	}
+
+	f.value = value
+}
+
 func (f *BigIntegerField) SetNil() error {
 	if f.hasNullConstraint() {
 		f.pointer = nil
@@ -424,6 +482,16 @@ func (f *TextField) SetNil() error {
 }
 
 func (f *ForeignKeyField) SetNil() error {
+	if f.hasNullConstraint() {
+		f.pointer = nil
+		f.value = 0
+		return nil
+	} else {
+		return errors.New("Cannot set field with NOT NULL constraint to nil")
+	}
+}
+
+func (f *OneToOneField) SetNil() error {
 	if f.hasNullConstraint() {
 		f.pointer = nil
 		f.value = 0

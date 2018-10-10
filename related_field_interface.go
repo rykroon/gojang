@@ -17,7 +17,15 @@ func (f *ForeignKeyField) isManyToMany() bool {
 	return f.manyToMany
 }
 
+func (f *OneToOneField) isManyToMany() bool {
+	return f.manyToMany
+}
+
 func (f *ForeignKeyField) isManyToOne() bool {
+	return f.manyToOne
+}
+
+func (f *OneToOneField) isManyToOne() bool {
 	return f.manyToOne
 }
 
@@ -25,7 +33,15 @@ func (f *ForeignKeyField) isOneToMany() bool {
 	return f.oneToMany
 }
 
+func (f *OneToOneField) isOneToMany() bool {
+	return f.oneToMany
+}
+
 func (f *ForeignKeyField) isOneToOne() bool {
+	return f.oneToOne
+}
+
+func (f *OneToOneField) isOneToOne() bool {
 	return f.oneToOne
 }
 
@@ -33,7 +49,15 @@ func (f *ForeignKeyField) getRelatedModel() *Model {
 	return f.relatedModel
 }
 
+func (f *OneToOneField) getRelatedModel() *Model {
+	return f.relatedModel
+}
+
 func (f *ForeignKeyField) getOnDelete() string {
+	return string(f.onDelete)
+}
+
+func (f *OneToOneField) getOnDelete() string {
 	return string(f.onDelete)
 }
 

@@ -11,7 +11,7 @@ type Model struct {
 	dbTable string
 	Objects Manager
 	fields  map[string]field
-	Pk      primaryKeyfield
+	Pk      primaryKeyField
 
 	db *sql.DB
 
