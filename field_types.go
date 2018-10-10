@@ -294,7 +294,7 @@ func NewForeignKeyField(to *Model, onDelete onDelete, constraints ...constraint)
 	return field
 }
 
-func NewOneToOneField(to *Model, onDelete onDelete, constraints ...constraint) *ForeignKeyField {
+func NewOneToOneField(to *Model, onDelete onDelete, constraints ...constraint) *OneToOneField {
 	field := &OneToOneField{dbType: "INT8"}
 	field.isRelation = true
 	field.oneToOne = true
@@ -510,7 +510,7 @@ func create(f field) string {
 
 		if f.hasRelation() {
 			fkey := f.(relatedField)
-			s += " REFERENCES " + dbq(fkey.getRelatedModel().getDbTable()) + " ON DELETE " + fkey.getOnDelete()
+			s += " REFERENCES " + dbq(fkey.getRelatedModel().dbTable) + " ON DELETE " + fkey.getOnDelete()
 		}
 
 		if f.hasNullConstraint() {

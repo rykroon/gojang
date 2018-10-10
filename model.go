@@ -55,7 +55,8 @@ func MakeModel(i interface{}) error {
 
 	//dbTable := modelVal.FieldByName("dbTable")
 	//dbTable.SetString(tableName)
-	model.setDbTable(tableName)
+
+	model.dbTable = tableName
 
 	//fieldsMap := modelVal.FieldByName("Fields")
 	numOfPKs := 0
@@ -111,16 +112,6 @@ func snakeCase(s string) string {
 	}
 
 	return result
-}
-
-//Set the name of the Database Table
-func (m *Model) setDbTable(tableName string) {
-	m.dbTable = tableName
-}
-
-//Get the name of the Database table
-func (m *Model) getDbTable() string {
-	return m.dbTable
 }
 
 //Perfect this later

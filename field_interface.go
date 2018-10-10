@@ -78,6 +78,10 @@ func (f *ForeignKeyField) hasNullConstraint() bool {
 	return f.null
 }
 
+func (f *OneToOneField) hasNullConstraint() bool {
+	return f.null
+}
+
 func (f *AutoField) hasUniqueConstraint() bool {
 	return f.unique
 }
@@ -107,6 +111,10 @@ func (f *TextField) hasUniqueConstraint() bool {
 }
 
 func (f *ForeignKeyField) hasUniqueConstraint() bool {
+	return f.unique
+}
+
+func (f *OneToOneField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
@@ -142,6 +150,10 @@ func (f *ForeignKeyField) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
 }
 
+func (f *OneToOneField) hasPrimaryKeyConstraint() bool {
+	return f.primaryKey
+}
+
 func (f *AutoField) hasRelation() bool {
 	return f.primaryKey
 }
@@ -171,6 +183,10 @@ func (f *TextField) hasRelation() bool {
 }
 
 func (f *ForeignKeyField) hasRelation() bool {
+	return f.isRelation
+}
+
+func (f *OneToOneField) hasRelation() bool {
 	return f.isRelation
 }
 
@@ -206,6 +222,10 @@ func (f *ForeignKeyField) getDbColumn() string {
 	return f.dbColumn
 }
 
+func (f *OneToOneField) getDbColumn() string {
+	return f.dbColumn
+}
+
 func (f *AutoField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
@@ -235,6 +255,10 @@ func (f *TextField) setDbColumn(columnName string) {
 }
 
 func (f *ForeignKeyField) setDbColumn(columnName string) {
+	f.dbColumn = columnName
+}
+
+func (f OneToOneField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
@@ -270,6 +294,10 @@ func (f *ForeignKeyField) getDbType() string {
 	return f.dbType
 }
 
+func (f *OneToOneField) getDbType() string {
+	return f.dbType
+}
+
 func (f *AutoField) getGoType() string {
 	return reflect.TypeOf(f.value).String()
 }
@@ -299,6 +327,10 @@ func (f *TextField) getGoType() string {
 }
 
 func (f *ForeignKeyField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *OneToOneField) getGoType() string {
 	return reflect.TypeOf(f.value).String()
 }
 
@@ -334,6 +366,10 @@ func (f *ForeignKeyField) IsNil() bool {
 	return f.pointer == nil
 }
 
+func (f *OneToOneField) IsNil() bool {
+	return f.pointer == nil
+}
+
 func (f *AutoField) getPtr() unsafe.Pointer {
 	return unsafe.Pointer(f.pointer)
 }
@@ -363,6 +399,10 @@ func (f *TextField) getPtr() unsafe.Pointer {
 }
 
 func (f *ForeignKeyField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *OneToOneField) getPtr() unsafe.Pointer {
 	return unsafe.Pointer(f.pointer)
 }
 
@@ -430,6 +470,14 @@ func (f *ForeignKeyField) sqlValue() string {
 	}
 }
 
+func (f *OneToOneField) sqlValue() string {
+	if f.IsNil() {
+		return "NULL"
+	} else {
+		return int64ToSql(f.value)
+	}
+}
+
 type orderByExpression string
 
 func (f *AutoField) Asc() orderByExpression {
@@ -464,6 +512,10 @@ func (f *ForeignKeyField) Asc() orderByExpression {
 	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
 }
 
+func (f *OneToOneField) Asc() orderByExpression {
+	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+}
+
 func (f *AutoField) Desc() orderByExpression {
 	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
 }
@@ -493,5 +545,9 @@ func (f *TextField) Desc() orderByExpression {
 }
 
 func (f *ForeignKeyField) Desc() orderByExpression {
+	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+}
+
+func (f *OneToOneField) Desc() orderByExpression {
 	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
 }
