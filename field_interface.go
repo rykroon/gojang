@@ -17,6 +17,7 @@ type field interface {
 	getGoType() string
 
 	IsNil() bool
+	//SetNil() error
 
 	Asc() orderByExpression
 	Desc() orderByExpression
@@ -25,26 +26,31 @@ type field interface {
 	sqlValue() string
 }
 
-type primaryKeyField interface {
-	id() int
-	setId(int)
+
+type intField interface {
+	Val() int
 }
 
-func (f *AutoField) id() int {
-	return int(f.value)
-}
-
-func (f *BigAutoField) id() int {
-	return int(f.value)
-}
-
-func (f *AutoField) setId(value int) {
-	f.value = int32(value)
-}
-
-func (f *BigAutoField) setId(value int) {
-	f.value = int64(value)
-}
+// type primaryKeyField interface {
+// 	id() int
+// 	setId(int)
+// }
+//
+// func (f *AutoField) id() int {
+// 	return int(f.value)
+// }
+//
+// func (f *BigAutoField) id() int {
+// 	return int(f.value)
+// }
+//
+// func (f *AutoField) setId(value int) {
+// 	f.value = int32(value)
+// }
+//
+// func (f *BigAutoField) setId(value int) {
+// 	f.value = int64(value)
+// }
 
 func (f *AutoField) hasNullConstraint() bool {
 	return f.null

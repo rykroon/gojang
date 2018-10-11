@@ -357,24 +357,6 @@ func (f OneToOneField) Val() int {
 	return int(f.value)
 }
 
-//The client can not set the value of the primary key
-func (f *AutoField) set(value int32) {
-	if f.pointer == nil { //pointer should never be nil for Auto and BigAuto fields
-		f.pointer = &f.value
-	}
-
-	f.value = value
-}
-
-//The client can not set the value of the primary key
-func (f *BigAutoField) set(value int64) {
-	if f.pointer == nil {
-		f.pointer = &f.value
-	}
-
-	f.value = value
-}
-
 func (f *BigIntegerField) Set(value int64) {
 	if f.pointer == nil {
 		f.pointer = &f.value

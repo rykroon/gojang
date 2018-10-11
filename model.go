@@ -11,7 +11,7 @@ type Model struct {
 	dbTable string
 	Objects Manager
 	fields  map[string]field
-	Pk      primaryKeyField
+	Pk      intField
 
 	db *sql.DB
 
@@ -51,14 +51,9 @@ func MakeModel(i interface{}) error {
 
 	tableName := v.Type().String()
 	dotIdx := strings.Index(tableName, ".") + 1
-	tableName = snakeCase(tableName[dotIdx:])
+	tableName = tableName[dotIdx:]
+	model.dbTable = snakeCase(tableName)
 
-	//dbTable := modelVal.FieldByName("dbTable")
-	//dbTable.SetString(tableName)
-
-	model.dbTable = tableName
-
-	//fieldsMap := modelVal.FieldByName("Fields")
 	numOfPKs := 0
 
 	for idx := 0; idx < v.NumField(); idx++ {
@@ -68,23 +63,30 @@ func MakeModel(i interface{}) error {
 		field, isAField := fieldVal.Interface().(field)
 
 		if isAField {
-			//if fieldVal.Interface().(field).hasPrimaryKeyConstraint() {
 			if field.hasPrimaryKeyConstraint() {
+				intField, isAnIntField := field.(intField)
+
+				if !isAnIntField {
+					panic("A non integer field cannot be a primary key")
+				}
+
 				numOfPKs += 1
 
 				if numOfPKs > 1 {
 					panic("Model cannot have more than one primary key")
 				}
+
+				model.Pk = intField
 			}
 
-			//fieldVal.Interface().(field).setDbColumn(strings.ToLower(fieldType.Name))
 			field.setDbColumn(snakeCase(fieldType.Name))
 			model.addField(fieldType.Name, field)
-			//fieldsMap.SetMapIndex(reflect.ValueOf(fieldType.Name), fieldVal)
 		}
 	}
 
 	if numOfPKs < 1 {
+		//in the future if no primary key is added then create a NewAutoField()
+		//users can access the field by doing Model.Pk
 		panic("Model must have a Primary Key")
 	}
 
@@ -126,17 +128,6 @@ func snakeCase(s string) string {
 // 	return nil
 // }
 
-func (m Model) getPKField() primaryKeyField {
-	for _, field := range m.fields {
-		if field.hasPrimaryKeyConstraint() {
-			pk, _ := field.(primaryKeyField)
-			return pk
-		}
-	}
-
-	return NewAutoField()
-}
-
 func (m Model) getPointers(columns []string) []interface{} {
 	result := make([]interface{}, 0)
 
@@ -144,13 +135,24 @@ func (m Model) getPointers(columns []string) []interface{} {
 		field := m.getFieldByDbColumn(col)
 		if field != nil {
 			goType := field.getGoType()
+			var ptr interface{}
 
 			switch goType {
+			case "int64":
+				ptr = (*int64)(field.getPtr())
 			case "int32":
-				result = append(result, (*int32)(field.getPtr()))
+				ptr = (*int32)(field.getPtr())
+			case "int16":
+				ptr = (*int16)(field.getPtr())
+			case "float64":
+				ptr = (*float64)(field.getPtr())
+			case "bool":
+				ptr = (*bool)(field.getPtr())
 			case "string":
-				result = append(result, (*string)(field.getPtr()))
+				ptr = (*string)(field.getPtr())
 			}
+
+			result = append(result, ptr)
 		}
 	}
 
@@ -170,17 +172,23 @@ func (m Model) getFieldByDbColumn(dbColumn string) field {
 //If instance does not have a primary key then it will insert into the database
 //Otherwise it updates the record
 func (m *Model) Save() error {
-	pk := m.getPKField()
+	if m.Pk.Val() == 0 {
+		var err error
+		row := m.db.QueryRow(m.insert())
+		goType := m.Pk.(field).getGoType()
 
-	if pk.id() == 0 {
-		var id int
-		err := m.db.QueryRow(m.insert()).Scan(&id)
+		switch goType {
+		case "int64":
+			ptr := (*int64)(m.Pk.(field).getPtr())
+			err = row.Scan(ptr)
+		case "int32":
+			ptr := (*int32)(m.Pk.(field).getPtr())
+			err = row.Scan(ptr)
+		}
 
 		if err != nil {
 			return err
 		}
-
-		pk.setId(id)
 
 	} else {
 		_, err := m.db.Exec(m.update())
@@ -193,6 +201,7 @@ func (m *Model) Save() error {
 	return nil
 }
 
+//
 func (m *Model) insert() string {
 	sql := "INSERT INTO " + dbq(m.dbTable) + " "
 	columns := "("
@@ -216,6 +225,7 @@ func (m *Model) insert() string {
 	return sql
 }
 
+//
 func (m *Model) update() string {
 	sql := "UPDATE " + dbq(m.dbTable) + " SET "
 	var pk field
