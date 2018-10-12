@@ -26,7 +26,6 @@ type field interface {
 	sqlValue() string
 }
 
-
 // type intField interface {
 // 	Val() int
 // }

@@ -62,65 +62,16 @@ func (q QuerySet) OrderBy(orderBys ...orderByExpression) QuerySet {
 	return q
 }
 
-// func (q QuerySet) Distinct(fields ...field) QuerySet {
-// 	q.distinct = true
-//
-// 	for _, field := range fields {
-// 		q.selected = append(q.selected, field.toSql())
-// 	}
-//
-// 	q.Query = q.buildQuery()
-// 	return q
-// }
-//
 // func (q QuerySet) All() QuerySet {
 // 	q.evaluated = false
 // 	//maybe do other stuff?
 // 	return q
 // }
-//
-// //add fields to the deferred list
-// func (q QuerySet) Defer(fields ...field) QuerySet {
-// 	for _, field := range fields {
-// 		if field.primaryKey {
-// 			panic("Cannot defer the primary key")
-// 		}
-//
-// 		q.deferred = append(q.deferred, field.toSql())
-// 	}
-//
-// 	q.Query = q.buildQuery()
-// 	return q
-// }
-//
-// //clear current array of select fields and deffered fields
-// func (q QuerySet) Only(fields ...field) QuerySet {
-// 	q.selected = nil
-// 	q.deferred = nil
-//
-// 	foundPrimaryKey := false
-//
-// 	for _, field := range fields {
-// 		if field.primaryKey {
-// 			foundPrimaryKey = true
-// 		}
-//
-// 		q.selected = append(q.selected, field.toSql())
-// 	}
-//
-// 	if !foundPrimaryKey {
-// 		q.selected = append(q.selected, q.model.getPrimaryKey().toSql())
-// 	}
-//
-// 	q.Query = q.buildQuery()
-// 	return q
-// }
 
 //Functions that do not return Querysets
 
-// func (q QuerySet) Get() modelInstance {
-// 	//row := q.queryRow()
-// 	return modelInstance{}
+// func (q QuerySet) Get() {
+// 	row := q.queryRow()
 // }
 
 func (q QuerySet) Count() int {

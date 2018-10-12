@@ -3,8 +3,8 @@ package gojang
 import (
 	//"database/sql"
 	//"reflect"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 //auxillary functions used in all programs

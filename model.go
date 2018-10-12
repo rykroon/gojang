@@ -2,8 +2,8 @@ package gojang
 
 import (
 	"database/sql"
-	"reflect"
 	"fmt"
+	"reflect"
 	"strings"
 )
 

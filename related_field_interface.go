@@ -64,10 +64,10 @@ func (f *OneToOneField) getOnDelete() string {
 func (f *ForeignKeyField) Fetch() error {
 	model := f.relatedModel
 
-  table := dbq(model.dbTable)
-  pkCol := dbq(model.Pk.(field).getDbColumn())
+	table := dbq(model.dbTable)
+	pkCol := dbq(model.Pk.(field).getDbColumn())
 
-  //when queryset logic is finished use that to build the string
+	//when queryset logic is finished use that to build the string
 	sql := "SELECT * FROM " + table + " WHERE " + pkCol + " = " + f.sqlValue() + ";"
 	rows, err := model.db.Query(sql)
 
@@ -77,7 +77,7 @@ func (f *ForeignKeyField) Fetch() error {
 
 	columns, err := rows.Columns()
 
-  if err != nil {
+	if err != nil {
 		return err
 	}
 
@@ -90,7 +90,7 @@ func (f *ForeignKeyField) Fetch() error {
 			return err
 		}
 
-    break
+		break
 	}
 
 	return nil
