@@ -11,7 +11,7 @@ type Model struct {
 	dbTable string
 	Objects Manager
 	fields  map[string]field
-	Pk      intField
+	Pk      primaryKeyField
 
 	db *sql.DB
 
@@ -64,71 +64,37 @@ func MakeModel(i interface{}) error {
 
 		if isAField {
 			if field.hasPrimaryKeyConstraint() {
-				intField, isAnIntField := field.(intField)
-
-				if !isAnIntField {
-					panic("A non integer field cannot be a primary key")
-				}
-
 				numOfPKs += 1
 
 				if numOfPKs > 1 {
 					panic("Model cannot have more than one primary key")
 				}
 
-				model.Pk = intField
+				model.Pk = field.(primaryKeyField)
 			}
 
 			field.setDbColumn(snakeCase(fieldType.Name))
-			model.addField(fieldType.Name, field)
+			//model.addField(fieldType.Name, field)
+			model.fields[fieldType.Name] = field
 		}
 	}
 
 	if numOfPKs < 1 {
-		//in the future if no primary key is added then create a NewAutoField()
-		//users can access the field by doing Model.Pk
-		panic("Model must have a Primary Key")
+		model.Pk = NewAutoField()
+		model.Pk.(field).setDbColumn("id")
+		model.fields["id"] = model.Pk.(field)
+		//panic("Model must have a Primary Key")
 	}
 
 	return nil
 }
 
 //Adds a field to a Model's map of fields
-func (m *Model) addField(key string, value field) {
-	m.fields[key] = value
-}
-
-//Transforms a 'CamelCase' string into a 'snake_case' string
-func snakeCase(s string) string {
-	result := ""
-
-	for idx, byte := range s {
-		char := string(byte)
-		lowerChar := strings.ToLower(char)
-
-		if char != lowerChar && idx != 0 {
-			result += "_" + lowerChar
-		} else {
-			result += lowerChar
-		}
-	}
-
-	return result
-}
-
-//Perfect this later
-// func (m *Model) Set(newModel Model) error {
-// 	//check if models are of some type
-// 	//are probably a few way to do this
-//
-// 	for key, _ := range m.Fields {
-// 		m.Fields[key], _ = newModel.Fields[key]
-// 	}
-//
-// 	return nil
+// func (m *Model) addField(key string, value field) {
+// 	m.fields[key] = value
 // }
 
-func (m Model) getPointers(columns []string) []interface{} {
+func (m *Model) getPointers(columns []string) []interface{} {
 	result := make([]interface{}, 0)
 
 	for _, col := range columns {

@@ -3,6 +3,7 @@ package gojang
 import (
 	//"database/sql"
 	//"reflect"
+	"strings"
 	"strconv"
 )
 
@@ -18,6 +19,24 @@ func dbq(s string) string {
 
 func singleQuotes(s string) string {
 	return "'" + s + "'"
+}
+
+//Transforms a 'CamelCase' string into a 'snake_case' string
+func snakeCase(s string) string {
+	result := ""
+
+	for idx, byte := range s {
+		char := string(byte)
+		lowerChar := strings.ToLower(char)
+
+		if char != lowerChar && idx != 0 {
+			result += "_" + lowerChar
+		} else {
+			result += lowerChar
+		}
+	}
+
+	return result
 }
 
 func (l lookup) toSql() string {

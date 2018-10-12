@@ -27,30 +27,22 @@ type field interface {
 }
 
 
-type intField interface {
+// type intField interface {
+// 	Val() int
+// }
+
+type primaryKeyField interface {
+	id() int
 	Val() int
 }
 
-// type primaryKeyField interface {
-// 	id() int
-// 	setId(int)
-// }
-//
-// func (f *AutoField) id() int {
-// 	return int(f.value)
-// }
-//
-// func (f *BigAutoField) id() int {
-// 	return int(f.value)
-// }
-//
-// func (f *AutoField) setId(value int) {
-// 	f.value = int32(value)
-// }
-//
-// func (f *BigAutoField) setId(value int) {
-// 	f.value = int64(value)
-// }
+func (f *AutoField) id() int {
+	return int(f.value)
+}
+
+func (f *BigAutoField) id() int {
+	return int(f.value)
+}
 
 func (f *AutoField) hasNullConstraint() bool {
 	return f.null
