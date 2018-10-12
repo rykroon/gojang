@@ -20,13 +20,12 @@ type field interface {
 	IsNil() bool
 	//SetNil() error
 
-	Asc() orderByExpression
-	Desc() orderByExpression
+	Asc() sortExpression
+	Desc() sortExpression
 
 	getPtr() unsafe.Pointer
 	sqlField() string
 	sqlValue() string
-
 }
 
 // type intField interface {
@@ -550,76 +549,74 @@ func (f *OneToOneField) sqlField() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-type orderByExpression string
-
-func (f *AutoField) Asc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+func (f *AutoField) Asc() sortExpression {
+	return sortExpression{field: f}
 }
 
-func (f *BigAutoField) Asc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+func (f *BigAutoField) Asc() sortExpression {
+	return sortExpression{field: f}
 }
 
-func (f *BigIntegerField) Asc() orderByExpression {
-	return orderByExpression(dbq(f.dbColumn) + "ASC")
+func (f *BigIntegerField) Asc() sortExpression {
+	return sortExpression{field: f}
 }
 
-func (f *BooleanField) Asc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+func (f *BooleanField) Asc() sortExpression {
+	return sortExpression{field: f}
 }
 
-func (f *FloatField) Asc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+func (f *FloatField) Asc() sortExpression {
+	return sortExpression{field: f}
 }
 
-func (f *IntegerField) Asc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+func (f *IntegerField) Asc() sortExpression {
+	return sortExpression{field: f}
 }
 
-func (f *TextField) Asc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+func (f *TextField) Asc() sortExpression {
+	return sortExpression{field: f}
 }
 
-func (f *ForeignKeyField) Asc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+func (f *ForeignKeyField) Asc() sortExpression {
+	return sortExpression{field: f}
 }
 
-func (f *OneToOneField) Asc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "ASC")
+func (f *OneToOneField) Asc() sortExpression {
+	return sortExpression{field: f}
 }
 
-func (f *AutoField) Desc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+func (f *AutoField) Desc() sortExpression {
+	return sortExpression{field: f, desc: true}
 }
 
-func (f *BigAutoField) Desc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+func (f *BigAutoField) Desc() sortExpression {
+	return sortExpression{field: f, desc: true}
 }
 
-func (f *BigIntegerField) Desc() orderByExpression {
-	return orderByExpression(dbq(f.dbColumn) + "DESC")
+func (f *BigIntegerField) Desc() sortExpression {
+	return sortExpression{field: f, desc: true}
 }
 
-func (f *BooleanField) Desc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+func (f *BooleanField) Desc() sortExpression {
+	return sortExpression{field: f, desc: true}
 }
 
-func (f *FloatField) Desc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+func (f *FloatField) Desc() sortExpression {
+	return sortExpression{field: f, desc: true}
 }
 
-func (f *IntegerField) Desc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+func (f *IntegerField) Desc() sortExpression {
+	return sortExpression{field: f, desc: true}
 }
 
-func (f *TextField) Desc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+func (f *TextField) Desc() sortExpression {
+	return sortExpression{field: f, desc: true}
 }
 
-func (f *ForeignKeyField) Desc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+func (f *ForeignKeyField) Desc() sortExpression {
+	return sortExpression{field: f, desc: true}
 }
 
-func (f *OneToOneField) Desc() orderByExpression {
-	return orderByExpression(doubleQuotes(f.dbColumn) + "DESC")
+func (f *OneToOneField) Desc() sortExpression {
+	return sortExpression{field: f, desc: true}
 }

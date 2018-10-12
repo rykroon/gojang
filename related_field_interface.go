@@ -1,7 +1,7 @@
 package gojang
 
 import (
-	"fmt"
+	//"fmt"
 )
 
 type relatedField interface {

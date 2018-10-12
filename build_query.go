@@ -137,14 +137,14 @@ func (q QuerySet) processFrom() string {
 func (q QuerySet) processWhere() string {
 	sql := ""
 
-	if len(q.where) != 0 {
+	if len(q.lookups) != 0 {
 		sql += " WHERE "
 
-		for i, filter := range q.where {
+		for i, filter := range q.lookups {
 			if i == 0 {
-				sql += filter
+				sql += filter.toSql()
 			} else {
-				sql += " AND " + filter
+				sql += " AND " + filter.toSql()
 			}
 		}
 	}
@@ -159,7 +159,7 @@ func (q QuerySet) processOrderBy() string {
 		sql += " ORDER BY "
 
 		for _, expr := range q.orderBy {
-			sql += string(expr) + ", "
+			sql += expr.toSql() + ", "
 		}
 
 		sql = sql[0 : len(sql)-2]

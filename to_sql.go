@@ -39,10 +39,6 @@ func snakeCase(s string) string {
 	return result
 }
 
-func (l lookup) toSql() string {
-	return l.lhs + " " + l.lookupName + " " + l.rhs
-}
-
 func stringSliceToSql(slice []string) string {
 	s := "("
 

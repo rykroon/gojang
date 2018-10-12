@@ -13,7 +13,6 @@ type QuerySet struct {
 	//distinct  bool
 	selected []string
 	//deferred  []string
-	//annotated []string
 
 	insert bool
 	update bool
@@ -23,26 +22,48 @@ type QuerySet struct {
 	values  []string
 
 	from  string
-	where []string
-	//groupBy      string
-	//having       string
+	lookups []lookup
+
 	Ordered bool
-	orderBy []orderByExpression
+	orderBy []sortExpression
 
 	rows sql.Rows
 }
 
+type sortExpression struct {
+	field field
+	desc bool
+}
+
+func (s sortExpression) toSql() string {
+	sql := s.field.sqlField()
+
+	if s.desc {
+		sql += " DESC"
+	} else {
+		sql += " ASC"
+	}
+
+	return sql
+}
+
 //Functions that return QuerySets
 
-func (q QuerySet) Filter(l lookup) QuerySet {
-	q.where = append(q.where, l.toSql())
+func (q QuerySet) Filter(lookups ...lookup) QuerySet {
+	for _, lookup := range lookups {
+		q.lookups = append(q.lookups, lookup)
+	}
+
 	q.Query = q.buildQuery()
 	return q
 }
 
-func (q QuerySet) Exclude(l lookup) QuerySet {
-	sql := "NOT(" + l.toSql() + ")"
-	q.where = append(q.where, sql)
+func (q QuerySet) Exclude(lookups ...lookup) QuerySet {
+	for _, lookup := range lookups {
+		lookup.not = true
+		q.lookups = append(q.lookups, lookup)
+	}
+
 	q.Query = q.buildQuery()
 	return q
 }
@@ -53,7 +74,7 @@ func (q QuerySet) Exclude(l lookup) QuerySet {
 // 	return q
 // }
 
-func (q QuerySet) OrderBy(orderBys ...orderByExpression) QuerySet {
+func (q QuerySet) OrderBy(orderBys ...sortExpression) QuerySet {
 	for _, orderBy := range orderBys {
 		q.orderBy = append(q.orderBy, orderBy)
 	}
@@ -67,6 +88,9 @@ func (q QuerySet) OrderBy(orderBys ...orderByExpression) QuerySet {
 // 	//maybe do other stuff?
 // 	return q
 // }
+
+
+
 
 //Functions that do not return Querysets
 
