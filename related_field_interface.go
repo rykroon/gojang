@@ -1,7 +1,7 @@
 package gojang
 
 import (
-//"fmt"
+	"fmt"
 )
 
 type relatedField interface {
@@ -65,7 +65,7 @@ func (f *ForeignKeyField) Fetch() error {
 	model := f.relatedModel
 
 	table := dbq(model.dbTable)
-	pkCol := dbq(model.Pk.(field).getDbColumn())
+	pkCol := model.Pk.(field).sqlField()
 
 	//when queryset logic is finished use that to build the string
 	sql := "SELECT * FROM " + table + " WHERE " + pkCol + " = " + f.sqlValue() + ";"

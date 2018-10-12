@@ -20,6 +20,7 @@ const SetNull onDelete = "SET NULL"
 const SetDefault onDelete = "SET DEFAULT"
 
 type AutoField struct {
+	model *Model
 	dbColumn string
 	dbType   string
 
@@ -34,6 +35,7 @@ type AutoField struct {
 }
 
 type BigAutoField struct {
+	model *Model
 	dbColumn string
 	dbType   string
 
@@ -47,6 +49,7 @@ type BigAutoField struct {
 }
 
 type BigIntegerField struct {
+	model *Model
 	dbColumn string
 	dbType   string
 
@@ -60,6 +63,7 @@ type BigIntegerField struct {
 }
 
 type BooleanField struct {
+	model *Model
 	dbColumn string
 	dbType   string
 
@@ -73,6 +77,7 @@ type BooleanField struct {
 }
 
 type FloatField struct {
+	model *Model
 	dbColumn string
 	dbType   string
 
@@ -86,6 +91,7 @@ type FloatField struct {
 }
 
 type IntegerField struct {
+	model *Model
 	dbColumn string
 	dbType   string
 
@@ -99,6 +105,7 @@ type IntegerField struct {
 }
 
 type TextField struct {
+	model *Model
 	dbColumn string
 	dbType   string
 
@@ -113,6 +120,7 @@ type TextField struct {
 }
 
 type ForeignKeyField struct {
+	model *Model
 	dbColumn string
 	dbType   string
 
@@ -134,6 +142,7 @@ type ForeignKeyField struct {
 }
 
 type OneToOneField struct {
+	model *Model
 	dbColumn string
 	dbType   string
 

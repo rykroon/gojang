@@ -10,6 +10,12 @@ type lookup struct {
 	rhs        string
 }
 
+// type lookup struct {
+// 	lhs        field
+// 	lookupName string
+// 	rhs        string
+// }
+
 func (f AutoField) Exact(value int) lookup {
 	return lookup{lhs: f.dbColumn, lookupName: "=", rhs: intToSql(value)}
 }

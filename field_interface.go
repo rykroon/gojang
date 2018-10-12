@@ -11,6 +11,7 @@ type field interface {
 	hasPrimaryKeyConstraint() bool
 	hasRelation() bool
 
+	setModel(*Model)
 	getDbColumn() string
 	setDbColumn(string)
 	getDbType() string
@@ -23,7 +24,9 @@ type field interface {
 	Desc() orderByExpression
 
 	getPtr() unsafe.Pointer
+	sqlField() string
 	sqlValue() string
+
 }
 
 // type intField interface {
@@ -185,6 +188,42 @@ func (f *ForeignKeyField) hasRelation() bool {
 
 func (f *OneToOneField) hasRelation() bool {
 	return f.isRelation
+}
+
+func (f *AutoField) setModel(model *Model) {
+	f.model = model
+}
+
+func (f *BigAutoField) setModel(model *Model) {
+	f.model = model
+}
+
+func (f *BigIntegerField) setModel(model *Model) {
+	f.model = model
+}
+
+func (f *BooleanField) setModel(model *Model) {
+	f.model = model
+}
+
+func (f *FloatField) setModel(model *Model) {
+	f.model = model
+}
+
+func (f *IntegerField) setModel(model *Model) {
+	f.model = model
+}
+
+func (f *TextField) setModel(model *Model) {
+	f.model = model
+}
+
+func (f *ForeignKeyField) setModel(model *Model) {
+	f.model = model
+}
+
+func (f *OneToOneField) setModel(model *Model) {
+	f.model = model
 }
 
 func (f *AutoField) getDbColumn() string {
@@ -473,6 +512,42 @@ func (f *OneToOneField) sqlValue() string {
 	} else {
 		return int64ToSql(f.value)
 	}
+}
+
+func (f *AutoField) sqlField() string {
+	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+}
+
+func (f *BigAutoField) sqlField() string {
+	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+}
+
+func (f *BigIntegerField) sqlField() string {
+	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+}
+
+func (f *BooleanField) sqlField() string {
+	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+}
+
+func (f *FloatField) sqlField() string {
+	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+}
+
+func (f *IntegerField) sqlField() string {
+	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+}
+
+func (f *TextField) sqlField() string {
+	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+}
+
+func (f *ForeignKeyField) sqlField() string {
+	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+}
+
+func (f *OneToOneField) sqlField() string {
+	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
 type orderByExpression string

@@ -74,7 +74,7 @@ func MakeModel(i interface{}) error {
 			}
 
 			field.setDbColumn(snakeCase(fieldType.Name))
-			//model.addField(fieldType.Name, field)
+			field.setModel(model)
 			model.fields[fieldType.Name] = field
 		}
 	}
@@ -83,16 +83,10 @@ func MakeModel(i interface{}) error {
 		model.Pk = NewAutoField()
 		model.Pk.(field).setDbColumn("id")
 		model.fields["id"] = model.Pk.(field)
-		//panic("Model must have a Primary Key")
 	}
 
 	return nil
 }
-
-//Adds a field to a Model's map of fields
-// func (m *Model) addField(key string, value field) {
-// 	m.fields[key] = value
-// }
 
 func (m *Model) getPointers(columns []string) []interface{} {
 	result := make([]interface{}, 0)
