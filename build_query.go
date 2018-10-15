@@ -4,58 +4,15 @@ import ()
 
 func (q QuerySet) buildQuery() string {
 	sql := ""
+	sql += q.processSelect()
 
-	if q.update {
-		sql += "UPDATE"
-	} else if q.delete {
-		sql += "DELETE"
-	} else if q.insert {
-		sql += "INSERT INTO"
-	} else {
-		sql += q.processSelect()
-	}
 
 	//sql += " FROM " + q.from
 	sql += q.processFrom()
-
-	if q.insert {
-		sql += q.processInsert()
-	} else if q.update {
-		sql += q.processUpdate()
-	}
-
-	if !q.insert {
-		sql += q.processWhere()
-	}
-
-	if !q.update && !q.delete && !q.insert {
-		sql += q.processOrderBy()
-	}
+	sql += q.processWhere()
+	sql += q.processOrderBy()
 
 	sql += ";"
-	return sql
-}
-
-func (q QuerySet) processInsert() string {
-	sql := "("
-
-	for _, col := range q.columns {
-		sql += col + ", "
-	}
-
-	sql = sql[1:len(sql)-2] + ") VALUES ("
-
-	for _, value := range q.values {
-		sql += value + ", "
-	}
-
-	sql = sql[1:len(sql)-2] + ")"
-
-	return sql
-}
-
-func (q QuerySet) processUpdate() string {
-	sql := " SET "
 	return sql
 }
 
@@ -66,59 +23,12 @@ func (q QuerySet) processSelect() string {
 		sql += "*"
 	}
 
-	// if q.distinct {
-	// 	sql += "DISTINCT "
-	// }
-	//
-	// if len(q.selected) == 0 && len(q.deferred) == 0 && len(q.annotated) == 0 {
-	// 	sql += "*"
-	// 	return sql
-	// }
-	//
-	// selected := []string{}
-	//
-	// if len(q.selected) != 0 {
-	// 	selected = q.selected
-	// } else {
-	// 	selected = q.model.sqlFieldList()
-	// }
-	//
-	// for _, field := range selected {
-	// 	foundDefer := false
-	//
-	// 	if len(q.deferred) != 0 {
-	// 		for _, deferredField := range q.deferred {
-	// 			if field == deferredField {
-	// 				foundDefer = true
-	// 				break
-	// 			}
-	// 		}
-	//
-	// 		if foundDefer {
-	// 			continue
-	// 		}
-	// 	}
-	//
-	// 	sql += field + ", "
-	// }
-	//
-	// if len(q.annotated) != 0 {
-	// 	for _, annotation := range q.annotated {
-	// 		sql += annotation + ", "
-	// 	}
-	// }
-	//
-	// sql = sql[0 : len(sql)-2]
-
 	return sql
 }
 
 func (q QuerySet) processFrom() string {
 	sql := " "
-
-	if !q.update && !q.delete && !q.insert {
-		sql += "FROM "
-	}
+	sql += "FROM "
 
 	//sql += q.model.dbTable
 
