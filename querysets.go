@@ -8,13 +8,13 @@ import (
 type QuerySet struct {
 	model     *Model
 	Query     string
-	evaluated bool
+	db 				*sql.DB
 
 	//distinct  bool
 	selected []string
-	//deferred  []string
+	//deferred
 
-	from  string
+	joins  []relatedField
 	lookups []lookup
 
 	Ordered bool
@@ -30,7 +30,7 @@ type sortExpression struct {
 }
 
 func (s sortExpression) toSql() string {
-	sql := s.field.sqlField()
+	sql := s.field.toSql()
 
 	if s.desc {
 		sql += " DESC"
@@ -41,8 +41,14 @@ func (s sortExpression) toSql() string {
 	return sql
 }
 
+func newQuerySet(model *Model) QuerySet {
+	q := QuerySet{model: model, db: model.db}
+	return q
+}
+
 //Functions that return QuerySets
 
+//Returns a new QuerySet containing objects that match the given lookup parameters.
 func (q QuerySet) Filter(lookups ...lookup) QuerySet {
 	for _, lookup := range lookups {
 		q.lookups = append(q.lookups, lookup)
@@ -52,6 +58,7 @@ func (q QuerySet) Filter(lookups ...lookup) QuerySet {
 	return q
 }
 
+//returns a new QuerySet containing objects that do not match the given lookup parameters.
 func (q QuerySet) Exclude(lookups ...lookup) QuerySet {
 	for _, lookup := range lookups {
 		lookup.not = true
@@ -71,12 +78,20 @@ func (q QuerySet) OrderBy(orderBys ...sortExpression) QuerySet {
 	return q
 }
 
+//Returns a QuerySet that returns an array of maps.
+// func (q Queryset) Values() Queryset {
+// 	return q
+// }
+
 func (q QuerySet) All() QuerySet {
-	q.evaluated = false
 	//maybe do other stuff?
+	q.Query = q.buildQuery()
 	return q
 }
 
+// func (q Queryset) SelectRelated() Queryset {
+// 	return q
+// }
 
 
 
@@ -95,9 +110,13 @@ func (q QuerySet) Exists() bool {
 	return false
 }
 
-func (q QuerySet) Delete() int {
-	return 0
-}
+// func (q QuerySet) Update() int {
+// 	return 0
+// }
+
+// func (q QuerySet) Delete() int {
+// 	return 0
+// }
 
 
 //database/sql wrappers

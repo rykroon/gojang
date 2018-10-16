@@ -24,8 +24,9 @@ type field interface {
 	Desc() sortExpression
 
 	getPtr() unsafe.Pointer
-	sqlField() string
-	sqlValue() string
+	toSql() string
+
+	valueToSql() string
 }
 
 // type intField interface {
@@ -35,6 +36,7 @@ type field interface {
 type primaryKeyField interface {
 	id() int
 	Val() int
+	Exact(int) lookup
 }
 
 func (f *AutoField) id() int {
@@ -441,7 +443,7 @@ func (f *OneToOneField) getPtr() unsafe.Pointer {
 	return unsafe.Pointer(f.pointer)
 }
 
-func (f *AutoField) sqlValue() string {
+func (f *AutoField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -449,7 +451,7 @@ func (f *AutoField) sqlValue() string {
 	}
 }
 
-func (f *BigAutoField) sqlValue() string {
+func (f *BigAutoField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -457,7 +459,7 @@ func (f *BigAutoField) sqlValue() string {
 	}
 }
 
-func (f *BigIntegerField) sqlValue() string {
+func (f *BigIntegerField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -465,7 +467,7 @@ func (f *BigIntegerField) sqlValue() string {
 	}
 }
 
-func (f *BooleanField) sqlValue() string {
+func (f *BooleanField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -473,7 +475,7 @@ func (f *BooleanField) sqlValue() string {
 	}
 }
 
-func (f *FloatField) sqlValue() string {
+func (f *FloatField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -481,7 +483,7 @@ func (f *FloatField) sqlValue() string {
 	}
 }
 
-func (f *IntegerField) sqlValue() string {
+func (f *IntegerField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -489,7 +491,7 @@ func (f *IntegerField) sqlValue() string {
 	}
 }
 
-func (f *TextField) sqlValue() string {
+func (f *TextField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -497,7 +499,7 @@ func (f *TextField) sqlValue() string {
 	}
 }
 
-func (f *ForeignKeyField) sqlValue() string {
+func (f *ForeignKeyField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -505,7 +507,7 @@ func (f *ForeignKeyField) sqlValue() string {
 	}
 }
 
-func (f *OneToOneField) sqlValue() string {
+func (f *OneToOneField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -513,39 +515,39 @@ func (f *OneToOneField) sqlValue() string {
 	}
 }
 
-func (f *AutoField) sqlField() string {
+func (f *AutoField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *BigAutoField) sqlField() string {
+func (f *BigAutoField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *BigIntegerField) sqlField() string {
+func (f *BigIntegerField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *BooleanField) sqlField() string {
+func (f *BooleanField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *FloatField) sqlField() string {
+func (f *FloatField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *IntegerField) sqlField() string {
+func (f *IntegerField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *TextField) sqlField() string {
+func (f *TextField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *ForeignKeyField) sqlField() string {
+func (f *ForeignKeyField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *OneToOneField) sqlField() string {
+func (f *OneToOneField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 

@@ -2,7 +2,7 @@ package gojang
 
 import (
 	"database/sql"
-	"fmt"
+	//"fmt"
 	"reflect"
 	"strings"
 )
@@ -20,11 +20,12 @@ type Model struct {
 }
 
 //Returns a New Model
-func NewModel(db Database) Model {
-	m := Model{}
-	m.fields = make(map[string]field)
-	m.db, _ = db.toDB()
-	return m
+func NewModel(db Database) *Model {
+	model := &Model{}
+	model.fields = make(map[string]field)
+	model.db, _ = db.toDB()
+	model.Objects = newManager(model)
+	return model
 }
 
 //initializes a Model
@@ -43,11 +44,11 @@ func MakeModel(i interface{}) error {
 
 	modelVal := v.FieldByName("Model")
 
-	if modelVal.Type() != reflect.TypeOf(Model{}) {
+	if modelVal.Type() != reflect.TypeOf(&Model{}) {
 		panic("Value does not have an embedded Model")
 	}
 
-	model := modelVal.Addr().Interface().(*Model)
+	model := modelVal.Interface().(*Model)
 
 	tableName := v.Type().String()
 	dotIdx := strings.Index(tableName, ".") + 1
@@ -87,6 +88,11 @@ func MakeModel(i interface{}) error {
 
 	return nil
 }
+
+//Sets a Models fields
+// func (m *Model) SetFromRow(row sql.Row) {
+// 	pointers := m.getPointers()
+// }
 
 func (m *Model) getPointers(columns []string) []interface{} {
 	result := make([]interface{}, 0)
@@ -175,7 +181,7 @@ func (m *Model) insert() string {
 		}
 
 		columns += dbq(field.getDbColumn()) + ", "
-		values += field.sqlValue() + ", "
+		values += field.valueToSql() + ", "
 	}
 
 	columns = columns[:len(columns)-2] + ")"
@@ -196,11 +202,11 @@ func (m *Model) update() string {
 			continue
 		}
 
-		sql += dbq(field.getDbColumn()) + " = " + field.sqlValue() + ", "
+		sql += dbq(field.getDbColumn()) + " = " + field.valueToSql() + ", "
 	}
 
 	sql = sql[:len(sql)-2]
-	sql += " WHERE " + dbq(pk.getDbColumn()) + " = " + pk.sqlValue()
+	sql += " WHERE " + dbq(pk.getDbColumn()) + " = " + pk.valueToSql()
 
 	return sql
 }
@@ -221,7 +227,5 @@ func (m Model) createTable() string {
 	}
 
 	sql = sql[0:len(sql)-2] + ");"
-
-	fmt.Println(sql)
 	return sql
 }

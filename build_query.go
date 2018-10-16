@@ -1,13 +1,12 @@
 package gojang
 
-import ()
+import (
+	//"fmt"
+)
 
 func (q QuerySet) buildQuery() string {
 	sql := ""
 	sql += q.processSelect()
-
-
-	//sql += " FROM " + q.from
 	sql += q.processFrom()
 	sql += q.processWhere()
 	sql += q.processOrderBy()
@@ -27,19 +26,11 @@ func (q QuerySet) processSelect() string {
 }
 
 func (q QuerySet) processFrom() string {
-	sql := " "
-	sql += "FROM "
+	sql := " FROM " + dbq(q.model.dbTable)
 
-	//sql += q.model.dbTable
-
-	// for _, field := range q.model.fieldList() {
-	// 	if field.isRelation {
-	// 		joinModel := field.relatedModel
-	// 		joinTable := joinModel.dbTable
-	// 		joinField := joinModel.getPrimaryKey().toSql()
-	// 		sql += " JOIN " + joinTable + " ON " + field.toSql() + " = " + joinField
-	// 	}
-	// }
+	if len(q.joins) > 0 {
+		// add joins
+	}
 
 	return sql
 }

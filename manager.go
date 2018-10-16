@@ -7,28 +7,36 @@ type Manager struct {
 	//queryset QuerySet
 }
 
+func newManager(model *Model) Manager {
+	manager := Manager{model: model}
+	return manager
+}
+
 func (m Manager) All() QuerySet {
-	qs := QuerySet{}
-	qs.model = m.model
-	//qs.from = m.model.dbTable
-	qs.Query = qs.buildQuery()
+	qs := newQuerySet(m.model)
+	qs = qs.All()
 	return qs
 }
 
-func (m Manager) Filter(l lookup) QuerySet {
-	qs := m.All()
-	qs = qs.Filter(l)
+func (m Manager) Filter(lookups ...lookup) QuerySet {
+	qs := newQuerySet(m.model)
+	qs = qs.Filter(lookups...)
 	return qs
 }
 
-func (m Manager) Exclude(l lookup) QuerySet {
-	qs := m.All()
-	qs = qs.Exclude(l)
+func (m Manager) Exclude(lookups ...lookup) QuerySet {
+	qs := newQuerySet(m.model)
+	qs = qs.Exclude(lookups...)
 	return qs
 }
 
-//Should the parameter be a lookup or do I create an aggregattion struct?
-func (m Manager) Annotate() QuerySet {
-	qs := m.All()
+func (m Manager) OrderBy(orderBys ...sortExpression) QuerySet {
+	qs := newQuerySet(m.model)
+	qs = qs.OrderBy(orderBys...)
 	return qs
 }
+
+// func (m Manager) Get(lookups ...lookup) {
+// 	qs := newQuerySet(m.model)
+// 	return qs.Get(lookups...)
+// }

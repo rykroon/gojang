@@ -12,7 +12,7 @@ type lookup struct {
 }
 
 func (l lookup) toSql() string {
-	sql := l.lhs.sqlValue() + " " + l.lookupName + " " + l.rhs
+	sql := l.lhs.toSql() + " " + l.lookupName + " " + l.rhs
 
 	if l.not {
 		sql = "NOT(" + sql + ")"
