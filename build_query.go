@@ -1,7 +1,7 @@
 package gojang
 
 import (
-	//"fmt"
+//"fmt"
 )
 
 func (q QuerySet) buildQuery() string {
@@ -20,6 +20,13 @@ func (q QuerySet) processSelect() string {
 
 	if len(q.selected) == 0 {
 		sql += "*"
+	} else {
+
+		for _, field := range q.selected {
+			sql += field + ", "
+		}
+
+		sql = sql[:len(sql)-2]
 	}
 
 	return sql
@@ -41,11 +48,11 @@ func (q QuerySet) processWhere() string {
 	if len(q.lookups) != 0 {
 		sql += " WHERE "
 
-		for i, filter := range q.lookups {
+		for i, lookup := range q.lookups {
 			if i == 0 {
-				sql += filter.toSql()
+				sql += lookup.toSql()
 			} else {
-				sql += " AND " + filter.toSql()
+				sql += " AND " + lookup.toSql()
 			}
 		}
 	}
@@ -59,8 +66,8 @@ func (q QuerySet) processOrderBy() string {
 	if len(q.orderBy) != 0 {
 		sql += " ORDER BY "
 
-		for _, expr := range q.orderBy {
-			sql += expr.toSql() + ", "
+		for _, sort := range q.orderBy {
+			sql += sort.toSql() + ", "
 		}
 
 		sql = sql[0 : len(sql)-2]

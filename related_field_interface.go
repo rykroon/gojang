@@ -1,7 +1,7 @@
 package gojang
 
 import (
-	//"fmt"
+//"fmt"
 )
 
 type relatedField interface {
@@ -63,30 +63,10 @@ func (f *OneToOneField) getOnDelete() string {
 
 func (f *ForeignKeyField) Fetch() error {
 	model := f.relatedModel
-	qs := model.Objects.Filter(model.Pk.Exact(f.Val()))
-	rows, err := model.db.Query(qs.Query)
+	return model.Objects.Get(model.Pk.Exact(f.Val()))
+}
 
-	if err != nil {
-		return err
-	}
-
-	columns, err := rows.Columns()
-
-	if err != nil {
-		return err
-	}
-
-	pointers := model.getPointers(columns)
-
-	for rows.Next() {
-		err := rows.Scan(pointers...)
-
-		if err != nil {
-			return err
-		}
-
-		break
-	}
-
-	return nil
+func (f *OneToOneField) Fetch() error {
+	model := f.relatedModel
+	return model.Objects.Get(model.Pk.Exact(f.Val()))
 }

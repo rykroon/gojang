@@ -2,19 +2,19 @@ package gojang
 
 import (
 	"database/sql"
-	//"reflect"
+	//"errors"
 )
 
 type QuerySet struct {
-	model     *Model
-	Query     string
-	db 				*sql.DB
+	model *Model
+	Query string
+	db    *sql.DB
 
 	//distinct  bool
 	selected []string
 	//deferred
 
-	joins  []relatedField
+	joins   []relatedField
 	lookups []lookup
 
 	Ordered bool
@@ -26,7 +26,7 @@ type QuerySet struct {
 
 type sortExpression struct {
 	field field
-	desc bool
+	desc  bool
 }
 
 func (s sortExpression) toSql() string {
@@ -93,17 +93,64 @@ func (q QuerySet) All() QuerySet {
 // 	return q
 // }
 
-
-
 //Functions that do not return Querysets
 
-func (q QuerySet) Get() {
-	//row := q.queryRow()
-	return
+//populates the Model associated with the queryset with the data returned from the query
+func (q QuerySet) Get(lookups ...lookup) error {
+	if len(lookups) > 0 {
+		q = q.Filter(lookups...)
+	}
+
+	rows, err := q.query()
+	if err != nil {
+		return err
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil
+	}
+
+	pointers := q.model.getPointers(columns)
+	numOfRows := 0
+
+	for rows.Next() {
+		numOfRows += 1
+
+		if numOfRows > 2 {
+			return multipleObjectsReturned
+		}
+
+		err := rows.Scan(pointers...)
+		if err != nil {
+			return err
+		}
+	}
+
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	if numOfRows == 0 {
+		return doesNotExist
+	}
+
+	return nil
 }
 
-func (q QuerySet) Count() int {
-	return 0
+func (q QuerySet) Count() (int, error) {
+	q.selected = nil
+	q.selected = append(q.selected, "COUNT(*)")
+	q.Query = q.buildQuery()
+	row := q.queryRow()
+	result := 0
+
+	err := row.Scan(&result)
+	if err != nil {
+		return 0, err
+	}
+
+	return result, nil
 }
 
 func (q QuerySet) Exists() bool {
@@ -119,55 +166,17 @@ func (q QuerySet) Exists() bool {
 // }
 
 
+
 //database/sql wrappers
 
-// func (q QuerySet) Evaluate() []modelInstance {
-// 	rows, err := q.query()
-//
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer rows.Close()
-//
-// 	columnTypes, err := rows.ColumnTypes()
-// 	objects := make([]modelInstance, 0)
-// 	dbColumnMap := q.model.dbColumnToAttrMap()
-//
-// 	for rows.Next() {
-// 		pointers := make([]interface{}, len(columnTypes))
-//
-// 		for i, _ := range columnTypes {
-// 			pointers[i] = new(interface{})
-// 		}
-//
-// 		err := rows.Scan(pointers...)
-//
-// 		if err != nil {
-// 			panic(err)
-// 		}
-//
-// 		obj := q.model.NewInstance()
-//
-// 		for idx, ptr := range pointers {
-// 			attr := dbColumnMap[columnTypes[idx].Name()]
-// 			val := reflect.ValueOf(ptr).Elem().Interface()
-// 			obj.Set(attr, val)
-// 		}
-//
-// 		objects = append(objects, obj)
-// 	}
-//
-// 	return objects
-// }
-
 func (q QuerySet) exec() (sql.Result, error) {
-	return q.model.db.Exec(q.Query)
+	return q.db.Exec(q.Query)
 }
 
 func (q QuerySet) query() (*sql.Rows, error) {
-	return q.model.db.Query(q.Query)
+	return q.db.Query(q.Query)
 }
 
 func (q QuerySet) queryRow() *sql.Row {
-	return q.model.db.QueryRow(q.Query)
+	return q.db.QueryRow(q.Query)
 }

@@ -4,7 +4,6 @@ import ()
 
 type Manager struct {
 	model *Model
-	//queryset QuerySet
 }
 
 func newManager(model *Model) Manager {
@@ -36,7 +35,12 @@ func (m Manager) OrderBy(orderBys ...sortExpression) QuerySet {
 	return qs
 }
 
-// func (m Manager) Get(lookups ...lookup) {
-// 	qs := newQuerySet(m.model)
-// 	return qs.Get(lookups...)
-// }
+func (m Manager) Get(lookups ...lookup) error {
+	qs := newQuerySet(m.model)
+	return qs.Get(lookups...)
+}
+
+func (m Manager) Count() (int, error) {
+	qs := newQuerySet(m.model)
+	return qs.Count()
+}
