@@ -44,3 +44,13 @@ func (m Manager) Count() (int, error) {
 	qs := newQuerySet(m.model)
 	return qs.Count()
 }
+
+func (m Manager) Exists() (bool, error) {
+	qs := newQuerySet(m.model)
+	return qs.Exists()
+}
+
+func (m Manager) Delete() (int, error) {
+	qs := newQuerySet(m.model)
+	return qs.Delete()
+}

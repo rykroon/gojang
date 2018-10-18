@@ -11,6 +11,7 @@ type Model struct {
 	dbTable string
 	Objects Manager
 	fields  map[string]field
+	//colsToFields map[string]string
 	Pk      primaryKeyField
 
 	db *sql.DB
@@ -89,10 +90,23 @@ func MakeModel(i interface{}) error {
 	return nil
 }
 
-//Sets a Models fields
-// func (m *Model) SetFromRow(row sql.Row) {
-// 	pointers := m.getPointers()
-// }
+//Sets a Model's fields from Rows.Scan()
+//Assumes that Rows.Next() had been previously called
+func (m *Model) setFromRows(rows *sql.Rows) error {
+	columns, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+
+	pointers := m.getPointers(columns)
+
+	err = rows.Scan(pointers...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (m *Model) getPointers(columns []string) []interface{} {
 	result := make([]interface{}, 0)

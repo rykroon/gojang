@@ -6,10 +6,18 @@ import (
 
 func (q QuerySet) buildQuery() string {
 	sql := ""
-	sql += q.processSelect()
+	if q.delete {
+		sql += "DELETE "
+	} else {
+		sql += q.processSelect()
+	}
+
 	sql += q.processFrom()
 	sql += q.processWhere()
-	sql += q.processOrderBy()
+
+	if !q.delete {
+		sql += q.processOrderBy()
+	}
 
 	sql += ";"
 	return sql

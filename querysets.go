@@ -13,6 +13,7 @@ type QuerySet struct {
 	//distinct  bool
 	selected []string
 	//deferred
+	delete bool
 
 	joins   []relatedField
 	lookups []lookup
@@ -106,38 +107,34 @@ func (q QuerySet) Get(lookups ...lookup) error {
 		return err
 	}
 
-	columns, err := rows.Columns()
-	if err != nil {
-		return nil
-	}
-
-	pointers := q.model.getPointers(columns)
 	numOfRows := 0
 
 	for rows.Next() {
 		numOfRows += 1
 
 		if numOfRows > 2 {
-			return multipleObjectsReturned
+			return NewMultipleObjectsReturned()
 		}
 
-		err := rows.Scan(pointers...)
+		err := q.model.setFromRows(rows)
 		if err != nil {
 			return err
 		}
 	}
 
-	if err := rows.Err(); err != nil {
+	err = rows.Err()
+	if err != nil {
 		return err
 	}
 
 	if numOfRows == 0 {
-		return doesNotExist
+		return NewObjectDoesNotExist()
 	}
 
 	return nil
 }
 
+//Returns an integer representing the number of objects in the database matching the QuerySet.
 func (q QuerySet) Count() (int, error) {
 	q.selected = nil
 	q.selected = append(q.selected, "COUNT(*)")
@@ -153,22 +150,42 @@ func (q QuerySet) Count() (int, error) {
 	return result, nil
 }
 
-func (q QuerySet) Exists() bool {
-	return false
+//Returns True if the QuerySet contains any results, and False if not.
+func (q QuerySet) Exists() (bool, error) {
+	count, err := q.Count()
+	if err != nil {
+		return false, err
+	}
+
+	result := count != 0
+	return result, nil
 }
 
 // func (q QuerySet) Update() int {
 // 	return 0
 // }
 
-// func (q QuerySet) Delete() int {
-// 	return 0
-// }
+//Performs an SQL delete query on all rows in the QuerySet and returns the number of objects deleted
+func (q QuerySet) Delete() (int, error) {
+	q.delete = true
+	q.Query = q.buildQuery()
+
+	result, err := q.exec()
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(rowsAffected), nil
+}
 
 
 
 //database/sql wrappers
-
 func (q QuerySet) exec() (sql.Result, error) {
 	return q.db.Exec(q.Query)
 }
