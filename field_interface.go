@@ -71,6 +71,10 @@ func (f *IntegerField) hasNullConstraint() bool {
 	return f.null
 }
 
+func (f *SmallIntegerField) hasNullConstraint() bool {
+	return f.null
+}
+
 func (f *TextField) hasNullConstraint() bool {
 	return f.null
 }
@@ -104,6 +108,10 @@ func (f *FloatField) hasUniqueConstraint() bool {
 }
 
 func (f *IntegerField) hasUniqueConstraint() bool {
+	return f.unique
+}
+
+func (f *SmallIntegerField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
@@ -143,6 +151,10 @@ func (f *IntegerField) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
 }
 
+func (f *SmallIntegerField) hasPrimaryKeyConstraint() bool {
+	return f.primaryKey
+}
+
 func (f *TextField) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
 }
@@ -176,6 +188,10 @@ func (f *FloatField) hasRelation() bool {
 }
 
 func (f *IntegerField) hasRelation() bool {
+	return f.isRelation
+}
+
+func (f *SmallIntegerField) hasRelation() bool {
 	return f.isRelation
 }
 
@@ -215,6 +231,10 @@ func (f *IntegerField) setModel(model *Model) {
 	f.model = model
 }
 
+func (f *SmallIntegerField) setModel(model *Model) {
+	f.model = model
+}
+
 func (f *TextField) setModel(model *Model) {
 	f.model = model
 }
@@ -248,6 +268,10 @@ func (f *FloatField) getDbColumn() string {
 }
 
 func (f *IntegerField) getDbColumn() string {
+	return f.dbColumn
+}
+
+func (f *SmallIntegerField) getDbColumn() string {
 	return f.dbColumn
 }
 
@@ -287,6 +311,10 @@ func (f *IntegerField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
+func (f *SmallIntegerField) setDbColumn(columnName string) {
+	f.dbColumn = columnName
+}
+
 func (f *TextField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
@@ -320,6 +348,10 @@ func (f *FloatField) getDbType() string {
 }
 
 func (f *IntegerField) getDbType() string {
+	return f.dbType
+}
+
+func (f *SmallIntegerField) getDbType() string {
 	return f.dbType
 }
 
@@ -359,6 +391,10 @@ func (f *IntegerField) getGoType() string {
 	return reflect.TypeOf(f.value).String()
 }
 
+func (f *SmallIntegerField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
 func (f *TextField) getGoType() string {
 	return reflect.TypeOf(f.value).String()
 }
@@ -395,6 +431,10 @@ func (f *IntegerField) IsNil() bool {
 	return f.pointer == nil
 }
 
+func (f *SmallIntegerField) IsNil() bool {
+	return f.pointer == nil
+}
+
 func (f *TextField) IsNil() bool {
 	return f.pointer == nil
 }
@@ -428,6 +468,10 @@ func (f *FloatField) getPtr() unsafe.Pointer {
 }
 
 func (f *IntegerField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *SmallIntegerField) getPtr() unsafe.Pointer {
 	return unsafe.Pointer(f.pointer)
 }
 
@@ -491,6 +535,14 @@ func (f *IntegerField) valueToSql() string {
 	}
 }
 
+func (f *SmallIntegerField) valueToSql() string {
+	if f.IsNil() {
+		return "NULL"
+	} else {
+		return int16ToSql(f.value)
+	}
+}
+
 func (f *TextField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
@@ -539,6 +591,10 @@ func (f *IntegerField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
+func (f *SmallIntegerField) toSql() string {
+	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+}
+
 func (f *TextField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
@@ -575,6 +631,10 @@ func (f *IntegerField) Asc() sortExpression {
 	return sortExpression{field: f}
 }
 
+func (f *SmallIntegerField) Asc() sortExpression {
+	return sortExpression{field: f}
+}
+
 func (f *TextField) Asc() sortExpression {
 	return sortExpression{field: f}
 }
@@ -608,6 +668,10 @@ func (f *FloatField) Desc() sortExpression {
 }
 
 func (f *IntegerField) Desc() sortExpression {
+	return sortExpression{field: f, desc: true}
+}
+
+func (f *SmallIntegerField) Desc() sortExpression {
 	return sortExpression{field: f, desc: true}
 }
 

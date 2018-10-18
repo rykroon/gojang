@@ -104,6 +104,20 @@ type IntegerField struct {
 	value   int32
 }
 
+type SmallIntegerField struct {
+	model    *Model
+	dbColumn string
+	dbType   string
+
+	null       bool
+	unique     bool
+	primaryKey bool
+	isRelation bool
+
+	pointer *int16
+	value   int16
+}
+
 type TextField struct {
 	model    *Model
 	dbColumn string
@@ -259,6 +273,26 @@ func NewIntegerField(constraints ...constraint) *IntegerField {
 	return field
 }
 
+func NewSmallIntegerField(constraints ...constraint) *SmallIntegerField {
+	field := &SmallIntegerField{dbType: "INT2"}
+
+	for _, constraint := range constraints {
+		switch constraint {
+		case "NULL":
+			field.null = true
+
+		case "UNIQUE":
+			field.unique = true
+		}
+	}
+
+	if !field.null {
+		field.pointer = &field.value
+	}
+
+	return field
+}
+
 func NewTextField(constraints ...constraint) *TextField {
 	field := &TextField{dbType: "TEXT"}
 
@@ -354,6 +388,10 @@ func (f IntegerField) Val() int {
 	return int(f.value)
 }
 
+func (f SmallIntegerField) Val() int {
+	return int(f.value)
+}
+
 func (f TextField) Val() string {
 	return f.value
 }
@@ -391,6 +429,14 @@ func (f *FloatField) Set(value float64) {
 }
 
 func (f *IntegerField) Set(value int32) {
+	if f.pointer == nil {
+		f.pointer = &f.value
+	}
+
+	f.value = value
+}
+
+func (f *SmallIntegerField) Set(value int16) {
 	if f.pointer == nil {
 		f.pointer = &f.value
 	}
@@ -453,6 +499,16 @@ func (f *FloatField) SetNil() error {
 }
 
 func (f *IntegerField) SetNil() error {
+	if f.hasNullConstraint() {
+		f.pointer = nil
+		f.value = 0
+		return nil
+	} else {
+		return errors.New("Cannot set field with NOT NULL constraint to nil")
+	}
+}
+
+func (f *SmallIntegerField) SetNil() error {
 	if f.hasNullConstraint() {
 		f.pointer = nil
 		f.value = 0

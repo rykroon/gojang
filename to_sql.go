@@ -71,6 +71,10 @@ func intToSql(i int) string {
 	return strconv.Itoa(i)
 }
 
+func int16ToSql(i int16) string {
+	return strconv.Itoa(int(i))
+}
+
 func int32ToSql(i int32) string {
 	return strconv.Itoa(int(i))
 }
