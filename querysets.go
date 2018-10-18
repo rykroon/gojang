@@ -44,6 +44,10 @@ func (s sortExpression) toSql() string {
 
 func newQuerySet(model *Model) QuerySet {
 	q := QuerySet{model: model, db: model.db}
+	for _, field := range model.fields {
+		q.selected = append(q.selected, field.toSql())
+	}
+
 	return q
 }
 
