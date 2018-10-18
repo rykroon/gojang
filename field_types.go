@@ -119,7 +119,7 @@ type TextField struct {
 	value   string
 }
 
-type ForeignKeyField struct {
+type ForeignKey struct {
 	model    *Model
 	dbColumn string
 	dbType   string
@@ -279,8 +279,8 @@ func NewTextField(constraints ...constraint) *TextField {
 	return field
 }
 
-func NewForeignKeyField(to *Model, onDelete onDelete, constraints ...constraint) *ForeignKeyField {
-	field := &ForeignKeyField{dbType: "INT8"}
+func NewForeignKey(to *Model, onDelete onDelete, constraints ...constraint) *ForeignKey {
+	field := &ForeignKey{dbType: "INT8"}
 	field.isRelation = true
 	field.manyToOne = true
 	field.relatedModel = to
@@ -358,7 +358,7 @@ func (f TextField) Val() string {
 	return f.value
 }
 
-func (f ForeignKeyField) Val() int {
+func (f ForeignKey) Val() int {
 	return int(f.value)
 }
 
@@ -406,7 +406,7 @@ func (f *TextField) Set(value string) {
 	f.value = value
 }
 
-func (f *ForeignKeyField) Set(value int64) {
+func (f *ForeignKey) Set(value int64) {
 	if f.pointer == nil {
 		f.pointer = &f.value
 	}
@@ -472,7 +472,7 @@ func (f *TextField) SetNil() error {
 	}
 }
 
-func (f *ForeignKeyField) SetNil() error {
+func (f *ForeignKey) SetNil() error {
 	if f.hasNullConstraint() {
 		f.pointer = nil
 		f.value = 0

@@ -48,7 +48,7 @@ func (f *TextField) Exact(value string) lookup {
 	return lookup{lhs: f, lookupName: "=", rhs: stringToSql(value)}
 }
 
-func (f *ForeignKeyField) Exact(value int) lookup {
+func (f *ForeignKey) Exact(value int) lookup {
 	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
 }
 
@@ -98,7 +98,7 @@ func (f *TextField) In(values ...string) lookup {
 	return lookup{lhs: f, lookupName: "IN", rhs: stringSliceToSql(values)}
 }
 
-func (f *ForeignKeyField) In(values ...int) lookup {
+func (f *ForeignKey) In(values ...int) lookup {
 	return lookup{lhs: f, lookupName: "IN", rhs: intSliceToSql(values)}
 }
 
@@ -134,7 +134,7 @@ func (f *TextField) Gt(value string) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: stringToSql(value)}
 }
 
-func (f *ForeignKeyField) Gt(value int) lookup {
+func (f *ForeignKey) Gt(value int) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: intToSql(value)}
 }
 
@@ -170,7 +170,7 @@ func (f *TextField) Gte(value string) lookup {
 	return lookup{lhs: f, lookupName: ">=", rhs: stringToSql(value)}
 }
 
-func (f *ForeignKeyField) Gte(value int) lookup {
+func (f *ForeignKey) Gte(value int) lookup {
 	return lookup{lhs: f, lookupName: ">=", rhs: intToSql(value)}
 }
 
@@ -206,7 +206,7 @@ func (f *TextField) Lt(value string) lookup {
 	return lookup{lhs: f, lookupName: "<", rhs: stringToSql(value)}
 }
 
-func (f *ForeignKeyField) Lt(value int) lookup {
+func (f *ForeignKey) Lt(value int) lookup {
 	return lookup{lhs: f, lookupName: "<", rhs: intToSql(value)}
 }
 
@@ -242,7 +242,7 @@ func (f *TextField) Lte(value string) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: stringToSql(value)}
 }
 
-func (f *ForeignKeyField) Lte(value int) lookup {
+func (f *ForeignKey) Lte(value int) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: intToSql(value)}
 }
 
@@ -312,7 +312,7 @@ func (f *TextField) Range(from string, to string) lookup {
 	return lookup
 }
 
-func (f *ForeignKeyField) Range(from int, to int) lookup {
+func (f *ForeignKey) Range(from int, to int) lookup {
 	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
 	lookup.rhs = intToSql(from) + " AND " + intToSql(to)
 	return lookup
@@ -408,7 +408,7 @@ func (f *TextField) IsNull(value bool) lookup {
 	return lookup
 }
 
-func (f *ForeignKeyField) IsNull(value bool) lookup {
+func (f *ForeignKey) IsNull(value bool) lookup {
 	lookup := lookup{lhs: f, lookupName: "IS"}
 
 	if value {

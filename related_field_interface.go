@@ -13,7 +13,7 @@ type relatedField interface {
 	getOnDelete() string
 }
 
-func (f *ForeignKeyField) isManyToMany() bool {
+func (f *ForeignKey) isManyToMany() bool {
 	return f.manyToMany
 }
 
@@ -21,7 +21,7 @@ func (f *OneToOneField) isManyToMany() bool {
 	return f.manyToMany
 }
 
-func (f *ForeignKeyField) isManyToOne() bool {
+func (f *ForeignKey) isManyToOne() bool {
 	return f.manyToOne
 }
 
@@ -29,7 +29,7 @@ func (f *OneToOneField) isManyToOne() bool {
 	return f.manyToOne
 }
 
-func (f *ForeignKeyField) isOneToMany() bool {
+func (f *ForeignKey) isOneToMany() bool {
 	return f.oneToMany
 }
 
@@ -37,7 +37,7 @@ func (f *OneToOneField) isOneToMany() bool {
 	return f.oneToMany
 }
 
-func (f *ForeignKeyField) isOneToOne() bool {
+func (f *ForeignKey) isOneToOne() bool {
 	return f.oneToOne
 }
 
@@ -45,7 +45,7 @@ func (f *OneToOneField) isOneToOne() bool {
 	return f.oneToOne
 }
 
-func (f *ForeignKeyField) getRelatedModel() *Model {
+func (f *ForeignKey) getRelatedModel() *Model {
 	return f.relatedModel
 }
 
@@ -53,7 +53,7 @@ func (f *OneToOneField) getRelatedModel() *Model {
 	return f.relatedModel
 }
 
-func (f *ForeignKeyField) getOnDelete() string {
+func (f *ForeignKey) getOnDelete() string {
 	return string(f.onDelete)
 }
 
@@ -61,7 +61,7 @@ func (f *OneToOneField) getOnDelete() string {
 	return string(f.onDelete)
 }
 
-func (f *ForeignKeyField) Fetch() error {
+func (f *ForeignKey) Fetch() error {
 	model := f.relatedModel
 	return model.Objects.Get(model.Pk.Exact(f.Val()))
 }

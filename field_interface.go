@@ -75,7 +75,7 @@ func (f *TextField) hasNullConstraint() bool {
 	return f.null
 }
 
-func (f *ForeignKeyField) hasNullConstraint() bool {
+func (f *ForeignKey) hasNullConstraint() bool {
 	return f.null
 }
 
@@ -111,7 +111,7 @@ func (f *TextField) hasUniqueConstraint() bool {
 	return f.unique
 }
 
-func (f *ForeignKeyField) hasUniqueConstraint() bool {
+func (f *ForeignKey) hasUniqueConstraint() bool {
 	return f.unique
 }
 
@@ -147,7 +147,7 @@ func (f *TextField) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
 }
 
-func (f *ForeignKeyField) hasPrimaryKeyConstraint() bool {
+func (f *ForeignKey) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
 }
 
@@ -183,7 +183,7 @@ func (f *TextField) hasRelation() bool {
 	return f.isRelation
 }
 
-func (f *ForeignKeyField) hasRelation() bool {
+func (f *ForeignKey) hasRelation() bool {
 	return f.isRelation
 }
 
@@ -219,7 +219,7 @@ func (f *TextField) setModel(model *Model) {
 	f.model = model
 }
 
-func (f *ForeignKeyField) setModel(model *Model) {
+func (f *ForeignKey) setModel(model *Model) {
 	f.model = model
 }
 
@@ -255,7 +255,7 @@ func (f *TextField) getDbColumn() string {
 	return f.dbColumn
 }
 
-func (f *ForeignKeyField) getDbColumn() string {
+func (f *ForeignKey) getDbColumn() string {
 	return f.dbColumn
 }
 
@@ -291,7 +291,7 @@ func (f *TextField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
-func (f *ForeignKeyField) setDbColumn(columnName string) {
+func (f *ForeignKey) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
 
@@ -327,7 +327,7 @@ func (f *TextField) getDbType() string {
 	return f.dbType
 }
 
-func (f *ForeignKeyField) getDbType() string {
+func (f *ForeignKey) getDbType() string {
 	return f.dbType
 }
 
@@ -363,7 +363,7 @@ func (f *TextField) getGoType() string {
 	return reflect.TypeOf(f.value).String()
 }
 
-func (f *ForeignKeyField) getGoType() string {
+func (f *ForeignKey) getGoType() string {
 	return reflect.TypeOf(f.value).String()
 }
 
@@ -399,7 +399,7 @@ func (f *TextField) IsNil() bool {
 	return f.pointer == nil
 }
 
-func (f *ForeignKeyField) IsNil() bool {
+func (f *ForeignKey) IsNil() bool {
 	return f.pointer == nil
 }
 
@@ -435,7 +435,7 @@ func (f *TextField) getPtr() unsafe.Pointer {
 	return unsafe.Pointer(f.pointer)
 }
 
-func (f *ForeignKeyField) getPtr() unsafe.Pointer {
+func (f *ForeignKey) getPtr() unsafe.Pointer {
 	return unsafe.Pointer(f.pointer)
 }
 
@@ -499,7 +499,7 @@ func (f *TextField) valueToSql() string {
 	}
 }
 
-func (f *ForeignKeyField) valueToSql() string {
+func (f *ForeignKey) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
@@ -543,7 +543,7 @@ func (f *TextField) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *ForeignKeyField) toSql() string {
+func (f *ForeignKey) toSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
@@ -579,7 +579,7 @@ func (f *TextField) Asc() sortExpression {
 	return sortExpression{field: f}
 }
 
-func (f *ForeignKeyField) Asc() sortExpression {
+func (f *ForeignKey) Asc() sortExpression {
 	return sortExpression{field: f}
 }
 
@@ -615,7 +615,7 @@ func (f *TextField) Desc() sortExpression {
 	return sortExpression{field: f, desc: true}
 }
 
-func (f *ForeignKeyField) Desc() sortExpression {
+func (f *ForeignKey) Desc() sortExpression {
 	return sortExpression{field: f, desc: true}
 }
 
