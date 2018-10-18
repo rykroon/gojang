@@ -20,7 +20,7 @@ func (a aggregate) As(name string) aggregate {
 //use Count aggregate in queryset count
 func Count(field field, distinct bool) aggregate {
 	name := field.getDbColumn() + "__count"
-	a := aggregate{field: field, function:"COUNT", name: name}
+	a := aggregate{field: field, function: "COUNT", name: name}
 	return a
 }
 

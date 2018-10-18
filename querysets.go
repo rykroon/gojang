@@ -183,8 +183,6 @@ func (q QuerySet) Delete() (int, error) {
 	return int(rowsAffected), nil
 }
 
-
-
 //database/sql wrappers
 func (q QuerySet) exec() (sql.Result, error) {
 	return q.db.Exec(q.Query)

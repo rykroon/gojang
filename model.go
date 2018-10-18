@@ -12,7 +12,7 @@ type Model struct {
 	Objects Manager
 	fields  map[string]field
 	//colsToFields map[string]string
-	Pk      primaryKeyField
+	Pk primaryKeyField
 
 	db *sql.DB
 
