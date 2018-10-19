@@ -11,6 +11,8 @@ type Model struct {
 	dbTable string
 	Objects Manager
 	fields  map[string]field
+	fieldList []field
+	colToFields map[string]field
 	//colsToFields map[string]string
 	Pk primaryKeyField
 
@@ -24,6 +26,8 @@ type Model struct {
 func NewModel(db Database) *Model {
 	model := &Model{}
 	model.fields = make(map[string]field)
+	model.fieldList = make([]field,0)
+	model.colToFields = make(map[string]field)
 	model.db, _ = db.toDB()
 	model.Objects = newManager(model)
 	return model
@@ -75,19 +79,38 @@ func MakeModel(i interface{}) error {
 				model.Pk = field.(primaryKeyField)
 			}
 
-			field.setDbColumn(snakeCase(fieldType.Name))
+			colName := snakeCase(fieldType.Name)
+			field.setDbColumn(colName)
 			field.setModel(model)
+			model.addField(field)
+
 			model.fields[fieldType.Name] = field
 		}
 	}
 
 	if numOfPKs < 1 {
 		model.Pk = NewAutoField()
+		model.Pk.(field).setModel(model)
 		model.Pk.(field).setDbColumn("id")
 		model.fields["id"] = model.Pk.(field)
+		model.addField(model.Pk.(field))
 	}
 
 	return nil
+}
+
+//Add Field to the model
+//Returns false if colum name already exists
+func (m *Model) addField(field field) {
+	columnName := field.getDbColumn()
+
+	_, ok := m.colToFields[columnName];
+	if ok {
+		panic("Model cannot have two columns with the same name")
+	}
+
+	m.fieldList = append(m.fieldList, field)
+	m.colToFields[columnName] = field
 }
 
 //Sets a Model's fields from Rows.Scan()

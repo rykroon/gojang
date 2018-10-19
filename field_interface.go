@@ -11,7 +11,7 @@ type field interface {
 	hasPrimaryKeyConstraint() bool
 	hasRelation() bool
 
-	setModel(*Model)
+	setModel(*Model) //Do I even use this for anything?
 	getDbColumn() string
 	setDbColumn(string)
 	getDbType() string
