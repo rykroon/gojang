@@ -12,6 +12,10 @@ type MultipleObjectsReturned struct {
 	message string
 }
 
+type CannotSetNil struct {
+	message string
+}
+
 func NewObjectDoesNotExist() ObjectDoesNotExist {
 	msg := "The requested object does not exist"
 	e := ObjectDoesNotExist{message: msg}
@@ -29,5 +33,15 @@ func NewMultipleObjectsReturned() MultipleObjectsReturned {
 }
 
 func (e MultipleObjectsReturned) Error() string {
+	return e.message
+}
+
+func NewCannotSetNil() CannotSetNil {
+	msg := "Cannot set field with Not-Null constraint to nil"
+	e := CannotSetNil{message: msg}
+	return e
+}
+
+func (e CannotSetNil) Error() string {
 	return e.message
 }

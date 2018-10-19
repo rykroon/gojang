@@ -3,7 +3,6 @@ package gojang
 import (
 	//"strconv"
 	//"reflect"
-	"errors"
 	//"fmt"
 )
 
@@ -474,7 +473,7 @@ func (f *BigIntegerField) SetNil() error {
 		f.value = 0
 		return nil
 	} else {
-		return errors.New("Cannot set field with NOT NULL constraint to nil")
+		return NewCannotSetNil()
 	}
 }
 
@@ -484,7 +483,7 @@ func (f *BooleanField) SetNil() error {
 		f.value = false
 		return nil
 	} else {
-		return errors.New("Cannot set field with NOT NULL constraint to nil")
+		return NewCannotSetNil()
 	}
 }
 
@@ -494,7 +493,7 @@ func (f *FloatField) SetNil() error {
 		f.value = 0
 		return nil
 	} else {
-		return errors.New("Cannot set field with NOT NULL constraint to nil")
+		return NewCannotSetNil()
 	}
 }
 
@@ -504,7 +503,7 @@ func (f *IntegerField) SetNil() error {
 		f.value = 0
 		return nil
 	} else {
-		return errors.New("Cannot set field with NOT NULL constraint to nil")
+		return NewCannotSetNil()
 	}
 }
 
@@ -514,7 +513,7 @@ func (f *SmallIntegerField) SetNil() error {
 		f.value = 0
 		return nil
 	} else {
-		return errors.New("Cannot set field with NOT NULL constraint to nil")
+		return NewCannotSetNil()
 	}
 }
 
@@ -524,7 +523,7 @@ func (f *TextField) SetNil() error {
 		f.value = ""
 		return nil
 	} else {
-		return errors.New("Cannot set field with NOT NULL constraint to nil")
+		return NewCannotSetNil()
 	}
 }
 
@@ -534,7 +533,7 @@ func (f *ForeignKey) SetNil() error {
 		f.value = 0
 		return nil
 	} else {
-		return errors.New("Cannot set field with NOT NULL constraint to nil")
+		return NewCannotSetNil()
 	}
 }
 
@@ -544,7 +543,7 @@ func (f *OneToOneField) SetNil() error {
 		f.value = 0
 		return nil
 	} else {
-		return errors.New("Cannot set field with NOT NULL constraint to nil")
+		return NewCannotSetNil()
 	}
 }
 
