@@ -103,10 +103,10 @@ func MakeModel(i interface{}) error {
 
 	if numOfPKs < 1 {
 		model.Pk = NewAutoField()
-		model.Pk.(field).setModel(model)
-		model.Pk.(field).setDbColumn("id")
-		model.fields["id"] = model.Pk.(field)
-		model.addField(model.Pk.(field))
+		model.Pk.setModel(model)
+		model.Pk.setDbColumn("id")
+		model.fields["id"] = model.Pk
+		model.addField(model.Pk)
 	}
 
 	return nil
@@ -191,14 +191,14 @@ func (m *Model) Save() error {
 	if m.Pk.Val() == 0 {
 		var err error
 		row := m.db.QueryRow(m.insert())
-		goType := m.Pk.(field).getGoType()
+		goType := m.Pk.getGoType()
 
 		switch goType {
 		case "int64":
-			ptr := (*int64)(m.Pk.(field).getPtr())
+			ptr := (*int64)(m.Pk.getPtr())
 			err = row.Scan(ptr)
 		case "int32":
-			ptr := (*int32)(m.Pk.(field).getPtr())
+			ptr := (*int32)(m.Pk.getPtr())
 			err = row.Scan(ptr)
 		}
 

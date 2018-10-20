@@ -6,11 +6,6 @@ import (
 //"fmt"
 )
 
-//type constraint string
-
-//const Null constraint = "NULL"
-//const Unique constraint = "UNIQUE"
-
 type onDelete string
 
 const Cascade onDelete = "CASCADE"

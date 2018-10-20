@@ -31,21 +31,28 @@ type field interface {
 	valueToSql() string
 }
 
-// type intField interface {
-// 	Val() int
-// }
-
-type primaryKeyField interface {
-	id() int
+type intField interface {
+	field
 	Val() int
 	Exact(int) lookup
+	In(...int) lookup
+	Gt(int) lookup
+	Gte(int) lookup
+	Lt(int) lookup
+	Lte(int) lookup
+	Range(int, int) lookup
 }
 
-func (f *AutoField) id() int {
+type primaryKeyField interface {
+	intField
+	Id() int
+}
+
+func (f *AutoField) Id() int {
 	return int(f.value)
 }
 
-func (f *BigAutoField) id() int {
+func (f *BigAutoField) Id() int {
 	return int(f.value)
 }
 
