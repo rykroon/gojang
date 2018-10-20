@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	//"fmt"
 	"reflect"
-	"strconv"
+	//"strconv"
 	"strings"
 )
 
@@ -71,53 +71,15 @@ func MakeModel(i interface{}) error {
 
 		if isAField {
 
-			//Check dbColumn tag
-			dbColumn, ok := fieldType.Tag.Lookup("dbColumn")
-
-			if ok {
-				field.setDbColumn(dbColumn)
-			} else {
-				field.setDbColumn(snakeCase(fieldType.Name))
+			fieldTags, err := processTags(fieldType)
+			if err != nil {
+				panic(err)
 			}
 
-			//Check PrimaryKey tag
-			pkeyTag, ok := fieldType.Tag.Lookup("primaryKey")
-
-			if ok {
-				pkey, err := strconv.ParseBool(pkeyTag)
-
-				if err != nil {
-					panic("Invalid value for primaryKey tag")
-				} else {
-					field.setPrimaryKeyConstraint(pkey)
-				}
-			}
-
-			//Check null tag
-			nullTag, ok := fieldType.Tag.Lookup("null")
-
-			if ok {
-				null, err := strconv.ParseBool(nullTag)
-
-				if err != nil {
-					panic("Invalid value for null tag")
-				} else {
-					field.setNullConstraint(null)
-				}
-			}
-
-			//Check unique tag
-			uniqueTag, ok := fieldType.Tag.Lookup("unique")
-
-			if ok {
-				unique, err := strconv.ParseBool(uniqueTag)
-
-				if err != nil {
-					panic("Invalid value for unique tag")
-				} else {
-					field.setUniqueConstraint(unique)
-				}
-			}
+			field.setDbColumn(fieldTags.dbColumn)
+			field.setPrimaryKeyConstraint(fieldTags.primaryKey)
+			field.setNullConstraint(fieldTags.null)
+			field.setUniqueConstraint(fieldTags.unique)
 
 			field.validate()
 
