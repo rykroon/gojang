@@ -46,14 +46,23 @@ type intField interface {
 type primaryKeyField interface {
 	intField
 	Id() int
+	isAutoField() bool
 }
 
 func (f *AutoField) Id() int {
-	return int(f.value)
+	return f.Val()
 }
 
 func (f *BigAutoField) Id() int {
-	return int(f.value)
+	return f.Val()
+}
+
+func (f *AutoField) isAutoField() bool {
+	return true
+}
+
+func (f *BigAutoField) isAutoField() bool {
+	return true
 }
 
 func (f *AutoField) hasNullConstraint() bool {
@@ -407,80 +416,48 @@ func (f *BigAutoField) validate() {
 }
 
 func (f *BigIntegerField) validate() {
-	if f.primaryKey {
-		panic(NewInvalidPrimaryKey(f))
-	}
-
 	if f.primaryKey && f.null {
 		panic(NewNullPrimaryKeyErr())
 	}
 }
 
 func (f *BooleanField) validate() {
-	if f.primaryKey {
-		panic(NewInvalidPrimaryKey(f))
-	}
-
 	if f.primaryKey && f.null {
 		panic(NewNullPrimaryKeyErr())
 	}
 }
 
 func (f *FloatField) validate() {
-	if f.primaryKey {
-		panic(NewInvalidPrimaryKey(f))
-	}
-
 	if f.primaryKey && f.null {
 		panic(NewNullPrimaryKeyErr())
 	}
 }
 
 func (f *IntegerField) validate() {
-	if f.primaryKey {
-		panic(NewInvalidPrimaryKey(f))
-	}
-
 	if f.primaryKey && f.null {
 		panic(NewNullPrimaryKeyErr())
 	}
 }
 
 func (f *SmallIntegerField) validate() {
-	if f.primaryKey {
-		panic(NewInvalidPrimaryKey(f))
-	}
-
 	if f.primaryKey && f.null {
 		panic(NewNullPrimaryKeyErr())
 	}
 }
 
 func (f *TextField) validate() {
-	if f.primaryKey {
-		panic(NewInvalidPrimaryKey(f))
-	}
-
 	if f.primaryKey && f.null {
 		panic(NewNullPrimaryKeyErr())
 	}
 }
 
 func (f *ForeignKey) validate() {
-	if f.primaryKey {
-		panic(NewInvalidPrimaryKey(f))
-	}
-
 	if f.primaryKey && f.null {
 		panic(NewNullPrimaryKeyErr())
 	}
 }
 
 func (f *OneToOneField) validate() {
-	if f.primaryKey {
-		panic(NewInvalidPrimaryKey(f))
-	}
-
 	if f.primaryKey && f.null {
 		panic(NewNullPrimaryKeyErr())
 	}

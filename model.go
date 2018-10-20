@@ -11,11 +11,9 @@ import (
 type Model struct {
 	dbTable     string
 	Objects     Manager
-	fields      map[string]field
-	fieldList   []field
+	fields      []field
 	colToFields map[string]field
-	//colsToFields map[string]string
-	Pk primaryKeyField
+	Pk          primaryKeyField
 
 	db *sql.DB
 
@@ -26,8 +24,7 @@ type Model struct {
 //Returns a New Model
 func NewModel(db Database) *Model {
 	model := &Model{}
-	model.fields = make(map[string]field)
-	model.fieldList = make([]field, 0)
+	model.fields = make([]field, 0)
 	model.colToFields = make(map[string]field)
 	model.db, _ = db.toDB()
 	model.Objects = newManager(model)
@@ -50,16 +47,20 @@ func MakeModel(i interface{}) error {
 
 	modelVal := v.FieldByName("Model")
 
-	if modelVal.Type() != reflect.TypeOf(&Model{}) {
+	model, ok := modelVal.Interface().(*Model)
+
+	if !ok {
 		panic("Value does not have an embedded Model")
 	}
 
-	model := modelVal.Interface().(*Model)
+	//Get table name
+	modelStruct, _ := v.Type().FieldByName("Model")
 
-	tableName := v.Type().String()
-	dotIdx := strings.Index(tableName, ".") + 1
-	tableName = tableName[dotIdx:]
-	model.dbTable = snakeCase(tableName)
+	model.dbTable = lookupDbTableTag(modelStruct)
+	if model.dbTable == "" {
+		tableName := strings.ToLower(v.Type().String())
+		model.dbTable = strings.Replace(tableName, ".", "_", -1)
+	}
 
 	numOfPKs := 0
 
@@ -71,41 +72,48 @@ func MakeModel(i interface{}) error {
 
 		if isAField {
 
-			fieldTags, err := processTags(fieldType)
+			fieldOptions, err := lookupFieldTags(fieldType)
 			if err != nil {
 				panic(err)
 			}
 
-			field.setDbColumn(fieldTags.dbColumn)
-			field.setPrimaryKeyConstraint(fieldTags.primaryKey)
-			field.setNullConstraint(fieldTags.null)
-			field.setUniqueConstraint(fieldTags.unique)
+			field.setDbColumn(fieldOptions.dbColumn)
+			field.setPrimaryKeyConstraint(fieldOptions.primaryKey)
+			field.setNullConstraint(fieldOptions.null)
+			field.setUniqueConstraint(fieldOptions.unique)
 
 			field.validate()
 
-			//field.setDbColumn(snakeCase(fieldType.Name))
 			field.setModel(model)
 			model.addField(field)
 
-			model.fields[fieldType.Name] = field
-
 			if field.hasPrimaryKeyConstraint() {
+				//Use type assertion to make sure that even if the field has a
+				//Primary Key Constraint that it can still implement the
+				//primaryKeyField interface
+				pkeyField, ok := field.(primaryKeyField)
+
+				if !ok {
+					panic(NewInvalidPrimaryKey(field))
+				}
+
 				numOfPKs += 1
 
 				if numOfPKs > 1 {
 					panic("Model cannot have more than one primary key")
 				}
 
-				model.Pk = field.(primaryKeyField)
+				model.Pk = pkeyField
 			}
 		}
 	}
 
 	if numOfPKs < 1 {
 		model.Pk = NewAutoField()
+		model.Pk.setPrimaryKeyConstraint(true)
+		model.Pk.validate()
 		model.Pk.setModel(model)
 		model.Pk.setDbColumn("id")
-		model.fields["id"] = model.Pk
 		model.addField(model.Pk)
 	}
 
@@ -113,17 +121,23 @@ func MakeModel(i interface{}) error {
 }
 
 //Add Field to the model
-//Returns false if colum name already exists
-func (m *Model) addField(field field) {
-	columnName := field.getDbColumn()
+func (m *Model) addField(f field) {
+	columnName := f.getDbColumn()
 
-	_, ok := m.colToFields[columnName]
-	if ok {
+	_, duplicate := m.colToFields[columnName]
+	if duplicate {
 		panic("Model cannot have two columns with the same name")
 	}
 
-	m.fieldList = append(m.fieldList, field)
-	m.colToFields[columnName] = field
+	m.colToFields[columnName] = f
+
+	//prepend primaryKeyField to the beginning of the slice
+	_, isAPrimaryKeyField := f.(primaryKeyField)
+	if isAPrimaryKeyField && len(m.fields) != 0 {
+		m.fields = append([]field{f}, m.fields...)
+	} else {
+		m.fields = append(m.fields, f)
+	}
 }
 
 //Sets a Model's fields from Rows.Scan()
@@ -148,8 +162,9 @@ func (m *Model) getPointers(columns []string) []interface{} {
 	result := make([]interface{}, 0)
 
 	for _, col := range columns {
-		field := m.getFieldByDbColumn(col)
-		if field != nil {
+		field, ok := m.colToFields[col]
+
+		if ok {
 			goType := field.getGoType()
 			var ptr interface{}
 
@@ -173,16 +188,6 @@ func (m *Model) getPointers(columns []string) []interface{} {
 	}
 
 	return result
-}
-
-func (m Model) getFieldByDbColumn(dbColumn string) field {
-	for _, field := range m.fields {
-		if field.getDbColumn() == dbColumn {
-			return field
-		}
-	}
-
-	return nil
 }
 
 //If instance does not have a primary key then it will insert into the database
@@ -262,14 +267,12 @@ func (m *Model) update() string {
 }
 
 //Creates the Database table
-func (m Model) Migrate() (sql.Result, error) {
-	sql := m.createTable()
-	result, err := m.db.Exec(sql)
-	return result, err
+func (m Model) Migrate() error {
+	return m.CreateTable()
 }
 
 //Creates an SQL statement that will create the table
-func (m Model) createTable() string {
+func (m Model) CreateTable() error {
 	sql := "CREATE TABLE IF NOT EXISTS " + dbq(m.dbTable) + " ("
 
 	for _, field := range m.fields {
@@ -277,5 +280,12 @@ func (m Model) createTable() string {
 	}
 
 	sql = sql[0:len(sql)-2] + ");"
-	return sql
+	_, err := m.db.Exec(sql)
+	return err
+}
+
+func (m Model) DropTable() error {
+	sql := "DROP TABLE " + dbq(m.dbTable) + ";"
+	_, err := m.db.Exec(sql)
+	return err
 }
