@@ -36,27 +36,26 @@ func MakeModel(i interface{}) error {
 	v := reflect.ValueOf(i)
 
 	if v.Kind() != reflect.Ptr {
-		panic("Value is not a pointer")
+		panic("gojang: Value is not a pointer")
 	}
 
 	v = v.Elem()
 
 	if v.Kind() != reflect.Struct {
-		panic("Value does not point to a struct")
+		panic("gojang: Value does not point to a struct")
 	}
 
 	modelVal := v.FieldByName("Model")
-
 	model, ok := modelVal.Interface().(*Model)
 
 	if !ok {
-		panic("Value does not have an embedded Model")
+		panic("gojang: Value does not have an embedded Model")
 	}
 
 	//Get table name
 	modelStruct, _ := v.Type().FieldByName("Model")
+	model.dbTable = lookupDbTableTag(modelStruct.Tag)
 
-	model.dbTable = lookupDbTableTag(modelStruct)
 	if model.dbTable == "" {
 		tableName := strings.ToLower(v.Type().String())
 		model.dbTable = strings.Replace(tableName, ".", "_", -1)
@@ -72,19 +71,14 @@ func MakeModel(i interface{}) error {
 
 		if isAField {
 
-			fieldOptions, err := lookupFieldTags(fieldType)
+			options, err := getFieldOptions(fieldType)
 			if err != nil {
 				panic(err)
 			}
 
-			field.setDbColumn(fieldOptions.dbColumn)
-			field.setPrimaryKeyConstraint(fieldOptions.primaryKey)
-			field.setNullConstraint(fieldOptions.null)
-			field.setUniqueConstraint(fieldOptions.unique)
-
-			field.validate()
-
+			setFieldOptions(field, options)
 			field.setModel(model)
+			field.validate()
 			model.addField(field)
 
 			if field.hasPrimaryKeyConstraint() {
@@ -100,7 +94,7 @@ func MakeModel(i interface{}) error {
 				numOfPKs += 1
 
 				if numOfPKs > 1 {
-					panic("Model cannot have more than one primary key")
+					panic("gojang: Model cannot have more than one primary key")
 				}
 
 				model.Pk = pkeyField
@@ -110,10 +104,10 @@ func MakeModel(i interface{}) error {
 
 	if numOfPKs < 1 {
 		model.Pk = NewAutoField()
-		model.Pk.setPrimaryKeyConstraint(true)
-		model.Pk.validate()
-		model.Pk.setModel(model)
 		model.Pk.setDbColumn("id")
+		model.Pk.setPrimaryKeyConstraint(true)
+		model.Pk.setModel(model)
+		model.Pk.validate()
 		model.addField(model.Pk)
 	}
 
@@ -126,7 +120,7 @@ func (m *Model) addField(f field) {
 
 	_, duplicate := m.colToFields[columnName]
 	if duplicate {
-		panic("Model cannot have two columns with the same name")
+		panic("gojang: Model cannot have two columns with the same name")
 	}
 
 	m.colToFields[columnName] = f

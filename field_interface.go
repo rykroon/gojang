@@ -12,6 +12,8 @@ type field interface {
 	setUniqueConstraint(bool)
 	hasPrimaryKeyConstraint() bool
 	setPrimaryKeyConstraint(bool)
+
+	setOptions(fieldOptions)
 	hasRelation() bool
 	validate()
 
@@ -63,6 +65,76 @@ func (f *AutoField) isAutoField() bool {
 
 func (f *BigAutoField) isAutoField() bool {
 	return true
+}
+
+func (f *AutoField) setOptions(options fieldOptions) {
+	f.dbColumn = options.dbColumn
+	f.primaryKey = options.primaryKey
+	f.null = options.null
+	f.unique = options.unique
+}
+
+func (f *BigAutoField) setOptions(options fieldOptions) {
+	f.dbColumn = options.dbColumn
+	f.primaryKey = options.primaryKey
+	f.null = options.null
+	f.unique = options.unique
+}
+
+func (f *BigIntegerField) setOptions(options fieldOptions) {
+	f.dbColumn = options.dbColumn
+	f.primaryKey = options.primaryKey
+	f.null = options.null
+	f.unique = options.unique
+}
+
+func (f *BooleanField) setOptions(options fieldOptions) {
+	f.dbColumn = options.dbColumn
+	f.primaryKey = options.primaryKey
+	f.null = options.null
+	f.unique = options.unique
+}
+
+func (f *FloatField) setOptions(options fieldOptions) {
+	f.dbColumn = options.dbColumn
+	f.primaryKey = options.primaryKey
+	f.null = options.null
+	f.unique = options.unique
+}
+
+func (f *IntegerField) setOptions(options fieldOptions) {
+	f.dbColumn = options.dbColumn
+	f.primaryKey = options.primaryKey
+	f.null = options.null
+	f.unique = options.unique
+}
+
+func (f *SmallIntegerField) setOptions(options fieldOptions) {
+	f.dbColumn = options.dbColumn
+	f.primaryKey = options.primaryKey
+	f.null = options.null
+	f.unique = options.unique
+}
+
+func (f *TextField) setOptions(options fieldOptions) {
+	f.dbColumn = options.dbColumn
+	f.primaryKey = options.primaryKey
+	f.null = options.null
+	f.unique = options.unique
+}
+
+func (f *ForeignKey) setOptions(options fieldOptions) {
+	f.dbColumn = options.dbColumn
+	f.primaryKey = options.primaryKey
+	f.null = options.null
+	f.unique = options.unique
+}
+
+func (f *OneToOneField) setOptions(options fieldOptions) {
+	f.dbColumn = options.dbColumn
+	f.primaryKey = options.primaryKey
+	f.null = options.null
+	f.unique = options.unique
 }
 
 func (f *AutoField) hasNullConstraint() bool {
