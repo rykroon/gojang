@@ -4,14 +4,15 @@ import (
 	"database/sql"
 	//"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
 type Model struct {
-	dbTable string
-	Objects Manager
-	fields  map[string]field
-	fieldList []field
+	dbTable     string
+	Objects     Manager
+	fields      map[string]field
+	fieldList   []field
 	colToFields map[string]field
 	//colsToFields map[string]string
 	Pk primaryKeyField
@@ -26,7 +27,7 @@ type Model struct {
 func NewModel(db Database) *Model {
 	model := &Model{}
 	model.fields = make(map[string]field)
-	model.fieldList = make([]field,0)
+	model.fieldList = make([]field, 0)
 	model.colToFields = make(map[string]field)
 	model.db, _ = db.toDB()
 	model.Objects = newManager(model)
@@ -69,6 +70,63 @@ func MakeModel(i interface{}) error {
 		field, isAField := fieldVal.Interface().(field)
 
 		if isAField {
+
+			//Check dbColumn tag
+			dbColumn, ok := fieldType.Tag.Lookup("dbColumn")
+
+			if ok {
+				field.setDbColumn(dbColumn)
+			} else {
+				field.setDbColumn(snakeCase(fieldType.Name))
+			}
+
+			//Check PrimaryKey tag
+			pkeyTag, ok := fieldType.Tag.Lookup("primaryKey")
+
+			if ok {
+				pkey, err := strconv.ParseBool(pkeyTag)
+
+				if err != nil {
+					panic("Invalid value for primaryKey tag")
+				} else {
+					field.setPrimaryKeyConstraint(pkey)
+				}
+			}
+
+			//Check null tag
+			nullTag, ok := fieldType.Tag.Lookup("null")
+
+			if ok {
+				null, err := strconv.ParseBool(nullTag)
+
+				if err != nil {
+					panic("Invalid value for null tag")
+				} else {
+					field.setNullConstraint(null)
+				}
+			}
+
+			//Check unique tag
+			uniqueTag, ok := fieldType.Tag.Lookup("unique")
+
+			if ok {
+				unique, err := strconv.ParseBool(uniqueTag)
+
+				if err != nil {
+					panic("Invalid value for unique tag")
+				} else {
+					field.setUniqueConstraint(unique)
+				}
+			}
+
+			field.validate()
+
+			//field.setDbColumn(snakeCase(fieldType.Name))
+			field.setModel(model)
+			model.addField(field)
+
+			model.fields[fieldType.Name] = field
+
 			if field.hasPrimaryKeyConstraint() {
 				numOfPKs += 1
 
@@ -78,13 +136,6 @@ func MakeModel(i interface{}) error {
 
 				model.Pk = field.(primaryKeyField)
 			}
-
-			colName := snakeCase(fieldType.Name)
-			field.setDbColumn(colName)
-			field.setModel(model)
-			model.addField(field)
-
-			model.fields[fieldType.Name] = field
 		}
 	}
 
@@ -104,7 +155,7 @@ func MakeModel(i interface{}) error {
 func (m *Model) addField(field field) {
 	columnName := field.getDbColumn()
 
-	_, ok := m.colToFields[columnName];
+	_, ok := m.colToFields[columnName]
 	if ok {
 		panic("Model cannot have two columns with the same name")
 	}

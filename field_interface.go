@@ -7,25 +7,27 @@ import (
 
 type field interface {
 	hasNullConstraint() bool
+	setNullConstraint(bool)
 	hasUniqueConstraint() bool
+	setUniqueConstraint(bool)
 	hasPrimaryKeyConstraint() bool
+	setPrimaryKeyConstraint(bool)
 	hasRelation() bool
+	validate()
 
-	setModel(*Model) //Do I even use this for anything?
+	setModel(*Model)
 	getDbColumn() string
 	setDbColumn(string)
 	getDbType() string
 	getGoType() string
+	getPtr() unsafe.Pointer
 
 	IsNil() bool
-	//SetNil() error
 
 	Asc() sortExpression
 	Desc() sortExpression
 
-	getPtr() unsafe.Pointer
 	toSql() string
-
 	valueToSql() string
 }
 
@@ -87,6 +89,86 @@ func (f *OneToOneField) hasNullConstraint() bool {
 	return f.null
 }
 
+func (f *AutoField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.pointer = nil
+	}
+}
+
+func (f *BigAutoField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.pointer = nil
+	}
+}
+
+func (f *BigIntegerField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.pointer = nil
+	}
+}
+
+func (f *BooleanField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.pointer = nil
+	}
+}
+
+func (f *FloatField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.pointer = nil
+	}
+}
+
+func (f *IntegerField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.pointer = nil
+	}
+}
+
+func (f *SmallIntegerField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.pointer = nil
+	}
+}
+
+func (f *TextField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.pointer = nil
+	}
+}
+
+func (f *ForeignKey) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.pointer = nil
+	}
+}
+
+func (f *OneToOneField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.pointer = nil
+	}
+}
+
 func (f *AutoField) hasUniqueConstraint() bool {
 	return f.unique
 }
@@ -126,6 +208,56 @@ func (f *ForeignKey) hasUniqueConstraint() bool {
 func (f *OneToOneField) hasUniqueConstraint() bool {
 	return f.unique
 }
+
+func (f *AutoField) setUniqueConstraint(unique bool) {
+	f.unique = unique
+}
+
+func (f *BigAutoField) setUniqueConstraint(unique bool) {
+	f.unique = unique
+}
+
+func (f *BigIntegerField) setUniqueConstraint(unique bool) {
+	f.unique = unique
+}
+
+func (f *BooleanField) setUniqueConstraint(unique bool) {
+	f.unique = unique
+}
+
+func (f *FloatField) setUniqueConstraint(unique bool) {
+	f.unique = unique
+}
+
+func (f *IntegerField) setUniqueConstraint(unique bool) {
+	f.unique = unique
+}
+
+func (f *SmallIntegerField) setUniqueConstraint(unique bool) {
+	f.unique = unique
+}
+
+func (f *TextField) setUniqueConstraint(unique bool) {
+	f.unique = unique
+}
+
+func (f *ForeignKey) setUniqueConstraint(unique bool) {
+	f.unique = unique
+}
+
+//The 'Unique' field option is valid on all field types except ManyToManyField and OneToOneField.
+func (f *OneToOneField) setUniqueConstraint(unique bool) {
+	f.unique = unique
+}
+
+//The 'Unique' field option is valid on all field types except ManyToManyField and OneToOneField.
+// func (f *ManyToManyField) setUniqueConstraint(unique bool) {
+// 	f.unique = unique
+//
+// 	if !f.unique {
+// 		panic("OneToOneField must be unique")
+// 	}
+// }
 
 func (f *AutoField) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
@@ -167,8 +299,48 @@ func (f *OneToOneField) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
 }
 
+func (f *AutoField) setPrimaryKeyConstraint(primaryKey bool) {
+	f.primaryKey = primaryKey
+}
+
+func (f *BigAutoField) setPrimaryKeyConstraint(primaryKey bool) {
+	f.primaryKey = primaryKey
+}
+
+func (f *BigIntegerField) setPrimaryKeyConstraint(primaryKey bool) {
+	f.primaryKey = primaryKey
+}
+
+func (f *BooleanField) setPrimaryKeyConstraint(primaryKey bool) {
+	f.primaryKey = primaryKey
+}
+
+func (f *FloatField) setPrimaryKeyConstraint(primaryKey bool) {
+	f.primaryKey = primaryKey
+}
+
+func (f *IntegerField) setPrimaryKeyConstraint(primaryKey bool) {
+	f.primaryKey = primaryKey
+}
+
+func (f *SmallIntegerField) setPrimaryKeyConstraint(primaryKey bool) {
+	f.primaryKey = primaryKey
+}
+
+func (f *TextField) setPrimaryKeyConstraint(primaryKey bool) {
+	f.primaryKey = primaryKey
+}
+
+func (f *ForeignKey) setPrimaryKeyConstraint(primaryKey bool) {
+	f.primaryKey = primaryKey
+}
+
+func (f *OneToOneField) setPrimaryKeyConstraint(primaryKey bool) {
+	f.primaryKey = primaryKey
+}
+
 func (f *AutoField) hasRelation() bool {
-	return f.primaryKey
+	return f.isRelation
 }
 
 func (f *BigAutoField) hasRelation() bool {
@@ -205,6 +377,110 @@ func (f *ForeignKey) hasRelation() bool {
 
 func (f *OneToOneField) hasRelation() bool {
 	return f.isRelation
+}
+
+func (f *AutoField) validate() {
+	if !f.primaryKey {
+		panic(NewForcePrimaryKey(f))
+	}
+
+	if f.primaryKey && f.null {
+		panic(NewNullPrimaryKeyErr())
+	}
+}
+
+func (f *BigAutoField) validate() {
+	if !f.primaryKey {
+		panic(NewForcePrimaryKey(f))
+	}
+
+	if f.primaryKey && f.null {
+		panic(NewNullPrimaryKeyErr())
+	}
+}
+
+func (f *BigIntegerField) validate() {
+	if f.primaryKey {
+		panic(NewInvalidPrimaryKey(f))
+	}
+
+	if f.primaryKey && f.null {
+		panic(NewNullPrimaryKeyErr())
+	}
+}
+
+func (f *BooleanField) validate() {
+	if f.primaryKey {
+		panic(NewInvalidPrimaryKey(f))
+	}
+
+	if f.primaryKey && f.null {
+		panic(NewNullPrimaryKeyErr())
+	}
+}
+
+func (f *FloatField) validate() {
+	if f.primaryKey {
+		panic(NewInvalidPrimaryKey(f))
+	}
+
+	if f.primaryKey && f.null {
+		panic(NewNullPrimaryKeyErr())
+	}
+}
+
+func (f *IntegerField) validate() {
+	if f.primaryKey {
+		panic(NewInvalidPrimaryKey(f))
+	}
+
+	if f.primaryKey && f.null {
+		panic(NewNullPrimaryKeyErr())
+	}
+}
+
+func (f *SmallIntegerField) validate() {
+	if f.primaryKey {
+		panic(NewInvalidPrimaryKey(f))
+	}
+
+	if f.primaryKey && f.null {
+		panic(NewNullPrimaryKeyErr())
+	}
+}
+
+func (f *TextField) validate() {
+	if f.primaryKey {
+		panic(NewInvalidPrimaryKey(f))
+	}
+
+	if f.primaryKey && f.null {
+		panic(NewNullPrimaryKeyErr())
+	}
+}
+
+func (f *ForeignKey) validate() {
+	if f.primaryKey {
+		panic(NewInvalidPrimaryKey(f))
+	}
+
+	if f.primaryKey && f.null {
+		panic(NewNullPrimaryKeyErr())
+	}
+}
+
+func (f *OneToOneField) validate() {
+	if f.primaryKey {
+		panic(NewInvalidPrimaryKey(f))
+	}
+
+	if f.primaryKey && f.null {
+		panic(NewNullPrimaryKeyErr())
+	}
+
+	if !f.unique {
+		panic("OneToOneField must be unique")
+	}
 }
 
 func (f *AutoField) setModel(model *Model) {

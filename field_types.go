@@ -1,15 +1,15 @@
 package gojang
 
 import (
-	//"strconv"
-	//"reflect"
-	//"fmt"
+//"strconv"
+//"reflect"
+//"fmt"
 )
 
-type constraint string
+//type constraint string
 
-const Null constraint = "NULL"
-const Unique constraint = "UNIQUE"
+//const Null constraint = "NULL"
+//const Unique constraint = "UNIQUE"
 
 type onDelete string
 
@@ -178,187 +178,77 @@ type OneToOneField struct {
 
 //Constructors
 
-func NewAutoField(constraints ...constraint) *AutoField {
+func NewAutoField() *AutoField {
 	field := &AutoField{dbType: "SERIAL4"}
 	field.pointer = &field.value
-	field.primaryKey = true
 	return field
 }
 
 func NewBigAutoField() *BigAutoField {
 	field := &BigAutoField{dbType: "SERIAL8"}
 	field.pointer = &field.value
-	field.primaryKey = true
 	return field
 }
 
-func NewBigIntegerField(constraints ...constraint) *BigIntegerField {
+func NewBigIntegerField() *BigIntegerField {
 	field := &BigIntegerField{dbType: "INT8"}
-
-	for _, constraint := range constraints {
-		switch constraint {
-		case "NULL":
-			field.null = true
-
-		case "UNIQUE":
-			field.unique = true
-		}
-	}
-
-	if !field.null {
-		field.pointer = &field.value
-	}
-
+	field.pointer = &field.value
 	return field
 }
 
-func NewBooleanField(constraints ...constraint) *BooleanField {
+func NewBooleanField() *BooleanField {
 	field := &BooleanField{dbType: "BOOL"}
-
-	for _, constraint := range constraints {
-		switch constraint {
-		case "NULL":
-			field.null = true
-
-		case "UNIQUE":
-			field.unique = true
-		}
-	}
-
-	if !field.null {
-		field.pointer = &field.value
-	}
-
+	field.pointer = &field.value
 	return field
 }
 
-func NewFloatField(constraints ...constraint) *FloatField {
+func NewFloatField() *FloatField {
 	field := &FloatField{dbType: "FLOAT8"}
-
-	for _, constraint := range constraints {
-		switch constraint {
-		case "NULL":
-			field.null = true
-
-		case "UNIQUE":
-			field.unique = true
-		}
-	}
-
-	if !field.null {
-		field.pointer = &field.value
-	}
-
+	field.pointer = &field.value
 	return field
 }
 
-func NewIntegerField(constraints ...constraint) *IntegerField {
+func NewIntegerField() *IntegerField {
 	field := &IntegerField{dbType: "INT4"}
-
-	for _, constraint := range constraints {
-		switch constraint {
-		case "NULL":
-			field.null = true
-
-		case "UNIQUE":
-			field.unique = true
-		}
-	}
-
-	if !field.null {
-		field.pointer = &field.value
-	}
-
+	field.pointer = &field.value
 	return field
 }
 
-func NewSmallIntegerField(constraints ...constraint) *SmallIntegerField {
+func NewSmallIntegerField() *SmallIntegerField {
 	field := &SmallIntegerField{dbType: "INT2"}
-
-	for _, constraint := range constraints {
-		switch constraint {
-		case "NULL":
-			field.null = true
-
-		case "UNIQUE":
-			field.unique = true
-		}
-	}
-
-	if !field.null {
-		field.pointer = &field.value
-	}
-
+	field.pointer = &field.value
 	return field
 }
 
-func NewTextField(constraints ...constraint) *TextField {
+func NewTextField() *TextField {
 	field := &TextField{dbType: "TEXT"}
-
-	for _, constraint := range constraints {
-		switch constraint {
-		case "NULL":
-			field.null = true
-
-		case "UNIQUE":
-			field.unique = true
-		}
-	}
-
-	if !field.null {
-		field.pointer = &field.value
-	}
-
+	field.pointer = &field.value
 	return field
 }
 
-func NewForeignKey(to *Model, onDelete onDelete, constraints ...constraint) *ForeignKey {
+func NewForeignKey(to *Model, onDelete onDelete) *ForeignKey {
 	field := &ForeignKey{dbType: "INT8"}
+	field.pointer = &field.value
+
 	field.isRelation = true
 	field.manyToOne = true
 	field.relatedModel = to
 	field.onDelete = onDelete
 
-	for _, constraint := range constraints {
-		switch constraint {
-		case "NULL":
-			field.null = true
-
-		case "UNIQUE":
-			field.unique = true
-		}
-	}
-
-	if !field.null {
-		field.pointer = &field.value
-	}
-
 	return field
 }
 
-func NewOneToOneField(to *Model, onDelete onDelete, constraints ...constraint) *OneToOneField {
+func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 	field := &OneToOneField{dbType: "INT8"}
+	field.pointer = &field.value
+
 	field.isRelation = true
 	field.oneToOne = true
 	field.relatedModel = to
 	field.onDelete = onDelete
 
-	for _, constraint := range constraints {
-		switch constraint {
-		case "NULL":
-			field.null = true
-
-		case "UNIQUE":
-			field.unique = true
-		}
-	}
-
-	//unique constraint must be true foe OneToOne Field
+	//unique constraint must be true for OneToOne Field
 	field.unique = true
-
-	if !field.null {
-		field.pointer = &field.value
-	}
 
 	return field
 }

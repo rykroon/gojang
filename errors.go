@@ -1,7 +1,8 @@
 package gojang
 
 import (
-//"errors"
+	//"errors"
+	"reflect"
 )
 
 type ObjectDoesNotExist struct {
@@ -13,6 +14,18 @@ type MultipleObjectsReturned struct {
 }
 
 type CannotSetNil struct {
+	message string
+}
+
+type NullPrimaryKeyErr struct {
+	message string
+}
+
+type InvalidPrimaryKey struct {
+	message string
+}
+
+type ForcePrimaryKey struct {
 	message string
 }
 
@@ -37,11 +50,43 @@ func (e MultipleObjectsReturned) Error() string {
 }
 
 func NewCannotSetNil() CannotSetNil {
-	msg := "Cannot set field with Not-Null constraint to nil"
+	msg := "Cannot set field with Not-Null Constraint to nil"
 	e := CannotSetNil{message: msg}
 	return e
 }
 
 func (e CannotSetNil) Error() string {
+	return e.message
+}
+
+func NewNullPrimaryKeyErr() NullPrimaryKeyErr {
+	msg := "Field cannot have both Primary Key and Null Constraints"
+	e := NullPrimaryKeyErr{message: msg}
+	return e
+}
+
+func (e NullPrimaryKeyErr) Error() string {
+	return e.message
+}
+
+func NewInvalidPrimaryKey(field field) InvalidPrimaryKey {
+	fieldType := reflect.TypeOf(field).String()
+	msg := fieldType + " cannot have Primary Key Constraint"
+	e := InvalidPrimaryKey{message: msg}
+	return e
+}
+
+func (e InvalidPrimaryKey) Error() string {
+	return e.message
+}
+
+func NewForcePrimaryKey(field field) ForcePrimaryKey {
+	fieldType := reflect.TypeOf(field).String()
+	msg := fieldType + " must have Primary Key Constraint"
+	e := ForcePrimaryKey{message: msg}
+	return e
+}
+
+func (e ForcePrimaryKey) Error() string {
 	return e.message
 }
