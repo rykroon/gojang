@@ -29,8 +29,14 @@ type field interface {
 	Asc() sortExpression
 	Desc() sortExpression
 
-	toSql() string
+	asExpr() string
 	valueToSql() string
+}
+
+type numericField interface {
+	field
+	Avg() aggregate
+	Sum() aggregate
 }
 
 type intField interface {
@@ -897,44 +903,4 @@ func (f *OneToOneField) valueToSql() string {
 	} else {
 		return int64ToSql(f.value)
 	}
-}
-
-func (f *AutoField) toSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
-}
-
-func (f *BigAutoField) toSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
-}
-
-func (f *BigIntegerField) toSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
-}
-
-func (f *BooleanField) toSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
-}
-
-func (f *FloatField) toSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
-}
-
-func (f *IntegerField) toSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
-}
-
-func (f *SmallIntegerField) toSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
-}
-
-func (f *TextField) toSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
-}
-
-func (f *ForeignKey) toSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
-}
-
-func (f *OneToOneField) toSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }

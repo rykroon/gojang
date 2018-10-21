@@ -11,15 +11,6 @@ type lookup struct {
 	rhs        string
 }
 
-func (l lookup) toSql() string {
-	sql := l.lhs.toSql() + " " + l.lookupName + " " + l.rhs
-
-	if l.not {
-		sql = "NOT(" + sql + ")"
-	}
-	return sql
-}
-
 func (f *AutoField) Exact(value int) lookup {
 	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
 }

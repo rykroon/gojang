@@ -30,8 +30,8 @@ func (q QuerySet) processSelect() string {
 		sql += "*"
 	} else {
 
-		for _, field := range q.selected {
-			sql += field + ", "
+		for _, expr := range q.selected {
+			sql += expr.asExpr() + ", "
 		}
 
 		sql = sql[:len(sql)-2]
@@ -58,9 +58,9 @@ func (q QuerySet) processWhere() string {
 
 		for i, lookup := range q.lookups {
 			if i == 0 {
-				sql += lookup.toSql()
+				sql += lookup.asExpr()
 			} else {
-				sql += " AND " + lookup.toSql()
+				sql += " AND " + lookup.asExpr()
 			}
 		}
 	}
@@ -75,7 +75,7 @@ func (q QuerySet) processOrderBy() string {
 		sql += " ORDER BY "
 
 		for _, sort := range q.orderBy {
-			sql += sort.toSql() + ", "
+			sql += sort.asExpr() + ", "
 		}
 
 		sql = sql[0 : len(sql)-2]

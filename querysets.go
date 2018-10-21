@@ -3,6 +3,7 @@ package gojang
 import (
 	"database/sql"
 	//"errors"
+	"fmt"
 )
 
 type QuerySet struct {
@@ -11,7 +12,7 @@ type QuerySet struct {
 	db    *sql.DB
 
 	//distinct  bool
-	selected []string
+	selected []expression
 	//deferred
 	delete bool
 
@@ -25,27 +26,10 @@ type QuerySet struct {
 	//resultCache
 }
 
-type sortExpression struct {
-	field field
-	desc  bool
-}
-
-func (s sortExpression) toSql() string {
-	sql := s.field.toSql()
-
-	if s.desc {
-		sql += " DESC"
-	} else {
-		sql += " ASC"
-	}
-
-	return sql
-}
-
 func newQuerySet(model *Model) QuerySet {
 	q := QuerySet{model: model, db: model.db}
 	for _, field := range model.fields {
-		q.selected = append(q.selected, field.toSql())
+		q.selected = append(q.selected, field)
 	}
 
 	return q
@@ -141,8 +125,13 @@ func (q QuerySet) Get(lookups ...lookup) error {
 //Returns an integer representing the number of objects in the database matching the QuerySet.
 func (q QuerySet) Count() (int, error) {
 	q.selected = nil
-	q.selected = append(q.selected, "COUNT(*)")
+	q.orderBy = nil
+
+	var star star
+	count := Count(star)
+	q.selected = append(q.selected, count)
 	q.Query = q.buildQuery()
+	fmt.Println(q.Query)
 	row := q.queryRow()
 	result := 0
 
@@ -152,6 +141,21 @@ func (q QuerySet) Count() (int, error) {
 	}
 
 	return result, nil
+}
+
+func (q QuerySet) Aggregate(aggregates ...aggregate) {
+	q.selected = nil
+	q.orderBy = nil
+
+	for _, expr := range aggregates {
+		q.selected = append(q.selected, expr)
+	}
+
+	q.Query = q.buildQuery()
+	//row := q.queryRow()
+
+	return
+
 }
 
 //Returns True if the QuerySet contains any results, and False if not.
