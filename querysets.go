@@ -2,8 +2,8 @@ package gojang
 
 import (
 	"database/sql"
-	//"errors"
-	"fmt"
+	//"fmt"
+	"reflect"
 )
 
 type QuerySet struct {
@@ -12,7 +12,7 @@ type QuerySet struct {
 	db    *sql.DB
 
 	//distinct  bool
-	selected []expression
+	selected []selectExpression
 	//deferred
 	delete bool
 
@@ -22,9 +22,14 @@ type QuerySet struct {
 	Ordered bool
 	orderBy []sortExpression
 
-	rows sql.Rows //cache
+	//rows sql.Rows //cache
+	rows []row
+
 	//resultCache
 }
+
+type row map[string]interface{}
+
 
 func newQuerySet(model *Model) QuerySet {
 	q := QuerySet{model: model, db: model.db}
@@ -34,6 +39,69 @@ func newQuerySet(model *Model) QuerySet {
 
 	return q
 }
+
+func (q *QuerySet) getNewPointers() []interface{} {
+	var result []interface{}
+
+	for _, expr := range q.selected {
+		goType := expr.getGoType()
+		var ptr interface{}
+
+		switch goType {
+		case "int64":
+			ptr = new(int64)
+		case "int32":
+			ptr = new(int32)
+		case "int16":
+			ptr = new(int16)
+		case "float64":
+			ptr = new(float64)
+		case "bool":
+			ptr = new(bool)
+		case "string":
+			ptr = new(string)
+		}
+
+		result = append(result, ptr)
+	}
+
+	return result
+}
+
+func (q QuerySet) pointersToValues(pointers []interface{}) []interface{}{
+	var result []interface{}
+
+	for _, ptr := range pointers {
+		value := ptrToValue(ptr)
+		result = append(result, value)
+	}
+
+	return result
+}
+
+func ptrToValue(ptr interface{}) interface{} {
+	goType := reflect.TypeOf(ptr).String()
+	var value interface{}
+
+	switch goType {
+	case "*int16":
+		value = *ptr.(*int16)
+	case "*int32":
+		value = *ptr.(*int32)
+	case "*int64":
+		value = *ptr.(*int64)
+	case "*float64":
+		value = *ptr.(*float64)
+	case "*bool":
+		value = *ptr.(*bool)
+	case "*string":
+		value = *ptr.(*string)
+	}
+
+	return value
+}
+
+
 
 //Functions that return QuerySets
 
@@ -128,10 +196,9 @@ func (q QuerySet) Count() (int, error) {
 	q.orderBy = nil
 
 	var star star
-	count := Count(star)
-	q.selected = append(q.selected, count)
+	q.selected = append(q.selected, star.Count())
 	q.Query = q.buildQuery()
-	fmt.Println(q.Query)
+
 	row := q.queryRow()
 	result := 0
 
@@ -143,19 +210,30 @@ func (q QuerySet) Count() (int, error) {
 	return result, nil
 }
 
-func (q QuerySet) Aggregate(aggregates ...aggregate) {
+func (q *QuerySet) Aggregate(aggregates ...aggregate) (map[string]interface{} , error) {
 	q.selected = nil
 	q.orderBy = nil
+	result := make(map[string]interface{})
 
 	for _, expr := range aggregates {
 		q.selected = append(q.selected, expr)
 	}
 
+
 	q.Query = q.buildQuery()
-	//row := q.queryRow()
+	row := q.queryRow()
+	pointers := q.getNewPointers()
 
-	return
+	err := row.Scan(pointers...)
+	if err != nil {
+		return nil, err
+	}
 
+	for idx, agg := range aggregates {
+		result[agg.alias] = ptrToValue(pointers[idx])
+	}
+
+	return result, nil
 }
 
 //Returns True if the QuerySet contains any results, and False if not.

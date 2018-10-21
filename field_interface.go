@@ -1,11 +1,10 @@
 package gojang
 
-import (
-	"reflect"
-	"unsafe"
-)
+import ()
 
 type field interface {
+	selectExpression
+
 	hasNullConstraint() bool
 	setNullConstraint(bool)
 	hasUniqueConstraint() bool
@@ -21,15 +20,13 @@ type field interface {
 	getDbColumn() string
 	setDbColumn(string)
 	getDbType() string
-	getGoType() string
-	getPtr() unsafe.Pointer
 
 	IsNil() bool
 
 	Asc() sortExpression
 	Desc() sortExpression
+	Count(bool) aggregate
 
-	asExpr() string
 	valueToSql() string
 }
 
@@ -40,8 +37,11 @@ type numericField interface {
 }
 
 type intField interface {
-	field
+	//field
+	numericField
 	Val() int
+
+	//lookups
 	Exact(int) lookup
 	In(...int) lookup
 	Gt(int) lookup
@@ -705,46 +705,6 @@ func (f *OneToOneField) getDbType() string {
 	return f.dbType
 }
 
-func (f *AutoField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
-}
-
-func (f *BigAutoField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
-}
-
-func (f *BigIntegerField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
-}
-
-func (f *BooleanField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
-}
-
-func (f *FloatField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
-}
-
-func (f *IntegerField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
-}
-
-func (f *SmallIntegerField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
-}
-
-func (f *TextField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
-}
-
-func (f *ForeignKey) getGoType() string {
-	return reflect.TypeOf(f.value).String()
-}
-
-func (f *OneToOneField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
-}
-
 func (f *AutoField) IsNil() bool {
 	return f.pointer == nil
 }
@@ -783,46 +743,6 @@ func (f *ForeignKey) IsNil() bool {
 
 func (f *OneToOneField) IsNil() bool {
 	return f.pointer == nil
-}
-
-func (f *AutoField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *BigAutoField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *BigIntegerField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *BooleanField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *FloatField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *IntegerField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *SmallIntegerField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *TextField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *ForeignKey) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *OneToOneField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
 }
 
 func (f *AutoField) valueToSql() string {

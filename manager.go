@@ -45,6 +45,11 @@ func (m Manager) Count() (int, error) {
 	return qs.Count()
 }
 
+func (m Manager) Aggregate(aggregates ...aggregate) (map[string]interface{}, error) {
+	qs := newQuerySet(m.model)
+	return qs.Aggregate(aggregates...)
+}
+
 func (m Manager) Exists() (bool, error) {
 	qs := newQuerySet(m.model)
 	return qs.Exists()

@@ -1,6 +1,10 @@
 package gojang
 
-import ()
+import (
+	"fmt"
+	"reflect"
+	"unsafe"
+)
 
 //Expressions describe a value or a computation that can be used as part of an
 //update, create, filter, order by, annotation, or aggregate.
@@ -8,8 +12,14 @@ type expression interface {
 	asExpr() string
 }
 
+type selectExpression interface {
+	expression
+	getPtr() unsafe.Pointer
+	getGoType() string
+}
+
 type sortExpression struct {
-	field expression
+	field field
 	desc  bool
 }
 
@@ -17,6 +27,10 @@ type star string
 
 func (s star) asExpr() string {
 	return "*"
+}
+
+func (a aggregate) asExpr() string {
+	return fmt.Sprintf(a.template, a.function, a.expression.asExpr(), a.alias)
 }
 
 func (l lookup) asExpr() string {
@@ -34,10 +48,6 @@ func (e sortExpression) asExpr() string {
 	} else {
 		return e.field.asExpr() + " ASC"
 	}
-}
-
-func (a aggregate) asExpr() string {
-	return a.function + "(" + a.expression.asExpr() + ") AS " + a.alias
 }
 
 func (f *AutoField) asExpr() string {
@@ -79,6 +89,95 @@ func (f *ForeignKey) asExpr() string {
 func (f *OneToOneField) asExpr() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
+
+func (a aggregate) getPtr() unsafe.Pointer {
+	return a.outputField.getPtr()
+}
+
+func (f *AutoField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *BigAutoField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *BigIntegerField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *BooleanField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *FloatField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *IntegerField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *SmallIntegerField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *TextField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *ForeignKey) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (f *OneToOneField) getPtr() unsafe.Pointer {
+	return unsafe.Pointer(f.pointer)
+}
+
+func (a aggregate) getGoType() string {
+	return a.outputField.getGoType()
+}
+
+func (f *AutoField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *BigAutoField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *BigIntegerField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *BooleanField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *FloatField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *IntegerField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *SmallIntegerField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *TextField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *ForeignKey) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
+func (f *OneToOneField) getGoType() string {
+	return reflect.TypeOf(f.value).String()
+}
+
 
 func (f *AutoField) Asc() sortExpression {
 	return sortExpression{field: f}
