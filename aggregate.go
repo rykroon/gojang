@@ -36,6 +36,14 @@ func newCount(expr expression, distinct bool) aggregate {
 	return a
 }
 
+func newMax(expr expression, outputField field) aggregate {
+	return newAggregate("max", expr, outputField)
+}
+
+func newMin(expr expression, outputField field) aggregate {
+	return newAggregate("min", expr, outputField)
+}
+
 func newSum(expr expression, outputField field) aggregate {
 	return newAggregate("sum", expr, outputField)
 }
