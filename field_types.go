@@ -26,6 +26,9 @@ type AutoField struct {
 	pointer *int32
 	Ptr     *int32
 	value   int32
+
+	Valid bool
+	Value int32
 }
 
 type BigAutoField struct {
@@ -40,6 +43,9 @@ type BigAutoField struct {
 
 	pointer *int64
 	value   int64
+
+	Valid bool
+	Value int64
 }
 
 type BigIntegerField struct {
@@ -54,6 +60,9 @@ type BigIntegerField struct {
 
 	pointer *int64
 	value   int64
+
+	Valid bool
+	Value int64
 }
 
 type BooleanField struct {
@@ -68,6 +77,9 @@ type BooleanField struct {
 
 	pointer *bool
 	value   bool
+
+	Valid bool
+	Value bool
 }
 
 type FloatField struct {
@@ -82,6 +94,9 @@ type FloatField struct {
 
 	pointer *float64
 	value   float64
+
+	Valid bool
+	Value float64
 }
 
 type IntegerField struct {
@@ -96,6 +111,9 @@ type IntegerField struct {
 
 	pointer *int32
 	value   int32
+
+	Valid bool
+	Value int32
 }
 
 type SmallIntegerField struct {
@@ -110,6 +128,9 @@ type SmallIntegerField struct {
 
 	pointer *int16
 	value   int16
+
+	Valid bool
+	Value int16
 }
 
 type TextField struct {
@@ -125,6 +146,9 @@ type TextField struct {
 	pointer *string
 	Ptr     *string
 	value   string
+
+	Valid bool
+	Value string
 }
 
 type ForeignKey struct {
@@ -147,6 +171,9 @@ type ForeignKey struct {
 
 	pointer *int64
 	value   int64
+
+	Valid bool
+	Value int64
 }
 
 type OneToOneField struct {
@@ -169,6 +196,9 @@ type OneToOneField struct {
 
 	pointer *int64
 	value   int64
+
+	Valid bool
+	Value int64
 }
 
 //Constructors

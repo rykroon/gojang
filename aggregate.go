@@ -5,10 +5,10 @@ import (
 )
 
 type aggregate struct {
-	function   string
-	expression expression
-	alias      string
-	template   string
+	function    string
+	expression  expression
+	alias       string
+	template    string
 	outputField field
 }
 
@@ -23,7 +23,9 @@ func newAggregate(function string, expr expression, outputField field) aggregate
 }
 
 func newAvg(expr expression) aggregate {
-	return newAggregate("avg", expr, NewFloatField())
+	a := newAggregate("avg", expr, NewFloatField())
+	a.template = "%v(%v)::float AS \"%v\""
+	return a
 }
 
 func newCount(expr expression, distinct bool) aggregate {
@@ -89,42 +91,6 @@ func (f *SmallIntegerField) Avg() aggregate {
 	return a
 }
 
-func (f *AutoField) Sum() aggregate {
-	a := newSum(f, NewBigIntegerField())
-	a.alias = f.dbColumn + "__sum"
-	return a
-}
-
-func (f *BigAutoField) Sum() aggregate {
-	a := newSum(f, NewBigIntegerField())
-	a.alias = f.dbColumn + "__sum"
-	return a
-}
-
-func (f *BigIntegerField) Sum() aggregate {
-	a := newSum(f, NewBigIntegerField())
-	a.alias = f.dbColumn + "__sum"
-	return a
-}
-
-func (f *FloatField) Sum() aggregate {
-	a := newSum(f, NewFloatField())
-	a.alias = f.dbColumn + "__sum"
-	return a
-}
-
-func (f *IntegerField) Sum() aggregate {
-	a := newSum(f, NewIntegerField())
-	a.alias = f.dbColumn + "__sum"
-	return a
-}
-
-func (f *SmallIntegerField) Sum() aggregate {
-	a := newSum(f, NewSmallIntegerField())
-	a.alias = f.dbColumn + "__sum"
-	return a
-}
-
 func (s star) Count() aggregate {
 	return newCount(s, false)
 }
@@ -186,5 +152,42 @@ func (f *ForeignKey) Count(distinct bool) aggregate {
 func (f *OneToOneField) Count(distinct bool) aggregate {
 	a := newCount(f, distinct)
 	a.alias = f.dbColumn + "__count"
+	return a
+}
+
+func (f *AutoField) Sum() aggregate {
+	a := newSum(f, NewBigIntegerField())
+	a.alias = f.dbColumn + "__sum"
+	return a
+}
+
+func (f *BigAutoField) Sum() aggregate {
+	a := newSum(f, NewBigIntegerField())
+	a.alias = f.dbColumn + "__sum"
+	return a
+}
+
+func (f *BigIntegerField) Sum() aggregate {
+	a := newSum(f, NewBigIntegerField())
+	a.alias = f.dbColumn + "__sum"
+	return a
+}
+
+func (f *FloatField) Sum() aggregate {
+	a := newSum(f, NewFloatField())
+	a.alias = f.dbColumn + "__sum"
+	//a.template = "%v(%v)::float AS \"%v\""
+	return a
+}
+
+func (f *IntegerField) Sum() aggregate {
+	a := newSum(f, NewIntegerField())
+	a.alias = f.dbColumn + "__sum"
+	return a
+}
+
+func (f *SmallIntegerField) Sum() aggregate {
+	a := newSum(f, NewSmallIntegerField())
+	a.alias = f.dbColumn + "__sum"
 	return a
 }

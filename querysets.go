@@ -3,7 +3,7 @@ package gojang
 import (
 	"database/sql"
 	//"fmt"
-	"reflect"
+	//"reflect"
 )
 
 type QuerySet struct {
@@ -23,13 +23,10 @@ type QuerySet struct {
 	orderBy []sortExpression
 
 	//rows sql.Rows //cache
-	rows []row
+	//rows []row
 
 	//resultCache
 }
-
-type row map[string]interface{}
-
 
 func newQuerySet(model *Model) QuerySet {
 	q := QuerySet{model: model, db: model.db}
@@ -40,68 +37,66 @@ func newQuerySet(model *Model) QuerySet {
 	return q
 }
 
-func (q *QuerySet) getNewPointers() []interface{} {
-	var result []interface{}
+// func (q *QuerySet) getNewPointers() []interface{} {
+// 	var result []interface{}
+//
+// 	for _, expr := range q.selected {
+// 		goType := expr.getGoType()
+// 		var ptr interface{}
+//
+// 		switch goType {
+// 		case "int64":
+// 			ptr = new(int64)
+// 		case "int32":
+// 			ptr = new(int32)
+// 		case "int16":
+// 			ptr = new(int16)
+// 		case "float64":
+// 			ptr = new(float64)
+// 		case "bool":
+// 			ptr = new(bool)
+// 		case "string":
+// 			ptr = new(string)
+// 		}
+//
+// 		result = append(result, ptr)
+// 	}
+//
+// 	return result
+// }
+//
+// func (q QuerySet) pointersToValues(pointers []interface{}) []interface{}{
+// 	var result []interface{}
+//
+// 	for _, ptr := range pointers {
+// 		value := ptrToValue(ptr)
+// 		result = append(result, value)
+// 	}
+//
+// 	return result
+// }
 
-	for _, expr := range q.selected {
-		goType := expr.getGoType()
-		var ptr interface{}
-
-		switch goType {
-		case "int64":
-			ptr = new(int64)
-		case "int32":
-			ptr = new(int32)
-		case "int16":
-			ptr = new(int16)
-		case "float64":
-			ptr = new(float64)
-		case "bool":
-			ptr = new(bool)
-		case "string":
-			ptr = new(string)
-		}
-
-		result = append(result, ptr)
-	}
-
-	return result
-}
-
-func (q QuerySet) pointersToValues(pointers []interface{}) []interface{}{
-	var result []interface{}
-
-	for _, ptr := range pointers {
-		value := ptrToValue(ptr)
-		result = append(result, value)
-	}
-
-	return result
-}
-
-func ptrToValue(ptr interface{}) interface{} {
-	goType := reflect.TypeOf(ptr).String()
-	var value interface{}
-
-	switch goType {
-	case "*int16":
-		value = *ptr.(*int16)
-	case "*int32":
-		value = *ptr.(*int32)
-	case "*int64":
-		value = *ptr.(*int64)
-	case "*float64":
-		value = *ptr.(*float64)
-	case "*bool":
-		value = *ptr.(*bool)
-	case "*string":
-		value = *ptr.(*string)
-	}
-
-	return value
-}
-
-
+// func ptrToValue(ptr interface{}) interface{} {
+// 	goType := reflect.TypeOf(ptr).String()
+// 	var value interface{}
+//
+// 	switch goType {
+// 	case "*int16":
+// 		value = *ptr.(*int16)
+// 	case "*int32":
+// 		value = *ptr.(*int32)
+// 	case "*int64":
+// 		value = *ptr.(*int64)
+// 	case "*float64":
+// 		value = *ptr.(*float64)
+// 	case "*bool":
+// 		value = *ptr.(*bool)
+// 	case "*string":
+// 		value = *ptr.(*string)
+// 	}
+//
+// 	return value
+// }
 
 //Functions that return QuerySets
 
@@ -192,25 +187,22 @@ func (q QuerySet) Get(lookups ...lookup) error {
 
 //Returns an integer representing the number of objects in the database matching the QuerySet.
 func (q QuerySet) Count() (int, error) {
-	q.selected = nil
-	q.orderBy = nil
-
 	var star star
-	q.selected = append(q.selected, star.Count())
-	q.Query = q.buildQuery()
+	agg := star.Count()
 
-	row := q.queryRow()
-	result := 0
-
-	err := row.Scan(&result)
+	_, err := q.Aggregate(agg)
 	if err != nil {
 		return 0, err
 	}
 
-	return result, nil
+	count := int(agg.getValue().(int32))
+	return count, nil
 }
 
-func (q *QuerySet) Aggregate(aggregates ...aggregate) (map[string]interface{} , error) {
+//Returns a map of aggregate values (averages, sums, etc.) calculated over
+//the QuerySet. Each argument to aggregate() specifies a value that will
+//be included in the map that is returned.
+func (q *QuerySet) Aggregate(aggregates ...aggregate) (map[string]interface{}, error) {
 	q.selected = nil
 	q.orderBy = nil
 	result := make(map[string]interface{})
@@ -219,18 +211,15 @@ func (q *QuerySet) Aggregate(aggregates ...aggregate) (map[string]interface{} , 
 		q.selected = append(q.selected, expr)
 	}
 
-
 	q.Query = q.buildQuery()
-	row := q.queryRow()
-	pointers := q.getNewPointers()
+	err := q.queryRowAndScan()
 
-	err := row.Scan(pointers...)
 	if err != nil {
 		return nil, err
 	}
 
-	for idx, agg := range aggregates {
-		result[agg.alias] = ptrToValue(pointers[idx])
+	for _, agg := range aggregates {
+		result[agg.alias] = agg.getValue()
 	}
 
 	return result, nil
@@ -270,6 +259,7 @@ func (q QuerySet) Delete() (int, error) {
 }
 
 //database/sql wrappers
+
 func (q QuerySet) exec() (sql.Result, error) {
 	return q.db.Exec(q.Query)
 }
@@ -280,4 +270,16 @@ func (q QuerySet) query() (*sql.Rows, error) {
 
 func (q QuerySet) queryRow() *sql.Row {
 	return q.db.QueryRow(q.Query)
+}
+
+func (q QuerySet) queryRowAndScan() error {
+	row := q.queryRow()
+	var scanners []interface{}
+
+	for _, scanner := range q.selected {
+		scanners = append(scanners, scanner)
+	}
+
+	err := row.Scan(scanners...)
+	return err
 }

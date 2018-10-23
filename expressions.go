@@ -14,6 +14,8 @@ type expression interface {
 
 type selectExpression interface {
 	expression
+	Scan(interface{}) error
+	getValue() interface{}
 	getPtr() unsafe.Pointer
 	getGoType() string
 }
@@ -88,6 +90,107 @@ func (f *ForeignKey) asExpr() string {
 
 func (f *OneToOneField) asExpr() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+}
+
+func (a aggregate) Scan(value interface{}) error {
+	return a.outputField.Scan(value)
+}
+
+func (f *AutoField) Scan(value interface{}) error {
+	result, ok := value.(int64)
+	f.Value, f.Valid = int32(result), ok
+	return nil
+}
+
+func (f *BigAutoField) Scan(value interface{}) error {
+	f.Value, f.Valid = value.(int64)
+	return nil
+}
+
+func (f *BigIntegerField) Scan(value interface{}) error {
+	f.Value, f.Valid = value.(int64)
+	return nil
+}
+
+func (f *BooleanField) Scan(value interface{}) error {
+	f.Value, f.Valid = value.(bool)
+	return nil
+}
+
+func (f *FloatField) Scan(value interface{}) error {
+	f.Value, f.Valid = value.(float64)
+	return nil
+}
+
+func (f *IntegerField) Scan(value interface{}) error {
+	result, ok := value.(int64)
+	f.Value, f.Valid = int32(result), ok
+	return nil
+}
+
+func (f *SmallIntegerField) Scan(value interface{}) error {
+	result, ok := value.(int64)
+	f.Value, f.Valid = int16(result), ok
+	return nil
+}
+
+func (f *TextField) Scan(value interface{}) error {
+	f.Value, f.Valid = value.(string)
+	return nil
+}
+
+func (f *ForeignKey) Scan(value interface{}) error {
+	f.Value, f.Valid = value.(int64)
+	return nil
+}
+
+func (f *OneToOneField) Scan(value interface{}) error {
+	f.Value, f.Valid = value.(int64)
+	return nil
+}
+
+func (a aggregate) getValue() interface{} {
+	return a.outputField.getValue()
+}
+
+func (f *AutoField) getValue() interface{} {
+	return f.Value
+}
+
+func (f *BigAutoField) getValue() interface{} {
+	return f.Value
+}
+
+func (f *BigIntegerField) getValue() interface{} {
+	return f.Value
+}
+
+func (f *BooleanField) getValue() interface{} {
+	return f.Value
+}
+
+func (f *FloatField) getValue() interface{} {
+	return f.Value
+}
+
+func (f *IntegerField) getValue() interface{} {
+	return f.Value
+}
+
+func (f *SmallIntegerField) getValue() interface{} {
+	return f.Value
+}
+
+func (f *TextField) getValue() interface{} {
+	return f.Value
+}
+
+func (f *ForeignKey) getValue() interface{} {
+	return f.Value
+}
+
+func (f *OneToOneField) getValue() interface{} {
+	return f.Value
 }
 
 func (a aggregate) getPtr() unsafe.Pointer {
@@ -177,7 +280,6 @@ func (f *ForeignKey) getGoType() string {
 func (f *OneToOneField) getGoType() string {
 	return reflect.TypeOf(f.value).String()
 }
-
 
 func (f *AutoField) Asc() sortExpression {
 	return sortExpression{field: f}
