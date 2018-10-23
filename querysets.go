@@ -31,72 +31,12 @@ type QuerySet struct {
 func newQuerySet(model *Model) QuerySet {
 	q := QuerySet{model: model, db: model.db}
 	for _, field := range model.fields {
-		q.selected = append(q.selected, field)
+		q.selected = append(q.selected, field.copy())
 	}
 
+	q.Query = q.buildQuery()
 	return q
 }
-
-// func (q *QuerySet) getNewPointers() []interface{} {
-// 	var result []interface{}
-//
-// 	for _, expr := range q.selected {
-// 		goType := expr.getGoType()
-// 		var ptr interface{}
-//
-// 		switch goType {
-// 		case "int64":
-// 			ptr = new(int64)
-// 		case "int32":
-// 			ptr = new(int32)
-// 		case "int16":
-// 			ptr = new(int16)
-// 		case "float64":
-// 			ptr = new(float64)
-// 		case "bool":
-// 			ptr = new(bool)
-// 		case "string":
-// 			ptr = new(string)
-// 		}
-//
-// 		result = append(result, ptr)
-// 	}
-//
-// 	return result
-// }
-//
-// func (q QuerySet) pointersToValues(pointers []interface{}) []interface{}{
-// 	var result []interface{}
-//
-// 	for _, ptr := range pointers {
-// 		value := ptrToValue(ptr)
-// 		result = append(result, value)
-// 	}
-//
-// 	return result
-// }
-
-// func ptrToValue(ptr interface{}) interface{} {
-// 	goType := reflect.TypeOf(ptr).String()
-// 	var value interface{}
-//
-// 	switch goType {
-// 	case "*int16":
-// 		value = *ptr.(*int16)
-// 	case "*int32":
-// 		value = *ptr.(*int32)
-// 	case "*int64":
-// 		value = *ptr.(*int64)
-// 	case "*float64":
-// 		value = *ptr.(*float64)
-// 	case "*bool":
-// 		value = *ptr.(*bool)
-// 	case "*string":
-// 		value = *ptr.(*string)
-// 	}
-//
-// 	return value
-// }
 
 //Functions that return QuerySets
 
@@ -148,55 +88,67 @@ func (q QuerySet) All() QuerySet {
 //Functions that do not return Querysets
 
 //populates the Model associated with the queryset with the data returned from the query
-func (q QuerySet) Get(lookups ...lookup) error {
+func (q QuerySet) Get(lookups ...lookup) ([]interface{}, error) {
 	if len(lookups) > 0 {
 		q = q.Filter(lookups...)
 	}
 
 	rows, err := q.query()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	numOfRows := 0
+	dest := q.getDest()
+
+	var result []interface{}
 
 	for rows.Next() {
 		numOfRows += 1
 
 		if numOfRows > 2 {
-			return NewMultipleObjectsReturned()
+			return nil, NewMultipleObjectsReturned()
 		}
 
-		err := q.model.setFromRows(rows)
+		err := rows.Scan(dest...)
+		//err := q.model.setFromRows(rows)
 		if err != nil {
-			return err
+			return nil, err
 		}
+
+		result = q.getScannedValues()
 	}
 
 	err = rows.Err()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if numOfRows == 0 {
-		return NewObjectDoesNotExist()
+		return nil, NewObjectDoesNotExist()
 	}
 
-	return nil
+	return result, nil
 }
 
 //Returns an integer representing the number of objects in the database matching the QuerySet.
 func (q QuerySet) Count() (int, error) {
-	var star star
-	agg := star.Count()
+	q.selected = nil
+	q.orderBy = nil
 
-	_, err := q.Aggregate(agg)
+	var star star
+	countExpr := star.Count()
+	q.selected = append(q.selected, countExpr)
+	q.Query = q.buildQuery()
+
+	//_, err := q.Aggregate(agg)
+	err := q.queryRowAndScan()
 	if err != nil {
 		return 0, err
 	}
 
-	count := int(agg.getValue().(int32))
-	return count, nil
+	result := int(countExpr.getValue().(int32))
+	return result, nil
 }
 
 //Returns a map of aggregate values (averages, sums, etc.) calculated over
@@ -227,13 +179,16 @@ func (q *QuerySet) Aggregate(aggregates ...aggregate) (map[string]interface{}, e
 
 //Returns True if the QuerySet contains any results, and False if not.
 func (q QuerySet) Exists() (bool, error) {
-	count, err := q.Count()
+	rows, err := q.query()
 	if err != nil {
 		return false, err
 	}
 
-	result := count != 0
-	return result, nil
+	if rows.Next() {
+		return true, nil
+	}
+
+	return false, rows.Err()
 }
 
 // func (q QuerySet) Update() int {
@@ -258,7 +213,7 @@ func (q QuerySet) Delete() (int, error) {
 	return int(rowsAffected), nil
 }
 
-//database/sql wrappers
+//database/sql wrappers an auxillary functions
 
 func (q QuerySet) exec() (sql.Result, error) {
 	return q.db.Exec(q.Query)
@@ -272,14 +227,60 @@ func (q QuerySet) queryRow() *sql.Row {
 	return q.db.QueryRow(q.Query)
 }
 
-func (q QuerySet) queryRowAndScan() error {
-	row := q.queryRow()
-	var scanners []interface{}
+//returns an interface{} slice with values that implement the sql.Scanner interface
+func (q *QuerySet) getDest() []interface{} {
+	var result []interface{}
 
-	for _, scanner := range q.selected {
-		scanners = append(scanners, scanner)
+	for _, dest := range q.selected {
+		result = append(result, dest)
 	}
 
-	err := row.Scan(scanners...)
+	return result
+}
+
+//return the values from the previous call to scan
+func (q *QuerySet) getScannedValues() []interface{} {
+	var result []interface{}
+
+	for _, expr := range q.selected {
+		result = append(result, expr.getValue())
+	}
+
+	return result
+}
+
+func (q QuerySet) queryRowAndScan() error {
+	row := q.queryRow()
+	dest := q.getDest()
+	err := row.Scan(dest...)
 	return err
+}
+
+func (q QuerySet) queryAndScan() ([]interface{}, error) {
+	rows, err := q.query()
+	if err != nil {
+		return nil, err
+	}
+
+	dest := q.getDest()
+
+	var result []interface{}
+
+	for rows.Next() {
+		err := rows.Scan(dest...)
+
+		if err != nil {
+			return nil, err
+		}
+
+		values := q.getScannedValues()
+		result = append(result, values)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

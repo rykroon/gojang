@@ -136,74 +136,77 @@ func (m *Model) addField(f field) {
 
 //Sets a Model's fields from Rows.Scan()
 //Assumes that Rows.Next() had been previously called
-func (m *Model) setFromRows(rows *sql.Rows) error {
-	columns, err := rows.Columns()
-	if err != nil {
-		return err
-	}
+// func (m *Model) setFromRows(rows *sql.Rows) error {
+// 	columns, err := rows.Columns()
+// 	if err != nil {
+// 		return err
+// 	}
+//
+// 	pointers := m.getPointers(columns)
+//
+// 	err = rows.Scan(pointers...)
+// 	if err != nil {
+// 		return err
+// 	}
+//
+// 	return nil
+// }
 
-	pointers := m.getPointers(columns)
-
-	err = rows.Scan(pointers...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Model) getPointers(columns []string) []interface{} {
-	result := make([]interface{}, 0)
-
-	for _, col := range columns {
-		field, ok := m.colToFields[col]
-
-		if ok {
-			goType := field.getGoType()
-			var ptr interface{}
-
-			switch goType {
-			case "int64":
-				ptr = (*int64)(field.getPtr())
-			case "int32":
-				ptr = (*int32)(field.getPtr())
-			case "int16":
-				ptr = (*int16)(field.getPtr())
-			case "float64":
-				ptr = (*float64)(field.getPtr())
-			case "bool":
-				ptr = (*bool)(field.getPtr())
-			case "string":
-				ptr = (*string)(field.getPtr())
-			}
-
-			result = append(result, ptr)
-		}
-	}
-
-	return result
-}
+// func (m *Model) getPointers(columns []string) []interface{} {
+// 	result := make([]interface{}, 0)
+//
+// 	for _, col := range columns {
+// 		field, ok := m.colToFields[col]
+//
+// 		if ok {
+// 			goType := field.getGoType()
+// 			var ptr interface{}
+//
+// 			switch goType {
+// 			case "int64":
+// 				ptr = (*int64)(field.getPtr())
+// 			case "int32":
+// 				ptr = (*int32)(field.getPtr())
+// 			case "int16":
+// 				ptr = (*int16)(field.getPtr())
+// 			case "float64":
+// 				ptr = (*float64)(field.getPtr())
+// 			case "bool":
+// 				ptr = (*bool)(field.getPtr())
+// 			case "string":
+// 				ptr = (*string)(field.getPtr())
+// 			}
+//
+// 			result = append(result, ptr)
+// 		}
+// 	}
+//
+// 	return result
+// }
 
 //If instance does not have a primary key then it will insert into the database
 //Otherwise it updates the record
 func (m *Model) Save() error {
 	if m.Pk.Val() == 0 {
-		var err error
 		row := m.db.QueryRow(m.insert())
-		goType := m.Pk.getGoType()
+		//goType := m.Pk.getGoType()
 
-		switch goType {
-		case "int64":
-			ptr := (*int64)(m.Pk.getPtr())
-			err = row.Scan(ptr)
-		case "int32":
-			ptr := (*int32)(m.Pk.getPtr())
-			err = row.Scan(ptr)
-		}
-
+		result := 0
+		err := row.Scan(&result)
 		if err != nil {
 			return err
 		}
+
+		m.Pk.setInt(result)
+
+		// switch goType {
+		// case "int64":
+		// 	ptr := (*int64)(m.Pk.getPtr())
+		// 	err = row.Scan(ptr)
+		// case "int32":
+		// 	ptr := (*int32)(m.Pk.getPtr())
+		// 	err = row.Scan(ptr)
+		// }
 
 	} else {
 		_, err := m.db.Exec(m.update())

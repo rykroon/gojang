@@ -3,20 +3,20 @@ package gojang
 import (
 	"fmt"
 	"reflect"
-	"unsafe"
+	//"unsafe"
 )
 
 //Expressions describe a value or a computation that can be used as part of an
 //update, create, filter, order by, annotation, or aggregate.
 type expression interface {
-	asExpr() string
+	asSql() string
 }
 
 type selectExpression interface {
 	expression
 	Scan(interface{}) error
 	getValue() interface{}
-	getPtr() unsafe.Pointer
+	//getPtr() unsafe.Pointer
 	getGoType() string
 }
 
@@ -27,16 +27,16 @@ type sortExpression struct {
 
 type star string
 
-func (s star) asExpr() string {
+func (s star) asSql() string {
 	return "*"
 }
 
-func (a aggregate) asExpr() string {
-	return fmt.Sprintf(a.template, a.function, a.expression.asExpr(), a.alias)
+func (a aggregate) asSql() string {
+	return fmt.Sprintf(a.template, a.function, a.expression.asSql(), a.alias)
 }
 
-func (l lookup) asExpr() string {
-	sql := l.lhs.asExpr() + " " + l.lookupName + " " + l.rhs
+func (l lookup) asSql() string {
+	sql := l.lhs.asSql() + " " + l.lookupName + " " + l.rhs
 
 	if l.not {
 		sql = "NOT(" + sql + ")"
@@ -44,51 +44,51 @@ func (l lookup) asExpr() string {
 	return sql
 }
 
-func (e sortExpression) asExpr() string {
+func (e sortExpression) asSql() string {
 	if e.desc {
-		return e.field.asExpr() + " DESC"
+		return e.field.asSql() + " DESC"
 	} else {
-		return e.field.asExpr() + " ASC"
+		return e.field.asSql() + " ASC"
 	}
 }
 
-func (f *AutoField) asExpr() string {
+func (f *AutoField) asSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *BigAutoField) asExpr() string {
+func (f *BigAutoField) asSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *BigIntegerField) asExpr() string {
+func (f *BigIntegerField) asSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *BooleanField) asExpr() string {
+func (f *BooleanField) asSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *FloatField) asExpr() string {
+func (f *FloatField) asSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *IntegerField) asExpr() string {
+func (f *IntegerField) asSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *SmallIntegerField) asExpr() string {
+func (f *SmallIntegerField) asSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *TextField) asExpr() string {
+func (f *TextField) asSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *ForeignKey) asExpr() string {
+func (f *ForeignKey) asSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
-func (f *OneToOneField) asExpr() string {
+func (f *OneToOneField) asSql() string {
 	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
 }
 
@@ -193,49 +193,49 @@ func (f *OneToOneField) getValue() interface{} {
 	return f.Value
 }
 
-func (a aggregate) getPtr() unsafe.Pointer {
-	return a.outputField.getPtr()
-}
-
-func (f *AutoField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *BigAutoField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *BigIntegerField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *BooleanField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *FloatField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *IntegerField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *SmallIntegerField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *TextField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *ForeignKey) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
-
-func (f *OneToOneField) getPtr() unsafe.Pointer {
-	return unsafe.Pointer(f.pointer)
-}
+// func (a aggregate) getPtr() unsafe.Pointer {
+// 	return a.outputField.getPtr()
+// }
+//
+// func (f *AutoField) getPtr() unsafe.Pointer {
+// 	return unsafe.Pointer(f.pointer)
+// }
+//
+// func (f *BigAutoField) getPtr() unsafe.Pointer {
+// 	return unsafe.Pointer(f.pointer)
+// }
+//
+// func (f *BigIntegerField) getPtr() unsafe.Pointer {
+// 	return unsafe.Pointer(f.pointer)
+// }
+//
+// func (f *BooleanField) getPtr() unsafe.Pointer {
+// 	return unsafe.Pointer(f.pointer)
+// }
+//
+// func (f *FloatField) getPtr() unsafe.Pointer {
+// 	return unsafe.Pointer(f.pointer)
+// }
+//
+// func (f *IntegerField) getPtr() unsafe.Pointer {
+// 	return unsafe.Pointer(f.pointer)
+// }
+//
+// func (f *SmallIntegerField) getPtr() unsafe.Pointer {
+// 	return unsafe.Pointer(f.pointer)
+// }
+//
+// func (f *TextField) getPtr() unsafe.Pointer {
+// 	return unsafe.Pointer(f.pointer)
+// }
+//
+// func (f *ForeignKey) getPtr() unsafe.Pointer {
+// 	return unsafe.Pointer(f.pointer)
+// }
+//
+// func (f *OneToOneField) getPtr() unsafe.Pointer {
+// 	return unsafe.Pointer(f.pointer)
+// }
 
 func (a aggregate) getGoType() string {
 	return a.outputField.getGoType()

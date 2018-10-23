@@ -61,12 +61,12 @@ func (f *OneToOneField) getOnDelete() string {
 	return string(f.onDelete)
 }
 
-func (f *ForeignKey) Fetch() error {
-	model := f.relatedModel
-	return model.Objects.Get(model.Pk.Exact(f.Val()))
-}
-
-func (f *OneToOneField) Fetch() error {
-	model := f.relatedModel
-	return model.Objects.Get(model.Pk.Exact(f.Val()))
-}
+// func (f *ForeignKey) Fetch() error {
+// 	model := f.relatedModel
+// 	return model.Objects.Get(model.Pk.Exact(f.Val()))
+// }
+//
+// func (f *OneToOneField) Fetch() error {
+// 	model := f.relatedModel
+// 	return model.Objects.Get(model.Pk.Exact(f.Val()))
+// }

@@ -35,7 +35,7 @@ func (m Manager) OrderBy(orderBys ...sortExpression) QuerySet {
 	return qs
 }
 
-func (m Manager) Get(lookups ...lookup) error {
+func (m Manager) Get(lookups ...lookup) (interface{}, error) {
 	qs := newQuerySet(m.model)
 	return qs.Get(lookups...)
 }

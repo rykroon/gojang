@@ -28,6 +28,7 @@ type field interface {
 	Count(bool) aggregate
 
 	valueToSql() string
+	copy() field
 }
 
 type numericField interface {
@@ -40,6 +41,7 @@ type intField interface {
 	//field
 	numericField
 	Val() int
+	setInt(int)
 
 	//lookups
 	Exact(int) lookup
@@ -58,11 +60,11 @@ type primaryKeyField interface {
 }
 
 func (f *AutoField) Id() int {
-	return f.Val()
+	return int(f.Value)
 }
 
 func (f *BigAutoField) Id() int {
-	return f.Val()
+	return int(f.Value)
 }
 
 func (f *AutoField) isAutoField() bool {
@@ -71,6 +73,104 @@ func (f *AutoField) isAutoField() bool {
 
 func (f *BigAutoField) isAutoField() bool {
 	return true
+}
+
+func (f *AutoField) setInt(num int) {
+	f.Value = int32(num)
+}
+
+func (f *BigAutoField) setInt(num int) {
+	f.Value = int64(num)
+}
+
+func (f *BigIntegerField) setInt(num int) {
+	f.Value = int64(num)
+}
+
+func (f *IntegerField) setInt(num int) {
+	f.Value = int32(num)
+}
+
+func (f *SmallIntegerField) setInt(num int) {
+	f.Value = int16(num)
+}
+
+func (f *ForeignKey) setInt(num int) {
+	f.Value = int64(num)
+}
+
+func (f *OneToOneField) setInt(num int) {
+	f.Value = int64(num)
+}
+
+func (f *AutoField) copy() field {
+	copy := NewAutoField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	return copy
+}
+
+func (f *BigAutoField) copy() field {
+	copy := NewBigAutoField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	return copy
+}
+
+func (f *BigIntegerField) copy() field {
+	copy := NewBigIntegerField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	return copy
+}
+
+func (f *BooleanField) copy() field {
+	copy := NewBooleanField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	return copy
+}
+
+func (f *FloatField) copy() field {
+	copy := NewFloatField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	return copy
+}
+
+func (f *IntegerField) copy() field {
+	copy := NewIntegerField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	return copy
+}
+
+func (f *SmallIntegerField) copy() field {
+	copy := NewSmallIntegerField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	return copy
+}
+
+func (f *TextField) copy() field {
+	copy := NewTextField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	return copy
+}
+
+func (f *ForeignKey) copy() field {
+	copy := NewForeignKey(f.relatedModel, f.onDelete)
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	return copy
+}
+
+func (f *OneToOneField) copy() field {
+	copy := NewOneToOneField(f.relatedModel, f.onDelete)
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	return copy
 }
 
 func (f *AutoField) setOptions(options fieldOptions) {
