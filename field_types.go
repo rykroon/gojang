@@ -23,9 +23,6 @@ type AutoField struct {
 	primaryKey bool
 	isRelation bool
 
-	//pointer *int32
-	value int32
-
 	valid bool
 	Value int32
 }
@@ -39,9 +36,6 @@ type BigAutoField struct {
 	unique     bool
 	primaryKey bool
 	isRelation bool
-
-	pointer *int64
-	value   int64
 
 	valid bool
 	Value int64
@@ -57,9 +51,6 @@ type BigIntegerField struct {
 	primaryKey bool
 	isRelation bool
 
-	pointer *int64
-	value   int64
-
 	valid bool
 	Value int64
 }
@@ -73,9 +64,6 @@ type BooleanField struct {
 	unique     bool
 	primaryKey bool
 	isRelation bool
-
-	pointer *bool
-	value   bool
 
 	valid bool
 	Value bool
@@ -91,9 +79,6 @@ type FloatField struct {
 	primaryKey bool
 	isRelation bool
 
-	pointer *float64
-	value   float64
-
 	valid bool
 	Value float64
 }
@@ -107,9 +92,6 @@ type IntegerField struct {
 	unique     bool
 	primaryKey bool
 	isRelation bool
-
-	pointer *int32
-	value   int32
 
 	valid bool
 	Value int32
@@ -125,9 +107,6 @@ type SmallIntegerField struct {
 	primaryKey bool
 	isRelation bool
 
-	pointer *int16
-	value   int16
-
 	valid bool
 	Value int16
 }
@@ -141,10 +120,6 @@ type TextField struct {
 	unique     bool
 	primaryKey bool
 	isRelation bool
-
-	pointer *string
-	Ptr     *string
-	value   string
 
 	valid bool
 	Value string
@@ -168,9 +143,6 @@ type ForeignKey struct {
 	relatedModel *Model
 	onDelete     onDelete
 
-	pointer *int64
-	value   int64
-
 	valid bool
 	Value int64
 }
@@ -193,9 +165,6 @@ type OneToOneField struct {
 	relatedModel *Model
 	onDelete     onDelete
 
-	pointer *int64
-	value   int64
-
 	valid bool
 	Value int64
 }
@@ -204,63 +173,54 @@ type OneToOneField struct {
 
 func NewAutoField() *AutoField {
 	field := &AutoField{dbType: "SERIAL4"}
-	//field.pointer = &field.value
 	field.valid = true
 	return field
 }
 
 func NewBigAutoField() *BigAutoField {
 	field := &BigAutoField{dbType: "SERIAL8"}
-	//field.pointer = &field.value
 	field.valid = true
 	return field
 }
 
 func NewBigIntegerField() *BigIntegerField {
 	field := &BigIntegerField{dbType: "INT8"}
-	//field.pointer = &field.value
 	field.valid = true
 	return field
 }
 
 func NewBooleanField() *BooleanField {
 	field := &BooleanField{dbType: "BOOL"}
-	//field.pointer = &field.value
 	field.valid = true
 	return field
 }
 
 func NewFloatField() *FloatField {
 	field := &FloatField{dbType: "FLOAT8"}
-	//field.pointer = &field.value
 	field.valid = true
 	return field
 }
 
 func NewIntegerField() *IntegerField {
 	field := &IntegerField{dbType: "INT4"}
-	//field.pointer = &field.value
 	field.valid = true
 	return field
 }
 
 func NewSmallIntegerField() *SmallIntegerField {
 	field := &SmallIntegerField{dbType: "INT2"}
-	//field.pointer = &field.value
 	field.valid = true
 	return field
 }
 
 func NewTextField() *TextField {
 	field := &TextField{dbType: "TEXT"}
-	//field.pointer = &field.value
 	field.valid = true
 	return field
 }
 
 func NewForeignKey(to *Model, onDelete onDelete) *ForeignKey {
 	field := &ForeignKey{dbType: "INT8"}
-	//field.pointer = &field.value
 	field.valid = true
 
 	field.isRelation = true
@@ -273,7 +233,6 @@ func NewForeignKey(to *Model, onDelete onDelete) *ForeignKey {
 
 func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 	field := &OneToOneField{dbType: "INT8"}
-	//field.pointer = &field.value
 	field.valid = true
 
 	field.isRelation = true
@@ -285,110 +244,6 @@ func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 	field.unique = true
 
 	return field
-}
-
-func (f AutoField) Val() int {
-	return int(f.value)
-}
-
-func (f BigAutoField) Val() int {
-	return int(f.value)
-}
-
-func (f BigIntegerField) Val() int {
-	return int(f.value)
-}
-
-func (f BooleanField) Val() bool {
-	return f.value
-}
-
-func (f FloatField) Val() float64 {
-	return f.value
-}
-
-func (f IntegerField) Val() int {
-	return int(f.value)
-}
-
-func (f SmallIntegerField) Val() int {
-	return int(f.value)
-}
-
-func (f TextField) Val() string {
-	return f.value
-}
-
-func (f ForeignKey) Val() int {
-	return int(f.value)
-}
-
-func (f OneToOneField) Val() int {
-	return int(f.value)
-}
-
-func (f *BigIntegerField) Set(value int64) {
-	if f.pointer == nil {
-		f.pointer = &f.value
-	}
-
-	f.value = value
-}
-
-func (f *BooleanField) Set(value bool) {
-	if f.pointer == nil {
-		f.pointer = &f.value
-	}
-
-	f.value = value
-}
-
-func (f *FloatField) Set(value float64) {
-	if f.pointer == nil {
-		f.pointer = &f.value
-	}
-
-	f.value = value
-}
-
-func (f *IntegerField) Set(value int32) {
-	if f.pointer == nil {
-		f.pointer = &f.value
-	}
-
-	f.value = value
-}
-
-func (f *SmallIntegerField) Set(value int16) {
-	if f.pointer == nil {
-		f.pointer = &f.value
-	}
-
-	f.value = value
-}
-
-func (f *TextField) Set(value string) {
-	if f.pointer == nil {
-		f.pointer = &f.value
-	}
-
-	f.value = value
-}
-
-func (f *ForeignKey) Set(value int64) {
-	if f.pointer == nil {
-		f.pointer = &f.value
-	}
-
-	f.value = value
-}
-
-func (f *OneToOneField) Set(value int64) {
-	if f.pointer == nil {
-		f.pointer = &f.value
-	}
-
-	f.value = value
 }
 
 func (f *AutoField) SetNil() error {

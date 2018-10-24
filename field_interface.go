@@ -789,7 +789,7 @@ func (f *AutoField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return int32ToSql(f.value)
+		return int32ToSql(f.Value)
 	}
 }
 
@@ -797,7 +797,7 @@ func (f *BigAutoField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return int64ToSql(f.value)
+		return int64ToSql(f.Value)
 	}
 }
 
@@ -805,7 +805,7 @@ func (f *BigIntegerField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return int64ToSql(f.value)
+		return int64ToSql(f.Value)
 	}
 }
 
@@ -813,7 +813,7 @@ func (f *BooleanField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return boolToSql(f.value)
+		return boolToSql(f.Value)
 	}
 }
 
@@ -821,7 +821,7 @@ func (f *FloatField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return float64ToSql(f.value)
+		return float64ToSql(f.Value)
 	}
 }
 
@@ -829,7 +829,7 @@ func (f *IntegerField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return int32ToSql(f.value)
+		return int32ToSql(f.Value)
 	}
 }
 
@@ -837,7 +837,7 @@ func (f *SmallIntegerField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return int16ToSql(f.value)
+		return int16ToSql(f.Value)
 	}
 }
 
@@ -845,7 +845,7 @@ func (f *TextField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return stringToSql(f.value)
+		return stringToSql(f.Value)
 	}
 }
 
@@ -853,7 +853,7 @@ func (f *ForeignKey) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return int64ToSql(f.value)
+		return int64ToSql(f.Value)
 	}
 }
 
@@ -861,6 +861,6 @@ func (f *OneToOneField) valueToSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return int64ToSql(f.value)
+		return int64ToSql(f.Value)
 	}
 }

@@ -197,43 +197,43 @@ func (a aggregate) getGoType() string {
 }
 
 func (f *AutoField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
+	return reflect.TypeOf(f.Value).String()
 }
 
 func (f *BigAutoField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
+	return reflect.TypeOf(f.Value).String()
 }
 
 func (f *BigIntegerField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
+	return reflect.TypeOf(f.Value).String()
 }
 
 func (f *BooleanField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
+	return reflect.TypeOf(f.Value).String()
 }
 
 func (f *FloatField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
+	return reflect.TypeOf(f.Value).String()
 }
 
 func (f *IntegerField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
+	return reflect.TypeOf(f.Value).String()
 }
 
 func (f *SmallIntegerField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
+	return reflect.TypeOf(f.Value).String()
 }
 
 func (f *TextField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
+	return reflect.TypeOf(f.Value).String()
 }
 
 func (f *ForeignKey) getGoType() string {
-	return reflect.TypeOf(f.value).String()
+	return reflect.TypeOf(f.Value).String()
 }
 
 func (f *OneToOneField) getGoType() string {
-	return reflect.TypeOf(f.value).String()
+	return reflect.TypeOf(f.Value).String()
 }
 
 func (f *AutoField) Asc() sortExpression {

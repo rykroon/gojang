@@ -72,3 +72,41 @@ func (f *ForeignKey) setInt(num int) {
 func (f *OneToOneField) setInt(num int) {
 	f.Value = int64(num)
 }
+
+func (f AutoField) Val() int {
+	return int(f.Value)
+}
+
+func (f BigAutoField) Val() int {
+	return int(f.Value)
+}
+
+func (f BigIntegerField) Val() int {
+	return int(f.Value)
+}
+
+//
+// func (f BooleanField) Val() bool {
+// 	return f.Value
+// }
+//
+// func (f FloatField) Val() float64 {
+// 	return f.Value
+// }
+//
+
+func (f IntegerField) Val() int {
+	return int(f.Value)
+}
+
+func (f SmallIntegerField) Val() int {
+	return int(f.Value)
+}
+
+func (f ForeignKey) Val() int {
+	return int(f.Value)
+}
+
+func (f OneToOneField) Val() int {
+	return int(f.Value)
+}
