@@ -134,62 +134,11 @@ func (m *Model) addField(f field) {
 	}
 }
 
-//Sets a Model's fields from Rows.Scan()
-//Assumes that Rows.Next() had been previously called
-// func (m *Model) setFromRows(rows *sql.Rows) error {
-// 	columns, err := rows.Columns()
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	pointers := m.getPointers(columns)
-//
-// 	err = rows.Scan(pointers...)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	return nil
-// }
-
-// func (m *Model) getPointers(columns []string) []interface{} {
-// 	result := make([]interface{}, 0)
-//
-// 	for _, col := range columns {
-// 		field, ok := m.colToFields[col]
-//
-// 		if ok {
-// 			goType := field.getGoType()
-// 			var ptr interface{}
-//
-// 			switch goType {
-// 			case "int64":
-// 				ptr = (*int64)(field.getPtr())
-// 			case "int32":
-// 				ptr = (*int32)(field.getPtr())
-// 			case "int16":
-// 				ptr = (*int16)(field.getPtr())
-// 			case "float64":
-// 				ptr = (*float64)(field.getPtr())
-// 			case "bool":
-// 				ptr = (*bool)(field.getPtr())
-// 			case "string":
-// 				ptr = (*string)(field.getPtr())
-// 			}
-//
-// 			result = append(result, ptr)
-// 		}
-// 	}
-//
-// 	return result
-// }
-
 //If instance does not have a primary key then it will insert into the database
 //Otherwise it updates the record
 func (m *Model) Save() error {
-	if m.Pk.Val() == 0 {
+	if m.Pk.Id() == 0 {
 		row := m.db.QueryRow(m.insert())
-		//goType := m.Pk.getGoType()
 
 		result := 0
 		err := row.Scan(&result)
@@ -199,17 +148,8 @@ func (m *Model) Save() error {
 
 		m.Pk.setInt(result)
 
-		// switch goType {
-		// case "int64":
-		// 	ptr := (*int64)(m.Pk.getPtr())
-		// 	err = row.Scan(ptr)
-		// case "int32":
-		// 	ptr := (*int32)(m.Pk.getPtr())
-		// 	err = row.Scan(ptr)
-		// }
-
 	} else {
-		_, err := m.db.Exec(m.update())
+		err := m.update()
 
 		if err != nil {
 			return err
@@ -244,24 +184,37 @@ func (m *Model) insert() string {
 }
 
 //
-func (m *Model) update() string {
-	sql := "UPDATE " + dbq(m.dbTable) + " SET "
-	var pk field
-
+func (m *Model) update() error {
+	var updateList []field
 	for _, field := range m.fields {
-		if field.hasPrimaryKeyConstraint() {
-			pk = field
-			continue
+		if !field.hasPrimaryKeyConstraint() {
+			updateList = append(updateList, field)
 		}
-
-		sql += dbq(field.getDbColumn()) + " = " + field.valueToSql() + ", "
 	}
 
-	sql = sql[:len(sql)-2]
-	sql += " WHERE " + dbq(pk.getDbColumn()) + " = " + pk.valueToSql()
-
-	return sql
+	qs := m.Objects.Filter(m.Pk.Exact(m.Pk.Id()))
+	_, err := qs.Update(updateList...)
+	return err
 }
+
+// func (m *Model) update() string {
+// 	sql := "UPDATE " + dbq(m.dbTable) + " SET "
+// 	var pk field
+//
+// 	for _, field := range m.fields {
+// 		if field.hasPrimaryKeyConstraint() {
+// 			pk = field
+// 			continue
+// 		}
+//
+// 		sql += dbq(field.getDbColumn()) + " = " + field.valueToSql() + ", "
+// 	}
+//
+// 	sql = sql[:len(sql)-2]
+// 	sql += " WHERE " + dbq(pk.getDbColumn()) + " = " + pk.valueToSql()
+//
+// 	return sql
+// }
 
 //Creates the Database table
 func (m Model) Migrate() error {

@@ -14,7 +14,10 @@ type QuerySet struct {
 	//distinct  bool
 	selected []selectExpression
 	//deferred
+	update bool
 	delete bool
+
+	set []field
 
 	joins   []relatedField
 	lookups []lookup
@@ -189,9 +192,27 @@ func (q QuerySet) Exists() (bool, error) {
 	return false, rows.Err()
 }
 
-// func (q QuerySet) Update() int {
-// 	return 0
-// }
+func (q QuerySet) Update(fields ...field) (int, error) {
+	q.update = true
+
+	for _, field := range fields {
+		q.set = append(q.set, field)
+	}
+
+	q.Query = q.buildQuery()
+	result, err := q.exec()
+
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(rowsAffected), nil
+}
 
 //Performs an SQL delete query on all rows in the QuerySet and returns the number of objects deleted
 func (q QuerySet) Delete() (int, error) {

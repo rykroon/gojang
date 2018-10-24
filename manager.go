@@ -55,6 +55,11 @@ func (m Manager) Exists() (bool, error) {
 	return qs.Exists()
 }
 
+func (m Manager) Update(fields ...field) (int, error) {
+	qs := newQuerySet(m.model)
+	return qs.Update(fields...)
+}
+
 func (m Manager) Delete() (int, error) {
 	qs := newQuerySet(m.model)
 	return qs.Delete()
