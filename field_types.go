@@ -23,11 +23,10 @@ type AutoField struct {
 	primaryKey bool
 	isRelation bool
 
-	pointer *int32
-	Ptr     *int32
-	value   int32
+	//pointer *int32
+	value int32
 
-	Valid bool
+	valid bool
 	Value int32
 }
 
@@ -44,7 +43,7 @@ type BigAutoField struct {
 	pointer *int64
 	value   int64
 
-	Valid bool
+	valid bool
 	Value int64
 }
 
@@ -61,7 +60,7 @@ type BigIntegerField struct {
 	pointer *int64
 	value   int64
 
-	Valid bool
+	valid bool
 	Value int64
 }
 
@@ -78,7 +77,7 @@ type BooleanField struct {
 	pointer *bool
 	value   bool
 
-	Valid bool
+	valid bool
 	Value bool
 }
 
@@ -95,7 +94,7 @@ type FloatField struct {
 	pointer *float64
 	value   float64
 
-	Valid bool
+	valid bool
 	Value float64
 }
 
@@ -112,7 +111,7 @@ type IntegerField struct {
 	pointer *int32
 	value   int32
 
-	Valid bool
+	valid bool
 	Value int32
 }
 
@@ -129,7 +128,7 @@ type SmallIntegerField struct {
 	pointer *int16
 	value   int16
 
-	Valid bool
+	valid bool
 	Value int16
 }
 
@@ -147,7 +146,7 @@ type TextField struct {
 	Ptr     *string
 	value   string
 
-	Valid bool
+	valid bool
 	Value string
 }
 
@@ -172,7 +171,7 @@ type ForeignKey struct {
 	pointer *int64
 	value   int64
 
-	Valid bool
+	valid bool
 	Value int64
 }
 
@@ -197,7 +196,7 @@ type OneToOneField struct {
 	pointer *int64
 	value   int64
 
-	Valid bool
+	valid bool
 	Value int64
 }
 
@@ -205,55 +204,64 @@ type OneToOneField struct {
 
 func NewAutoField() *AutoField {
 	field := &AutoField{dbType: "SERIAL4"}
-	field.pointer = &field.value
+	//field.pointer = &field.value
+	field.valid = true
 	return field
 }
 
 func NewBigAutoField() *BigAutoField {
 	field := &BigAutoField{dbType: "SERIAL8"}
-	field.pointer = &field.value
+	//field.pointer = &field.value
+	field.valid = true
 	return field
 }
 
 func NewBigIntegerField() *BigIntegerField {
 	field := &BigIntegerField{dbType: "INT8"}
-	field.pointer = &field.value
+	//field.pointer = &field.value
+	field.valid = true
 	return field
 }
 
 func NewBooleanField() *BooleanField {
 	field := &BooleanField{dbType: "BOOL"}
-	field.pointer = &field.value
+	//field.pointer = &field.value
+	field.valid = true
 	return field
 }
 
 func NewFloatField() *FloatField {
 	field := &FloatField{dbType: "FLOAT8"}
-	field.pointer = &field.value
+	//field.pointer = &field.value
+	field.valid = true
 	return field
 }
 
 func NewIntegerField() *IntegerField {
 	field := &IntegerField{dbType: "INT4"}
-	field.pointer = &field.value
+	//field.pointer = &field.value
+	field.valid = true
 	return field
 }
 
 func NewSmallIntegerField() *SmallIntegerField {
 	field := &SmallIntegerField{dbType: "INT2"}
-	field.pointer = &field.value
+	//field.pointer = &field.value
+	field.valid = true
 	return field
 }
 
 func NewTextField() *TextField {
 	field := &TextField{dbType: "TEXT"}
-	field.pointer = &field.value
+	//field.pointer = &field.value
+	field.valid = true
 	return field
 }
 
 func NewForeignKey(to *Model, onDelete onDelete) *ForeignKey {
 	field := &ForeignKey{dbType: "INT8"}
-	field.pointer = &field.value
+	//field.pointer = &field.value
+	field.valid = true
 
 	field.isRelation = true
 	field.manyToOne = true
@@ -265,7 +273,8 @@ func NewForeignKey(to *Model, onDelete onDelete) *ForeignKey {
 
 func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 	field := &OneToOneField{dbType: "INT8"}
-	field.pointer = &field.value
+	//field.pointer = &field.value
+	field.valid = true
 
 	field.isRelation = true
 	field.oneToOne = true
@@ -382,10 +391,18 @@ func (f *OneToOneField) Set(value int64) {
 	f.value = value
 }
 
+func (f *AutoField) SetNil() error {
+	return NewCannotSetNil()
+}
+
+func (f *BigAutoField) SetNil() error {
+	return NewCannotSetNil()
+}
+
 func (f *BigIntegerField) SetNil() error {
 	if f.hasNullConstraint() {
-		f.pointer = nil
-		f.value = 0
+		f.valid = false
+		f.Value = 0
 		return nil
 	} else {
 		return NewCannotSetNil()
@@ -394,8 +411,8 @@ func (f *BigIntegerField) SetNil() error {
 
 func (f *BooleanField) SetNil() error {
 	if f.hasNullConstraint() {
-		f.pointer = nil
-		f.value = false
+		f.valid = false
+		f.Value = false
 		return nil
 	} else {
 		return NewCannotSetNil()
@@ -404,8 +421,8 @@ func (f *BooleanField) SetNil() error {
 
 func (f *FloatField) SetNil() error {
 	if f.hasNullConstraint() {
-		f.pointer = nil
-		f.value = 0
+		f.valid = false
+		f.Value = 0
 		return nil
 	} else {
 		return NewCannotSetNil()
@@ -414,8 +431,8 @@ func (f *FloatField) SetNil() error {
 
 func (f *IntegerField) SetNil() error {
 	if f.hasNullConstraint() {
-		f.pointer = nil
-		f.value = 0
+		f.valid = false
+		f.Value = 0
 		return nil
 	} else {
 		return NewCannotSetNil()
@@ -424,8 +441,8 @@ func (f *IntegerField) SetNil() error {
 
 func (f *SmallIntegerField) SetNil() error {
 	if f.hasNullConstraint() {
-		f.pointer = nil
-		f.value = 0
+		f.valid = false
+		f.Value = 0
 		return nil
 	} else {
 		return NewCannotSetNil()
@@ -434,8 +451,8 @@ func (f *SmallIntegerField) SetNil() error {
 
 func (f *TextField) SetNil() error {
 	if f.hasNullConstraint() {
-		f.pointer = nil
-		f.value = ""
+		f.valid = false
+		f.Value = ""
 		return nil
 	} else {
 		return NewCannotSetNil()
@@ -444,8 +461,8 @@ func (f *TextField) SetNil() error {
 
 func (f *ForeignKey) SetNil() error {
 	if f.hasNullConstraint() {
-		f.pointer = nil
-		f.value = 0
+		f.valid = false
+		f.Value = 0
 		return nil
 	} else {
 		return NewCannotSetNil()
@@ -454,12 +471,52 @@ func (f *ForeignKey) SetNil() error {
 
 func (f *OneToOneField) SetNil() error {
 	if f.hasNullConstraint() {
-		f.pointer = nil
-		f.value = 0
+		f.valid = false
+		f.Value = 0
 		return nil
 	} else {
 		return NewCannotSetNil()
 	}
+}
+
+func (f AutoField) UnSetNil() {
+	f.valid = true
+}
+
+func (f BigAutoField) UnSetNil() {
+	f.valid = true
+}
+
+func (f BigIntegerField) UnSetNil() {
+	f.valid = true
+}
+
+func (f BooleanField) UnSetNil() {
+	f.valid = true
+}
+
+func (f FloatField) UnSetNil() {
+	f.valid = true
+}
+
+func (f IntegerField) UnSetNil() {
+	f.valid = true
+}
+
+func (f SmallIntegerField) UnSetNil() {
+	f.valid = true
+}
+
+func (f TextField) UnSetNil() {
+	f.valid = true
+}
+
+func (f ForeignKey) UnSetNil() {
+	f.valid = true
+}
+
+func (f OneToOneField) UnSetNil() {
+	f.valid = true
 }
 
 func create(f field) string {

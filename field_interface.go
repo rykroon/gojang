@@ -22,6 +22,8 @@ type field interface {
 	getDbType() string
 
 	IsNil() bool
+	SetNil() error
+	UnSetNil()
 
 	Asc() sortExpression
 	Desc() sortExpression
@@ -29,78 +31,6 @@ type field interface {
 
 	valueToSql() string
 	copy() field
-}
-
-type numericField interface {
-	field
-	Avg() aggregate
-	Sum() aggregate
-}
-
-type intField interface {
-	//field
-	numericField
-	Val() int
-	setInt(int)
-
-	//lookups
-	Exact(int) lookup
-	In(...int) lookup
-	Gt(int) lookup
-	Gte(int) lookup
-	Lt(int) lookup
-	Lte(int) lookup
-	Range(int, int) lookup
-}
-
-type primaryKeyField interface {
-	intField
-	Id() int
-	isAutoField() bool
-}
-
-func (f *AutoField) Id() int {
-	return int(f.Value)
-}
-
-func (f *BigAutoField) Id() int {
-	return int(f.Value)
-}
-
-func (f *AutoField) isAutoField() bool {
-	return true
-}
-
-func (f *BigAutoField) isAutoField() bool {
-	return true
-}
-
-func (f *AutoField) setInt(num int) {
-	f.Value = int32(num)
-}
-
-func (f *BigAutoField) setInt(num int) {
-	f.Value = int64(num)
-}
-
-func (f *BigIntegerField) setInt(num int) {
-	f.Value = int64(num)
-}
-
-func (f *IntegerField) setInt(num int) {
-	f.Value = int32(num)
-}
-
-func (f *SmallIntegerField) setInt(num int) {
-	f.Value = int16(num)
-}
-
-func (f *ForeignKey) setInt(num int) {
-	f.Value = int64(num)
-}
-
-func (f *OneToOneField) setInt(num int) {
-	f.Value = int64(num)
 }
 
 func (f *AutoField) copy() field {
@@ -287,7 +217,8 @@ func (f *AutoField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.pointer = nil
+		//f.pointer = nil
+		f.valid = false
 	}
 }
 
@@ -295,7 +226,8 @@ func (f *BigAutoField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.pointer = nil
+		//f.pointer = nil
+		f.valid = false
 	}
 }
 
@@ -303,7 +235,8 @@ func (f *BigIntegerField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.pointer = nil
+		//f.pointer = nil
+		f.valid = false
 	}
 }
 
@@ -311,7 +244,8 @@ func (f *BooleanField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.pointer = nil
+		//f.pointer = nil
+		f.valid = false
 	}
 }
 
@@ -319,7 +253,8 @@ func (f *FloatField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.pointer = nil
+		//f.pointer = nil
+		f.valid = false
 	}
 }
 
@@ -327,7 +262,8 @@ func (f *IntegerField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.pointer = nil
+		//f.pointer = nil
+		f.valid = false
 	}
 }
 
@@ -335,7 +271,8 @@ func (f *SmallIntegerField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.pointer = nil
+		//f.pointer = nil
+		f.valid = false
 	}
 }
 
@@ -343,7 +280,8 @@ func (f *TextField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.pointer = nil
+		//f.pointer = nil
+		f.valid = false
 	}
 }
 
@@ -351,7 +289,8 @@ func (f *ForeignKey) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.pointer = nil
+		//f.pointer = nil
+		f.valid = false
 	}
 }
 
@@ -359,7 +298,8 @@ func (f *OneToOneField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.pointer = nil
+		//f.pointer = nil
+		f.valid = false
 	}
 }
 
@@ -806,43 +746,43 @@ func (f *OneToOneField) getDbType() string {
 }
 
 func (f *AutoField) IsNil() bool {
-	return f.pointer == nil
+	return !f.valid
 }
 
 func (f *BigAutoField) IsNil() bool {
-	return f.pointer == nil
+	return f.valid
 }
 
 func (f *BigIntegerField) IsNil() bool {
-	return f.pointer == nil
+	return !f.valid
 }
 
 func (f *BooleanField) IsNil() bool {
-	return f.pointer == nil
+	return !f.valid
 }
 
 func (f *FloatField) IsNil() bool {
-	return f.pointer == nil
+	return !f.valid
 }
 
 func (f *IntegerField) IsNil() bool {
-	return f.pointer == nil
+	return !f.valid
 }
 
 func (f *SmallIntegerField) IsNil() bool {
-	return f.pointer == nil
+	return !f.valid
 }
 
 func (f *TextField) IsNil() bool {
-	return f.pointer == nil
+	return !f.valid
 }
 
 func (f *ForeignKey) IsNil() bool {
-	return f.pointer == nil
+	return !f.valid
 }
 
 func (f *OneToOneField) IsNil() bool {
-	return f.pointer == nil
+	return !f.valid
 }
 
 func (f *AutoField) valueToSql() string {

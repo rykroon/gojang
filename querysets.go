@@ -111,7 +111,6 @@ func (q QuerySet) Get(lookups ...lookup) ([]interface{}, error) {
 		}
 
 		err := rows.Scan(dest...)
-		//err := q.model.setFromRows(rows)
 		if err != nil {
 			return nil, err
 		}
@@ -141,7 +140,6 @@ func (q QuerySet) Count() (int, error) {
 	q.selected = append(q.selected, countExpr)
 	q.Query = q.buildQuery()
 
-	//_, err := q.Aggregate(agg)
 	err := q.queryRowAndScan()
 	if err != nil {
 		return 0, err

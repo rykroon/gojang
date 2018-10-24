@@ -16,7 +16,6 @@ type selectExpression interface {
 	expression
 	Scan(interface{}) error
 	getValue() interface{}
-	//getPtr() unsafe.Pointer
 	getGoType() string
 }
 
@@ -98,54 +97,54 @@ func (a aggregate) Scan(value interface{}) error {
 
 func (f *AutoField) Scan(value interface{}) error {
 	result, ok := value.(int64)
-	f.Value, f.Valid = int32(result), ok
+	f.Value, f.valid = int32(result), ok
 	return nil
 }
 
 func (f *BigAutoField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(int64)
+	f.Value, f.valid = value.(int64)
 	return nil
 }
 
 func (f *BigIntegerField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(int64)
+	f.Value, f.valid = value.(int64)
 	return nil
 }
 
 func (f *BooleanField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(bool)
+	f.Value, f.valid = value.(bool)
 	return nil
 }
 
 func (f *FloatField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(float64)
+	f.Value, f.valid = value.(float64)
 	return nil
 }
 
 func (f *IntegerField) Scan(value interface{}) error {
 	result, ok := value.(int64)
-	f.Value, f.Valid = int32(result), ok
+	f.Value, f.valid = int32(result), ok
 	return nil
 }
 
 func (f *SmallIntegerField) Scan(value interface{}) error {
 	result, ok := value.(int64)
-	f.Value, f.Valid = int16(result), ok
+	f.Value, f.valid = int16(result), ok
 	return nil
 }
 
 func (f *TextField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(string)
+	f.Value, f.valid = value.(string)
 	return nil
 }
 
 func (f *ForeignKey) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(int64)
+	f.Value, f.valid = value.(int64)
 	return nil
 }
 
 func (f *OneToOneField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(int64)
+	f.Value, f.valid = value.(int64)
 	return nil
 }
 
@@ -192,50 +191,6 @@ func (f *ForeignKey) getValue() interface{} {
 func (f *OneToOneField) getValue() interface{} {
 	return f.Value
 }
-
-// func (a aggregate) getPtr() unsafe.Pointer {
-// 	return a.outputField.getPtr()
-// }
-//
-// func (f *AutoField) getPtr() unsafe.Pointer {
-// 	return unsafe.Pointer(f.pointer)
-// }
-//
-// func (f *BigAutoField) getPtr() unsafe.Pointer {
-// 	return unsafe.Pointer(f.pointer)
-// }
-//
-// func (f *BigIntegerField) getPtr() unsafe.Pointer {
-// 	return unsafe.Pointer(f.pointer)
-// }
-//
-// func (f *BooleanField) getPtr() unsafe.Pointer {
-// 	return unsafe.Pointer(f.pointer)
-// }
-//
-// func (f *FloatField) getPtr() unsafe.Pointer {
-// 	return unsafe.Pointer(f.pointer)
-// }
-//
-// func (f *IntegerField) getPtr() unsafe.Pointer {
-// 	return unsafe.Pointer(f.pointer)
-// }
-//
-// func (f *SmallIntegerField) getPtr() unsafe.Pointer {
-// 	return unsafe.Pointer(f.pointer)
-// }
-//
-// func (f *TextField) getPtr() unsafe.Pointer {
-// 	return unsafe.Pointer(f.pointer)
-// }
-//
-// func (f *ForeignKey) getPtr() unsafe.Pointer {
-// 	return unsafe.Pointer(f.pointer)
-// }
-//
-// func (f *OneToOneField) getPtr() unsafe.Pointer {
-// 	return unsafe.Pointer(f.pointer)
-// }
 
 func (a aggregate) getGoType() string {
 	return a.outputField.getGoType()
