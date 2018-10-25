@@ -197,25 +197,6 @@ func (m *Model) update() error {
 	return err
 }
 
-// func (m *Model) update() string {
-// 	sql := "UPDATE " + dbq(m.dbTable) + " SET "
-// 	var pk field
-//
-// 	for _, field := range m.fields {
-// 		if field.hasPrimaryKeyConstraint() {
-// 			pk = field
-// 			continue
-// 		}
-//
-// 		sql += dbq(field.getDbColumn()) + " = " + field.valueToSql() + ", "
-// 	}
-//
-// 	sql = sql[:len(sql)-2]
-// 	sql += " WHERE " + dbq(pk.getDbColumn()) + " = " + pk.valueToSql()
-//
-// 	return sql
-// }
-
 //Creates the Database table
 func (m Model) Migrate() error {
 	return m.CreateTable()

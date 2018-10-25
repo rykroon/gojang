@@ -30,11 +30,13 @@ type primaryKeyField interface {
 }
 
 func (f *AutoField) Id() int {
-	return int(f.Value)
+	//return int(f.Value)
+	return f.Val()
 }
 
 func (f *BigAutoField) Id() int {
-	return int(f.Value)
+	//return int(f.Value)
+	return f.Val()
 }
 
 func (f *AutoField) isAutoField() bool {

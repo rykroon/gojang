@@ -2,12 +2,26 @@ package gojang
 
 import (
 	//"database/sql"
-	//"reflect"
+	"reflect"
 	"strconv"
 	"strings"
 )
 
 //auxillary functions used in all programs
+
+type value reflect.Value
+
+// type value struct {
+// 	outputField field
+// }
+
+func newValue(v interface{}) value {
+	return value(reflect.ValueOf(v))
+}
+
+func (v value) asSql() string {
+	return ""
+}
 
 func doubleQuotes(s string) string {
 	return "\"" + s + "\""

@@ -40,6 +40,11 @@ func (m Manager) Get(lookups ...lookup) (interface{}, error) {
 	return qs.Get(lookups...)
 }
 
+func (m Manager) Create(fields ...field) error {
+	qs := newQuerySet(m.model)
+	return qs.Create(fields...)
+}
+
 func (m Manager) Count() (int, error) {
 	qs := newQuerySet(m.model)
 	return qs.Count()

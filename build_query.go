@@ -5,7 +5,9 @@ import ()
 func (q QuerySet) buildQuery() string {
 	sql := ""
 
-	if q.update {
+	if q.insert {
+		sql += "INSERT INTO "
+	} else if q.update {
 		sql += "UPDATE "
 	} else if q.delete {
 		sql += "DELETE "
@@ -15,13 +17,17 @@ func (q QuerySet) buildQuery() string {
 
 	sql += q.processFrom()
 
-	if q.update {
+	if q.insert {
+		sql += q.processInsert()
+	} else if q.update {
 		sql += q.processUpdate()
 	}
 
-	sql += q.processWhere()
+	if !q.insert {
+		sql += q.processWhere()
+	}
 
-	if !(q.update || q.delete) {
+	if !(q.insert || q.update || q.delete) {
 		sql += q.processOrderBy()
 	}
 
@@ -50,7 +56,7 @@ func (q QuerySet) processFrom() string {
 	sql := ""
 	tableName := dbq(q.model.dbTable)
 
-	if q.update {
+	if q.insert || q.update {
 		sql = tableName
 		return sql
 	}
@@ -62,6 +68,21 @@ func (q QuerySet) processFrom() string {
 	}
 
 	return sql
+}
+
+func (q QuerySet) processInsert() string {
+	columns := "("
+	values := "("
+
+	for _, field := range q.set {
+		columns += dbq(field.getDbColumn()) + ", "
+		values += field.valueToSql() + ", "
+	}
+
+	columns = columns[:len(columns)-2] + ")"
+	values = values[:len(values)-2] + ")"
+
+	return columns + " VALUES " + values
 }
 
 func (q QuerySet) processUpdate() string {

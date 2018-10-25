@@ -14,6 +14,7 @@ type QuerySet struct {
 	//distinct  bool
 	selected []selectExpression
 	//deferred
+	insert bool
 	update bool
 	delete bool
 
@@ -131,6 +132,23 @@ func (q QuerySet) Get(lookups ...lookup) ([]interface{}, error) {
 	}
 
 	return result, nil
+}
+
+func (q QuerySet) Create(fields ...field) error {
+	q.insert = true
+
+	for _, field := range fields {
+		q.set = append(q.set, field)
+	}
+
+	q.Query = q.buildQuery()
+	_, err := q.exec()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 //Returns an integer representing the number of objects in the database matching the QuerySet.
