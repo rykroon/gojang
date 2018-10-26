@@ -16,9 +16,7 @@ type function struct {
 type aggregate function
 
 func (f function) asSql() string {
-	result := fmt.Sprintf(f.template, f.args...)
-	fmt.Println(result)
-	return result
+	return fmt.Sprintf(f.template, f.args...)
 }
 
 func (f function) Scan(v interface{}) error {
@@ -39,6 +37,11 @@ func (a aggregate) Scan(v interface{}) error {
 
 func (a aggregate) getValue() interface{} {
 	return function(a).getValue()
+}
+
+func (a aggregate) As(alias string) aggregate {
+	a.outputField.setDbColumn(alias)
+	return a
 }
 
 //Create a new function
@@ -73,8 +76,8 @@ func newCast(expr expression, outputField field) function {
 }
 
 //Creates a new COUNT Function
-func newCount(expr expression, distinct bool) function {
-	count := newFunc("COUNT", expr, NewIntegerField())
+func newCount(expr expression, distinct bool) aggregate {
+	count := newAgg("COUNT", expr, NewIntegerField())
 
 	if distinct {
 		count.template = "%v(DISTINCT %v)"
@@ -105,7 +108,7 @@ func avgField(field field) aggregate {
 }
 
 //Creates a new Count function for a field
-func countField(field field, distinct bool) function {
+func countField(field field, distinct bool) aggregate {
 	count := newCount(field, distinct)
 	alias := field.getDbColumn() + "__count"
 	count.outputField.setDbColumn(alias)
@@ -143,46 +146,46 @@ func (f *SmallIntegerField) Avg() aggregate {
 	return avgField(f)
 }
 
-func (s star) Count() function {
+func (s star) Count() aggregate {
 	return newCount(s, false)
 }
 
-func (f *AutoField) Count(distinct bool) function {
+func (f *AutoField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }
 
-func (f *BigAutoField) Count(distinct bool) function {
+func (f *BigAutoField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }
 
-func (f *BigIntegerField) Count(distinct bool) function {
+func (f *BigIntegerField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }
 
-func (f *BooleanField) Count(distinct bool) function {
+func (f *BooleanField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }
 
-func (f *FloatField) Count(distinct bool) function {
+func (f *FloatField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }
 
-func (f *IntegerField) Count(distinct bool) function {
+func (f *IntegerField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }
 
-func (f *SmallIntegerField) Count(distinct bool) function {
+func (f *SmallIntegerField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }
 
-func (f *TextField) Count(distinct bool) function {
+func (f *TextField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }
 
-func (f *ForeignKey) Count(distinct bool) function {
+func (f *ForeignKey) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }
 
-func (f *OneToOneField) Count(distinct bool) function {
+func (f *OneToOneField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }

@@ -19,6 +19,11 @@ type selectExpression interface {
 	//getGoType() string //only commented out because I realized I am not using it
 }
 
+// type annotation interface {
+// 	expression
+// 	As()
+// }
+
 type sortExpression struct {
 	field field
 	desc  bool

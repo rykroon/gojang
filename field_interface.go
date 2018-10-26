@@ -32,7 +32,7 @@ type field interface {
 
 	Asc() sortExpression
 	Desc() sortExpression
-	Count(bool) function
+	Count(bool) aggregate
 
 	valueToSql() string
 	copy() field
