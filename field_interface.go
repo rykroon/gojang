@@ -17,9 +17,14 @@ type field interface {
 	validate()
 
 	setModel(*Model)
+	getModel() *Model
+	hasModel() bool
 	getDbColumn() string
 	setDbColumn(string)
 	getDbType() string
+
+	getExpr() expression
+	setExpr(expression)
 
 	IsNil() bool
 	SetNil() error
@@ -27,10 +32,90 @@ type field interface {
 
 	Asc() sortExpression
 	Desc() sortExpression
-	Count(bool) aggregate
+	//Count(bool) aggregate
 
 	valueToSql() string
 	copy() field
+}
+
+func (f *AutoField) getExpr() expression {
+	return f.expr
+}
+
+func (f *BigAutoField) getExpr() expression {
+	return f.expr
+}
+
+func (f *BigIntegerField) getExpr() expression {
+	return f.expr
+}
+
+func (f *BooleanField) getExpr() expression {
+	return f.expr
+}
+
+func (f *FloatField) getExpr() expression {
+	return f.expr
+}
+
+func (f *IntegerField) getExpr() expression {
+	return f.expr
+}
+
+func (f *SmallIntegerField) getExpr() expression {
+	return f.expr
+}
+
+func (f *TextField) getExpr() expression {
+	return f.expr
+}
+
+func (f *ForeignKey) getExpr() expression {
+	return f.expr
+}
+
+func (f *OneToOneField) getExpr() expression {
+	return f.expr
+}
+
+func (f *AutoField) setExpr(expr expression) {
+	f.expr = expr
+}
+
+func (f *BigAutoField) setExpr(expr expression) {
+	f.expr = expr
+}
+
+func (f *BigIntegerField) setExpr(expr expression) {
+	f.expr = expr
+}
+
+func (f *BooleanField) setExpr(expr expression) {
+	f.expr = expr
+}
+
+func (f *FloatField) setExpr(expr expression) {
+	f.expr = expr
+}
+
+func (f *IntegerField) setExpr(expr expression) {
+	f.expr = expr
+}
+
+func (f *SmallIntegerField) setExpr(expr expression) {
+	f.expr = expr
+}
+
+func (f *TextField) setExpr(expr expression) {
+	f.expr = expr
+}
+
+func (f *ForeignKey) setExpr(expr expression) {
+	f.expr = expr
+}
+
+func (f *OneToOneField) setExpr(expr expression) {
+	f.expr = expr
 }
 
 func (f *AutoField) copy() field {
@@ -623,6 +708,86 @@ func (f *ForeignKey) setModel(model *Model) {
 
 func (f *OneToOneField) setModel(model *Model) {
 	f.model = model
+}
+
+func (f *AutoField) getModel() *Model {
+	return f.model
+}
+
+func (f *BigAutoField) getModel() *Model {
+	return f.model
+}
+
+func (f *BigIntegerField) getModel() *Model {
+	return f.model
+}
+
+func (f *BooleanField) getModel() *Model {
+	return f.model
+}
+
+func (f *FloatField) getModel() *Model {
+	return f.model
+}
+
+func (f *IntegerField) getModel() *Model {
+	return f.model
+}
+
+func (f *SmallIntegerField) getModel() *Model {
+	return f.model
+}
+
+func (f *TextField) getModel() *Model {
+	return f.model
+}
+
+func (f *ForeignKey) getModel() *Model {
+	return f.model
+}
+
+func (f *OneToOneField) getModel() *Model {
+	return f.model
+}
+
+func (f *AutoField) hasModel() bool {
+	return f.model != nil
+}
+
+func (f *BigAutoField) hasModel() bool {
+	return f.model != nil
+}
+
+func (f *BigIntegerField) hasModel() bool {
+	return f.model != nil
+}
+
+func (f *BooleanField) hasModel() bool {
+	return f.model != nil
+}
+
+func (f *FloatField) hasModel() bool {
+	return f.model != nil
+}
+
+func (f *IntegerField) hasModel() bool {
+	return f.model != nil
+}
+
+func (f *SmallIntegerField) hasModel() bool {
+	return f.model != nil
+}
+
+func (f *TextField) hasModel() bool {
+	return f.model != nil
+}
+
+func (f *ForeignKey) hasModel() bool {
+	return f.model != nil
+}
+
+func (f *OneToOneField) hasModel() bool {
+	return f.model != nil
 }
 
 func (f *AutoField) getDbColumn() string {

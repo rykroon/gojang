@@ -23,6 +23,8 @@ type AutoField struct {
 	primaryKey bool
 	isRelation bool
 
+	expr expression
+
 	valid bool
 	Value int32
 }
@@ -36,6 +38,8 @@ type BigAutoField struct {
 	unique     bool
 	primaryKey bool
 	isRelation bool
+
+	expr expression
 
 	valid bool
 	Value int64
@@ -51,6 +55,8 @@ type BigIntegerField struct {
 	primaryKey bool
 	isRelation bool
 
+	expr expression
+
 	valid bool
 	Value int64
 }
@@ -64,6 +70,8 @@ type BooleanField struct {
 	unique     bool
 	primaryKey bool
 	isRelation bool
+
+	expr expression
 
 	valid bool
 	Value bool
@@ -79,6 +87,8 @@ type FloatField struct {
 	primaryKey bool
 	isRelation bool
 
+	expr expression
+
 	valid bool
 	Value float64
 }
@@ -92,6 +102,8 @@ type IntegerField struct {
 	unique     bool
 	primaryKey bool
 	isRelation bool
+
+	expr expression
 
 	valid bool
 	Value int32
@@ -107,6 +119,8 @@ type SmallIntegerField struct {
 	primaryKey bool
 	isRelation bool
 
+	expr expression
+
 	valid bool
 	Value int16
 }
@@ -121,6 +135,8 @@ type TextField struct {
 	primaryKey bool
 	isRelation bool
 
+	expr expression
+
 	valid bool
 	Value string
 }
@@ -134,6 +150,8 @@ type ForeignKey struct {
 	unique     bool
 	primaryKey bool
 	isRelation bool
+
+	expr expression
 
 	//specific for related fields
 	manyToMany   bool
@@ -156,6 +174,8 @@ type OneToOneField struct {
 	unique     bool
 	primaryKey bool
 	isRelation bool
+
+	expr expression
 
 	//specific for related fields
 	manyToMany   bool

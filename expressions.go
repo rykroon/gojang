@@ -51,44 +51,52 @@ func (e sortExpression) asSql() string {
 	}
 }
 
+func fieldAsSql(field field) string {
+	if field.hasModel() {
+		return dbq(field.getModel().dbTable) + "." + dbq(field.getDbColumn())
+	} else {
+		return field.getExpr().asSql() + " AS " + dbq(field.getDbColumn())
+	}
+}
+
 func (f *AutoField) asSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+	return fieldAsSql(f)
 }
 
 func (f *BigAutoField) asSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+	return fieldAsSql(f)
 }
 
 func (f *BigIntegerField) asSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+	return fieldAsSql(f)
 }
 
 func (f *BooleanField) asSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+	return fieldAsSql(f)
 }
 
 func (f *FloatField) asSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+	return fieldAsSql(f)
 }
 
 func (f *IntegerField) asSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+	return fieldAsSql(f)
 }
 
 func (f *SmallIntegerField) asSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+	return fieldAsSql(f)
 }
 
 func (f *TextField) asSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+	return fieldAsSql(f)
 }
 
 func (f *ForeignKey) asSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+	return fieldAsSql(f)
 }
 
 func (f *OneToOneField) asSql() string {
-	return dbq(f.model.dbTable) + "." + dbq(f.dbColumn)
+	return fieldAsSql(f)
 }
 
 func (a aggregate) Scan(value interface{}) error {
