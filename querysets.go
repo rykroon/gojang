@@ -2,7 +2,7 @@ package gojang
 
 import (
 	"database/sql"
-	"fmt"
+	//"fmt"
 	//"reflect"
 )
 
@@ -173,19 +173,16 @@ func (q QuerySet) Count() (int, error) {
 //Returns a map of aggregate values (averages, sums, etc.) calculated over
 //the QuerySet. Each argument to aggregate() specifies a value that will
 //be included in the map that is returned.
-//func (q *QuerySet) Aggregate(aggregates ...aggregate) (map[string]interface{}, error) {
-func (q *QuerySet) Aggregate(aggregates ...function) (map[string]interface{}, error) {
+func (q *QuerySet) Aggregate(aggregates ...aggregate) (map[string]interface{}, error) {
 	q.selected = nil
 	q.orderBy = nil
 	result := make(map[string]interface{})
 
 	for _, expr := range aggregates {
-		//q.selected = append(q.selected, expr)
-		q.selected = append(q.selected, expr.outputField)
+		q.selected = append(q.selected, expr)
 	}
 
 	q.Query = q.buildQuery()
-	fmt.Println(q.Query)
 	err := q.queryRowAndScan()
 
 	if err != nil {
@@ -193,8 +190,7 @@ func (q *QuerySet) Aggregate(aggregates ...function) (map[string]interface{}, er
 	}
 
 	for _, agg := range aggregates {
-		//result[agg.alias] = agg.getValue()
-		result[agg.outputField.getDbColumn()] = agg.outputField.getValue()
+		result[agg.outputField.getDbColumn()] = agg.getValue()
 	}
 
 	return result, nil

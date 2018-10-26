@@ -50,8 +50,7 @@ func (m Manager) Count() (int, error) {
 	return qs.Count()
 }
 
-//func (m Manager) Aggregate(aggregates ...aggregate) (map[string]interface{}, error) {
-func (m Manager) Aggregate(aggregates ...function) (map[string]interface{}, error) {
+func (m Manager) Aggregate(aggregates ...aggregate) (map[string]interface{}, error) {
 	qs := newQuerySet(m.model)
 	return qs.Aggregate(aggregates...)
 }

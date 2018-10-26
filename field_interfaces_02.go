@@ -4,7 +4,7 @@ import ()
 
 type numericField interface {
 	field
-	Avg() function
+	Avg() aggregate
 	//Avg() aggregate
 	//Sum() aggregate
 }

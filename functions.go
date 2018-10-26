@@ -13,12 +13,32 @@ type function struct {
 	outputField field
 }
 
-//type aggregate function
+type aggregate function
 
 func (f function) asSql() string {
 	result := fmt.Sprintf(f.template, f.args...)
 	fmt.Println(result)
 	return result
+}
+
+func (f function) Scan(v interface{}) error {
+	return f.outputField.Scan(v)
+}
+
+func (f function) getValue() interface{} {
+	return f.outputField.getValue()
+}
+
+func (a aggregate) asSql() string {
+	return function(a).asSql()
+}
+
+func (a aggregate) Scan(v interface{}) error {
+	return function(a).Scan(v)
+}
+
+func (a aggregate) getValue() interface{} {
+	return function(a).getValue()
 }
 
 //Create a new function
@@ -34,9 +54,13 @@ func newFunc(name string, expr expression, outputField field) function {
 	return funct
 }
 
+func newAgg(name string, expr expression, outputField field) aggregate {
+	return aggregate(newFunc(name, expr, outputField))
+}
+
 //Creates a new AVG Function
-func newAvg(expr expression) function {
-	return newFunc("AVG", expr, NewFloatField())
+func newAvg(expr expression) aggregate {
+	return newAgg("AVG", expr, NewFloatField())
 }
 
 //Creates a new CAST Function
@@ -54,9 +78,8 @@ func newCount(expr expression, distinct bool) function {
 
 	if distinct {
 		count.template = "%v(DISTINCT %v)"
+		count.outputField.setExpr(count)
 	}
-
-	count.outputField.setExpr(count)
 
 	return count
 }
@@ -67,7 +90,7 @@ func newSum(expr expression, outputField field) function {
 }
 
 //Creates a new AVG function for a field
-func avgField(field field) function {
+func avgField(field field) aggregate {
 	avg := newAvg(field)
 	alias := field.getDbColumn() + "__avg"
 	avg.outputField.setDbColumn(alias)
@@ -75,32 +98,91 @@ func avgField(field field) function {
 	if field.getDbType() != avg.outputField.getDbType() {
 		cast := newCast(avg, avg.outputField)
 		cast.outputField.setDbColumn(alias)
-		return cast
+		return aggregate(cast)
 	}
 
 	return avg
 }
 
-func (f *AutoField) Avg() function {
+//Creates a new Count function for a field
+func countField(field field, distinct bool) function {
+	count := newCount(field, distinct)
+	alias := field.getDbColumn() + "__count"
+	count.outputField.setDbColumn(alias)
+	return count
+}
+
+// func sumField(field field) function {
+//   sum := newSum(field)
+//   alias := field.getDbColumn() + "__sum"
+//   sum.outputField.setDbColumn(alias)
+//   return sum
+// }
+
+func (f *AutoField) Avg() aggregate {
 	return avgField(f)
 }
 
-func (f *BigAutoField) Avg() function {
+func (f *BigAutoField) Avg() aggregate {
 	return avgField(f)
 }
 
-func (f *BigIntegerField) Avg() function {
+func (f *BigIntegerField) Avg() aggregate {
 	return avgField(f)
 }
 
-func (f *FloatField) Avg() function {
+func (f *FloatField) Avg() aggregate {
 	return avgField(f)
 }
 
-func (f *IntegerField) Avg() function {
+func (f *IntegerField) Avg() aggregate {
 	return avgField(f)
 }
 
-func (f *SmallIntegerField) Avg() function {
+func (f *SmallIntegerField) Avg() aggregate {
 	return avgField(f)
+}
+
+func (s star) Count() function {
+	return newCount(s, false)
+}
+
+func (f *AutoField) Count(distinct bool) function {
+	return countField(f, distinct)
+}
+
+func (f *BigAutoField) Count(distinct bool) function {
+	return countField(f, distinct)
+}
+
+func (f *BigIntegerField) Count(distinct bool) function {
+	return countField(f, distinct)
+}
+
+func (f *BooleanField) Count(distinct bool) function {
+	return countField(f, distinct)
+}
+
+func (f *FloatField) Count(distinct bool) function {
+	return countField(f, distinct)
+}
+
+func (f *IntegerField) Count(distinct bool) function {
+	return countField(f, distinct)
+}
+
+func (f *SmallIntegerField) Count(distinct bool) function {
+	return countField(f, distinct)
+}
+
+func (f *TextField) Count(distinct bool) function {
+	return countField(f, distinct)
+}
+
+func (f *ForeignKey) Count(distinct bool) function {
+	return countField(f, distinct)
+}
+
+func (f *OneToOneField) Count(distinct bool) function {
+	return countField(f, distinct)
 }
