@@ -600,73 +600,73 @@ func (f *OneToOneField) hasRelation() bool {
 
 func (f *AutoField) validate() {
 	if !f.primaryKey {
-		panic(NewForcePrimaryKey(f))
+		panic(NewForceConstraint(f, "primary key"))
 	}
 
 	if f.primaryKey && f.null {
-		panic(NewNullPrimaryKeyErr())
+		panic(NewConstraintConflict(f, "primary key", "null"))
 	}
 }
 
 func (f *BigAutoField) validate() {
 	if !f.primaryKey {
-		panic(NewForcePrimaryKey(f))
+		panic(NewForceConstraint(f, "primary key"))
 	}
 
 	if f.primaryKey && f.null {
-		panic(NewNullPrimaryKeyErr())
+		panic(NewConstraintConflict(f, "primary key", "null"))
 	}
 }
 
 func (f *BigIntegerField) validate() {
 	if f.primaryKey && f.null {
-		panic(NewNullPrimaryKeyErr())
+		panic(NewConstraintConflict(f, "primary key", "null"))
 	}
 }
 
 func (f *BooleanField) validate() {
-	if f.primaryKey && f.null {
-		panic(NewNullPrimaryKeyErr())
+	if f.primaryKey {
+		panic(NewInvalidConstraint(f, "primary key"))
 	}
 }
 
 func (f *FloatField) validate() {
-	if f.primaryKey && f.null {
-		panic(NewNullPrimaryKeyErr())
+	if f.primaryKey {
+		panic(NewInvalidConstraint(f, "primary key"))
 	}
 }
 
 func (f *IntegerField) validate() {
 	if f.primaryKey && f.null {
-		panic(NewNullPrimaryKeyErr())
+		panic(NewConstraintConflict(f, "primary key", "null"))
 	}
 }
 
 func (f *SmallIntegerField) validate() {
 	if f.primaryKey && f.null {
-		panic(NewNullPrimaryKeyErr())
+		panic(NewConstraintConflict(f, "primary key", "null"))
 	}
 }
 
 func (f *TextField) validate() {
-	if f.primaryKey && f.null {
-		panic(NewNullPrimaryKeyErr())
+	if f.primaryKey {
+		panic(NewInvalidConstraint(f, "primary key"))
 	}
 }
 
 func (f *ForeignKey) validate() {
-	if f.primaryKey && f.null {
-		panic(NewNullPrimaryKeyErr())
+	if f.primaryKey {
+		panic(NewInvalidConstraint(f, "primary key"))
 	}
 }
 
 func (f *OneToOneField) validate() {
-	if f.primaryKey && f.null {
-		panic(NewNullPrimaryKeyErr())
+	if f.primaryKey {
+		panic(NewInvalidConstraint(f, "primary key"))
 	}
 
 	if !f.unique {
-		panic("OneToOneField must be unique")
+		panic(NewForceConstraint(f, "unique"))
 	}
 }
 

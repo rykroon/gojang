@@ -88,13 +88,13 @@ func MakeModel(i interface{}) error {
 				pkeyField, ok := field.(primaryKeyField)
 
 				if !ok {
-					panic(NewInvalidPrimaryKey(field))
+					panic(NewInvalidConstraint(field, "primary key"))
 				}
 
 				numOfPKs += 1
 
 				if numOfPKs > 1 {
-					panic("gojang: Model cannot have more than one primary key")
+					panic(NewMultiplePrimaryKeyError(*model))
 				}
 
 				model.Pk = pkeyField
@@ -120,7 +120,7 @@ func (m *Model) addField(f field) {
 
 	_, duplicate := m.colToFields[columnName]
 	if duplicate {
-		panic("gojang: Model cannot have two columns with the same name")
+		panic(NewDuplicateColumnError(columnName))
 	}
 
 	m.colToFields[columnName] = f

@@ -267,11 +267,11 @@ func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 }
 
 func (f *AutoField) SetNil() error {
-	return NewCannotSetNil()
+	return NewNotNullConstraintViolation()
 }
 
 func (f *BigAutoField) SetNil() error {
-	return NewCannotSetNil()
+	return NewNotNullConstraintViolation()
 }
 
 func (f *BigIntegerField) SetNil() error {
@@ -280,7 +280,7 @@ func (f *BigIntegerField) SetNil() error {
 		f.Value = 0
 		return nil
 	} else {
-		return NewCannotSetNil()
+		return NewNotNullConstraintViolation()
 	}
 }
 
@@ -290,7 +290,7 @@ func (f *BooleanField) SetNil() error {
 		f.Value = false
 		return nil
 	} else {
-		return NewCannotSetNil()
+		return NewNotNullConstraintViolation()
 	}
 }
 
@@ -300,7 +300,7 @@ func (f *FloatField) SetNil() error {
 		f.Value = 0
 		return nil
 	} else {
-		return NewCannotSetNil()
+		return NewNotNullConstraintViolation()
 	}
 }
 
@@ -310,7 +310,7 @@ func (f *IntegerField) SetNil() error {
 		f.Value = 0
 		return nil
 	} else {
-		return NewCannotSetNil()
+		return NewNotNullConstraintViolation()
 	}
 }
 
@@ -320,7 +320,7 @@ func (f *SmallIntegerField) SetNil() error {
 		f.Value = 0
 		return nil
 	} else {
-		return NewCannotSetNil()
+		return NewNotNullConstraintViolation()
 	}
 }
 
@@ -330,7 +330,7 @@ func (f *TextField) SetNil() error {
 		f.Value = ""
 		return nil
 	} else {
-		return NewCannotSetNil()
+		return NewNotNullConstraintViolation()
 	}
 }
 
@@ -340,7 +340,7 @@ func (f *ForeignKey) SetNil() error {
 		f.Value = 0
 		return nil
 	} else {
-		return NewCannotSetNil()
+		return NewNotNullConstraintViolation()
 	}
 }
 
@@ -350,7 +350,7 @@ func (f *OneToOneField) SetNil() error {
 		f.Value = 0
 		return nil
 	} else {
-		return NewCannotSetNil()
+		return NewNotNullConstraintViolation()
 	}
 }
 
