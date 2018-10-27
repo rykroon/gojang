@@ -34,37 +34,37 @@ func (f *TextField) asAssignment() assignment {
 }
 
 func (f *BigIntegerField) Assign(value int64) assignment {
-	f.Value = value
-	f.valid = true
-	return f.asAssignment()
+	field := f.copy()
+	field.Value = value
+	return assignment(field.Exact(int(value)))
 }
 
 func (f *BooleanField) Assign(value bool) assignment {
-	f.Value = value
-	f.valid = true
-	return f.asAssignment()
+	field := f.copy()
+	field.Value = value
+	return assignment(field.Exact(value))
 }
 
 func (f *FloatField) Assign(value float64) assignment {
-	f.Value = value
-	f.valid = true
-	return f.asAssignment()
+	field := f.copy()
+	field.Value = value
+	return assignment(field.Exact(value))
 }
 
 func (f *IntegerField) Assign(value int32) assignment {
-	f.Value = value
-	f.valid = true
-	return f.asAssignment()
+	field := f.copy()
+	field.Value = value
+	return assignment(field.Exact(int(value)))
 }
 
 func (f *SmallIntegerField) Assign(value int16) assignment {
-	f.Value = value
-	f.valid = true
-	return f.asAssignment()
+	field := f.copy()
+	field.Value = value
+	return assignment(field.Exact(int(value)))
 }
 
 func (f *TextField) Assign(value string) assignment {
-	f.Value = value
-	f.valid = true
-	return f.asAssignment()
+	field := f.copy()
+	field.Value = value
+	return assignment(field.Exact(value))
 }

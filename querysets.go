@@ -25,16 +25,13 @@ type QuerySet struct {
 	Ordered bool
 	orderBy []sortExpression
 
-	//rows sql.Rows //cache
-	//rows []row
-
 	ResultCache []object
 }
 
 func newQuerySet(model *Model) QuerySet {
 	q := QuerySet{model: model, db: model.db}
 	for _, field := range model.fields {
-		q.selected = append(q.selected, field.copy())
+		q.selected = append(q.selected, field.copyField())
 	}
 
 	q.Query = q.buildQuery()
@@ -51,7 +48,9 @@ func (q *QuerySet) Evaluate() ([]object, error) {
 	return q.ResultCache, nil
 }
 
+//
 //Functions that return QuerySets
+//
 
 //Returns a new QuerySet containing objects that match the given lookup parameters.
 func (q QuerySet) Filter(lookups ...lookup) QuerySet {
@@ -98,7 +97,9 @@ func (q QuerySet) All() QuerySet {
 // 	return q
 // }
 
+//
 //Functions that do not return Querysets
+//
 
 //populates the Model associated with the queryset with the data returned from the query
 func (q QuerySet) Get(lookups ...lookup) (object, error) {
@@ -143,21 +144,30 @@ func (q QuerySet) Get(lookups ...lookup) (object, error) {
 	return obj, nil
 }
 
-func (q QuerySet) Create(assignments ...assignment) error {
+func (q QuerySet) Create(assignments ...assignment) (object, error) {
 	q.insert = true
+	q.selected = nil
+	q.selected = append(q.selected, q.model.Pk.copyField())
+	obj := newObj()
 
 	for _, assign := range assignments {
 		q.set = append(q.set, assign)
 	}
 
 	q.Query = q.buildQuery()
-	_, err := q.exec()
+	pkeyName := q.model.Pk.getDbColumn()
+	q.Query += " RETURNING " + dbq(pkeyName)
 
+	obj, err := q.queryRowAndScan()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	for _, assign := range assignments {
+		obj.SetAttr(assign.lhs.getDbColumn(), assign.lhs.getValue())
+	}
+
+	return obj, nil
 }
 
 //Returns an integer representing the number of objects in the database matching the QuerySet.
@@ -178,7 +188,6 @@ func (q QuerySet) Count() (int, error) {
 		return 0, err
 	}
 
-	//result := int(countExpr.getValue().(int32))
 	return result, nil
 }
 
@@ -188,7 +197,6 @@ func (q QuerySet) Count() (int, error) {
 func (q *QuerySet) Aggregate(aggregates ...aggregate) (object, error) {
 	q.selected = nil
 	q.orderBy = nil
-	//result := make(map[string]interface{})
 
 	for _, expr := range aggregates {
 		q.selected = append(q.selected, expr)
@@ -200,10 +208,6 @@ func (q *QuerySet) Aggregate(aggregates ...aggregate) (object, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// for _, agg := range aggregates {
-	// 	result[agg.outputField.getDbColumn()] = agg.getValue()
-	// }
 
 	return obj, nil
 }

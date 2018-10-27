@@ -2,6 +2,11 @@ package gojang
 
 import ()
 
+// type stringField interface {
+// 	Val() string
+// 	set(string)
+// }
+
 type numericField interface {
 	field
 	Avg() aggregate
@@ -30,12 +35,10 @@ type primaryKeyField interface {
 }
 
 func (f *AutoField) Id() int {
-	//return int(f.Value)
 	return f.Val()
 }
 
 func (f *BigAutoField) Id() int {
-	//return int(f.Value)
 	return f.Val()
 }
 

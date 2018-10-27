@@ -204,13 +204,53 @@ func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 	return field
 }
 
-// func (f *AutoField) SetNil() error {
-// 	return NewNotNullConstraintViolation()
-// }
-//
-// func (f *BigAutoField) SetNil() error {
-// 	return NewNotNullConstraintViolation()
-// }
+func (f *BigIntegerField) copy() *BigIntegerField {
+	copy := NewBigIntegerField()
+	copy.model = f.model //maybe change to be a copy of the model
+	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
+	return copy
+}
+
+func (f *BooleanField) copy() *BooleanField {
+	copy := NewBooleanField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
+	return copy
+}
+
+func (f *FloatField) copy() *FloatField {
+	copy := NewFloatField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
+	return copy
+}
+
+func (f *IntegerField) copy() *IntegerField {
+	copy := NewIntegerField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
+	return copy
+}
+
+func (f *SmallIntegerField) copy() *SmallIntegerField {
+	copy := NewSmallIntegerField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
+	return copy
+}
+
+func (f *TextField) copy() *TextField {
+	copy := NewTextField()
+	copy.model = f.model
+	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
+	return copy
+}
 
 func (f *BigIntegerField) SetNil() error {
 	if f.hasNullConstraint() {
@@ -272,34 +312,6 @@ func (f *TextField) SetNil() error {
 	}
 }
 
-// func (f *ForeignKey) SetNil() error {
-// 	if f.hasNullConstraint() {
-// 		f.valid = false
-// 		f.Value = 0
-// 		return nil
-// 	} else {
-// 		return NewNotNullConstraintViolation()
-// 	}
-// }
-//
-// func (f *OneToOneField) SetNil() error {
-// 	if f.hasNullConstraint() {
-// 		f.valid = false
-// 		f.Value = 0
-// 		return nil
-// 	} else {
-// 		return NewNotNullConstraintViolation()
-// 	}
-// }
-
-// func (f AutoField) UnSetNil() {
-// 	f.valid = true
-// }
-//
-// func (f BigAutoField) UnSetNil() {
-// 	f.valid = true
-// }
-
 func (f BigIntegerField) UnSetNil() {
 	f.valid = true
 }
@@ -323,14 +335,6 @@ func (f SmallIntegerField) UnSetNil() {
 func (f TextField) UnSetNil() {
 	f.valid = true
 }
-
-// func (f ForeignKey) UnSetNil() {
-// 	f.valid = true
-// }
-//
-// func (f OneToOneField) UnSetNil() {
-// 	f.valid = true
-// }
 
 func create(f field) string {
 	s := dbq(f.getDbColumn()) + " " + f.getDbType()

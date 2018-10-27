@@ -27,7 +27,6 @@ type field interface {
 	hasPrimaryKeyConstraint() bool
 	setPrimaryKeyConstraint(bool)
 
-	//setOptions(fieldOptions)
 	hasRelation() bool
 
 	IsNil() bool
@@ -37,8 +36,10 @@ type field interface {
 	asAssignment() assignment
 	Asc() sortExpression
 	Desc() sortExpression
-	copy() field
 	Count(bool) aggregate
+
+	copyField() field
+	new() field
 
 	validate()
 	valueAsSql() string
@@ -92,161 +93,53 @@ func (f *TextField) setExpr(expr expression) {
 	f.expr = expr
 }
 
-// func (f *AutoField) copy() field {
-// 	copy := NewAutoField()
-// 	copy.model = f.model
-// 	copy.dbColumn = f.dbColumn
-// 	return copy
-// }
-//
-// func (f *BigAutoField) copy() field {
-// 	copy := NewBigAutoField()
-// 	copy.model = f.model
-// 	copy.dbColumn = f.dbColumn
-// 	return copy
-// }
-
-func (f *BigIntegerField) copy() field {
-	copy := NewBigIntegerField()
-	copy.model = f.model //maybe change to be a copy of the model
-	copy.dbColumn = f.dbColumn
-	copy.constraints = f.constraints
-	return copy
+func (f *BigIntegerField) copyField() field {
+	return f.copy()
 }
 
-func (f *BooleanField) copy() field {
-	copy := NewBooleanField()
-	copy.model = f.model
-	copy.dbColumn = f.dbColumn
-	copy.constraints = f.constraints
-	return copy
+func (f *BooleanField) copyField() field {
+	return f.copy()
 }
 
-func (f *FloatField) copy() field {
-	copy := NewFloatField()
-	copy.model = f.model
-	copy.dbColumn = f.dbColumn
-	copy.constraints = f.constraints
-	return copy
+func (f *FloatField) copyField() field {
+	return f.copy()
 }
 
-func (f *IntegerField) copy() field {
-	copy := NewIntegerField()
-	copy.model = f.model
-	copy.dbColumn = f.dbColumn
-	copy.constraints = f.constraints
-	return copy
+func (f *IntegerField) copyField() field {
+	return f.copy()
 }
 
-func (f *SmallIntegerField) copy() field {
-	copy := NewSmallIntegerField()
-	copy.model = f.model
-	copy.dbColumn = f.dbColumn
-	copy.constraints = f.constraints
-	return copy
+func (f *SmallIntegerField) copyField() field {
+	return f.copy()
 }
 
-func (f *TextField) copy() field {
-	copy := NewTextField()
-	copy.model = f.model
-	copy.dbColumn = f.dbColumn
-	copy.constraints = f.constraints
-	return copy
+func (f *TextField) copyField() field {
+	return f.copy()
 }
 
-// func (f *ForeignKey) copy() field {
-// 	copy := NewForeignKey(f.relatedModel, f.onDelete)
-// 	copy.model = f.model
-// 	copy.dbColumn = f.dbColumn
-//	copy.constraints = f.constraints
-// 	return copy
-// }
-//
-// func (f *OneToOneField) copy() field {
-// 	copy := NewOneToOneField(f.relatedModel, f.onDelete)
-// 	copy.model = f.model
-// 	copy.dbColumn = f.dbColumn
-//	copy.constraints = f.constraints
-// 	return copy
-// }
+func (f *BigIntegerField) new() field {
+	return NewBigIntegerField()
+}
 
-// func (f *AutoField) setOptions(options fieldOptions) {
-// 	f.dbColumn = options.dbColumn
-// 	f.primaryKey = options.primaryKey
-// 	f.null = options.null
-// 	f.unique = options.unique
-// }
-//
-// func (f *BigAutoField) setOptions(options fieldOptions) {
-// 	f.dbColumn = options.dbColumn
-// 	f.primaryKey = options.primaryKey
-// 	f.null = options.null
-// 	f.unique = options.unique
-// }
+func (f *BooleanField) new() field {
+	return NewBooleanField()
+}
 
-// func (f *BigIntegerField) setOptions(options fieldOptions) {
-// 	f.dbColumn = options.dbColumn
-// 	f.primaryKey = options.primaryKey
-// 	f.null = options.null
-// 	f.unique = options.unique
-// }
-//
-// func (f *BooleanField) setOptions(options fieldOptions) {
-// 	f.dbColumn = options.dbColumn
-// 	f.primaryKey = options.primaryKey
-// 	f.null = options.null
-// 	f.unique = options.unique
-// }
-//
-// func (f *FloatField) setOptions(options fieldOptions) {
-// 	f.dbColumn = options.dbColumn
-// 	f.primaryKey = options.primaryKey
-// 	f.null = options.null
-// 	f.unique = options.unique
-// }
-//
-// func (f *IntegerField) setOptions(options fieldOptions) {
-// 	f.dbColumn = options.dbColumn
-// 	f.primaryKey = options.primaryKey
-// 	f.null = options.null
-// 	f.unique = options.unique
-// }
-//
-// func (f *SmallIntegerField) setOptions(options fieldOptions) {
-// 	f.dbColumn = options.dbColumn
-// 	f.primaryKey = options.primaryKey
-// 	f.null = options.null
-// 	f.unique = options.unique
-// }
-//
-// func (f *TextField) setOptions(options fieldOptions) {
-// 	f.dbColumn = options.dbColumn
-// 	f.primaryKey = options.primaryKey
-// 	f.null = options.null
-// 	f.unique = options.unique
-// }
+func (f *FloatField) new() field {
+	return NewFloatField()
+}
 
-// func (f *ForeignKey) setOptions(options fieldOptions) {
-// 	f.dbColumn = options.dbColumn
-// 	f.primaryKey = options.primaryKey
-// 	f.null = options.null
-// 	f.unique = options.unique
-// }
-//
-// func (f *OneToOneField) setOptions(options fieldOptions) {
-// 	f.dbColumn = options.dbColumn
-// 	f.primaryKey = options.primaryKey
-// 	f.null = options.null
-// 	f.unique = options.unique
-// }
+func (f *IntegerField) new() field {
+	return NewIntegerField()
+}
 
-// func (f *AutoField) hasNullConstraint() bool {
-// 	return f.null
-// }
-//
-// func (f *BigAutoField) hasNullConstraint() bool {
-// 	return f.null
-// }
+func (f *SmallIntegerField) new() field {
+	return NewSmallIntegerField()
+}
+
+func (f *TextField) new() field {
+	return NewTextField()
+}
 
 func (f *BigIntegerField) hasNullConstraint() bool {
 	return f.null
@@ -320,30 +213,6 @@ func (f *TextField) setNullConstraint(null bool) {
 	}
 }
 
-// func (f *ForeignKey) setNullConstraint(null bool) {
-// 	f.null = null
-//
-// 	if f.null {
-// 		f.valid = false
-// 	}
-// }
-//
-// func (f *OneToOneField) setNullConstraint(null bool) {
-// 	f.null = null
-//
-// 	if f.null {
-// 		f.valid = false
-// 	}
-// }
-
-// func (f *AutoField) hasUniqueConstraint() bool {
-// 	return f.unique
-// }
-//
-// func (f *BigAutoField) hasUniqueConstraint() bool {
-// 	return f.unique
-// }
-
 func (f *BigIntegerField) hasUniqueConstraint() bool {
 	return f.unique
 }
@@ -367,22 +236,6 @@ func (f *SmallIntegerField) hasUniqueConstraint() bool {
 func (f *TextField) hasUniqueConstraint() bool {
 	return f.unique
 }
-
-// func (f *ForeignKey) hasUniqueConstraint() bool {
-// 	return f.unique
-// }
-//
-// func (f *OneToOneField) hasUniqueConstraint() bool {
-// 	return f.unique
-// }
-
-// func (f *AutoField) setUniqueConstraint(unique bool) {
-// 	f.unique = unique
-// }
-//
-// func (f *BigAutoField) setUniqueConstraint(unique bool) {
-// 	f.unique = unique
-// }
 
 func (f *BigIntegerField) setUniqueConstraint(unique bool) {
 	f.unique = unique
@@ -408,23 +261,6 @@ func (f *TextField) setUniqueConstraint(unique bool) {
 	f.unique = unique
 }
 
-// func (f *ForeignKey) setUniqueConstraint(unique bool) {
-// 	f.unique = unique
-// }
-//
-// //The 'Unique' field option is valid on all field types except ManyToManyField and OneToOneField.
-// func (f *OneToOneField) setUniqueConstraint(unique bool) {
-// 	f.unique = unique
-// }
-//
-// func (f *AutoField) hasPrimaryKeyConstraint() bool {
-// 	return f.primaryKey
-// }
-//
-// func (f *BigAutoField) hasPrimaryKeyConstraint() bool {
-// 	return f.primaryKey
-// }
-
 func (f *BigIntegerField) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
 }
@@ -448,22 +284,6 @@ func (f *SmallIntegerField) hasPrimaryKeyConstraint() bool {
 func (f *TextField) hasPrimaryKeyConstraint() bool {
 	return f.primaryKey
 }
-
-// func (f *ForeignKey) hasPrimaryKeyConstraint() bool {
-// 	return f.primaryKey
-// }
-//
-// func (f *OneToOneField) hasPrimaryKeyConstraint() bool {
-// 	return f.primaryKey
-// }
-//
-// func (f *AutoField) setPrimaryKeyConstraint(primaryKey bool) {
-// 	f.primaryKey = primaryKey
-// }
-//
-// func (f *BigAutoField) setPrimaryKeyConstraint(primaryKey bool) {
-// 	f.primaryKey = primaryKey
-// }
 
 func (f *BigIntegerField) setPrimaryKeyConstraint(primaryKey bool) {
 	f.primaryKey = primaryKey
@@ -489,22 +309,6 @@ func (f *TextField) setPrimaryKeyConstraint(primaryKey bool) {
 	f.primaryKey = primaryKey
 }
 
-// func (f *ForeignKey) setPrimaryKeyConstraint(primaryKey bool) {
-// 	f.primaryKey = primaryKey
-// }
-//
-// func (f *OneToOneField) setPrimaryKeyConstraint(primaryKey bool) {
-// 	f.primaryKey = primaryKey
-// }
-//
-// func (f *AutoField) hasRelation() bool {
-// 	return f.isRelation
-// }
-//
-// func (f *BigAutoField) hasRelation() bool {
-// 	return f.isRelation
-// }
-
 func (f *BigIntegerField) hasRelation() bool {
 	return f.isRelation
 }
@@ -528,14 +332,6 @@ func (f *SmallIntegerField) hasRelation() bool {
 func (f *TextField) hasRelation() bool {
 	return f.isRelation
 }
-
-// func (f *ForeignKey) hasRelation() bool {
-// 	return f.isRelation
-// }
-//
-// func (f *OneToOneField) hasRelation() bool {
-// 	return f.isRelation
-// }
 
 func (f *AutoField) validate() {
 	if !f.primaryKey {
@@ -609,14 +405,6 @@ func (f *OneToOneField) validate() {
 	}
 }
 
-// func (f *AutoField) setModel(model *Model) {
-// 	f.model = model
-// }
-//
-// func (f *BigAutoField) setModel(model *Model) {
-// 	f.model = model
-// }
-
 func (f *BigIntegerField) setModel(model *Model) {
 	f.model = model
 }
@@ -640,22 +428,6 @@ func (f *SmallIntegerField) setModel(model *Model) {
 func (f *TextField) setModel(model *Model) {
 	f.model = model
 }
-
-// func (f *ForeignKey) setModel(model *Model) {
-// 	f.model = model
-// }
-//
-// func (f *OneToOneField) setModel(model *Model) {
-// 	f.model = model
-// }
-
-// func (f *AutoField) getModel() *Model {
-// 	return f.model
-// }
-//
-// func (f *BigAutoField) getModel() *Model {
-// 	return f.model
-// }
 
 func (f *BigIntegerField) getModel() *Model {
 	return f.model
@@ -681,22 +453,6 @@ func (f *TextField) getModel() *Model {
 	return f.model
 }
 
-// func (f *ForeignKey) getModel() *Model {
-// 	return f.model
-// }
-//
-// func (f *OneToOneField) getModel() *Model {
-// 	return f.model
-// }
-
-// func (f *AutoField) hasModel() bool {
-// 	return f.model != nil
-// }
-//
-// func (f *BigAutoField) hasModel() bool {
-// 	return f.model != nil
-// }
-
 func (f *BigIntegerField) hasModel() bool {
 	return f.model != nil
 }
@@ -720,22 +476,6 @@ func (f *SmallIntegerField) hasModel() bool {
 func (f *TextField) hasModel() bool {
 	return f.model != nil
 }
-
-// func (f *ForeignKey) hasModel() bool {
-// 	return f.model != nil
-// }
-//
-// func (f *OneToOneField) hasModel() bool {
-// 	return f.model != nil
-// }
-
-// func (f *AutoField) getDbColumn() string {
-// 	return f.dbColumn
-// }
-//
-// func (f *BigAutoField) getDbColumn() string {
-// 	return f.dbColumn
-// }
 
 func (f *BigIntegerField) getDbColumn() string {
 	return f.dbColumn
@@ -761,22 +501,6 @@ func (f *TextField) getDbColumn() string {
 	return f.dbColumn
 }
 
-// func (f *ForeignKey) getDbColumn() string {
-// 	return f.dbColumn
-// }
-//
-// func (f *OneToOneField) getDbColumn() string {
-// 	return f.dbColumn
-// }
-
-// func (f *AutoField) setDbColumn(columnName string) {
-// 	f.dbColumn = columnName
-// }
-//
-// func (f *BigAutoField) setDbColumn(columnName string) {
-// 	f.dbColumn = columnName
-// }
-
 func (f *BigIntegerField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
@@ -800,22 +524,6 @@ func (f *SmallIntegerField) setDbColumn(columnName string) {
 func (f *TextField) setDbColumn(columnName string) {
 	f.dbColumn = columnName
 }
-
-// func (f *ForeignKey) setDbColumn(columnName string) {
-// 	f.dbColumn = columnName
-// }
-//
-// func (f OneToOneField) setDbColumn(columnName string) {
-// 	f.dbColumn = columnName
-// }
-//
-// func (f *AutoField) getDbType() string {
-// 	return f.dbType
-// }
-//
-// func (f *BigAutoField) getDbType() string {
-// 	return f.dbType
-// }
 
 func (f *BigIntegerField) getDbType() string {
 	return f.dbType
@@ -841,22 +549,6 @@ func (f *TextField) getDbType() string {
 	return f.dbType
 }
 
-// func (f *ForeignKey) getDbType() string {
-// 	return f.dbType
-// }
-//
-// func (f *OneToOneField) getDbType() string {
-// 	return f.dbType
-// }
-
-// func (f *AutoField) IsNil() bool {
-// 	return !f.valid
-// }
-//
-// func (f *BigAutoField) IsNil() bool {
-// 	return f.valid
-// }
-
 func (f *BigIntegerField) IsNil() bool {
 	return !f.valid
 }
@@ -880,30 +572,6 @@ func (f *SmallIntegerField) IsNil() bool {
 func (f *TextField) IsNil() bool {
 	return !f.valid
 }
-
-// func (f *ForeignKey) IsNil() bool {
-// 	return !f.valid
-// }
-//
-// func (f *OneToOneField) IsNil() bool {
-// 	return !f.valid
-// }
-
-// func (f *AutoField) valueAsSql() string {
-// 	if f.IsNil() {
-// 		return "NULL"
-// 	} else {
-// 		return int32AsSql(f.Value)
-// 	}
-// }
-//
-// func (f *BigAutoField) valueAsSql() string {
-// 	if f.IsNil() {
-// 		return "NULL"
-// 	} else {
-// 		return int64AsSql(f.Value)
-// 	}
-// }
 
 func (f *BigIntegerField) valueAsSql() string {
 	if f.IsNil() {
@@ -952,19 +620,3 @@ func (f *TextField) valueAsSql() string {
 		return stringAsSql(f.Value)
 	}
 }
-
-// func (f *ForeignKey) valueAsSql() string {
-// 	if f.IsNil() {
-// 		return "NULL"
-// 	} else {
-// 		return int64AsSql(f.Value)
-// 	}
-// }
-//
-// func (f *OneToOneField) valueAsSql() string {
-// 	if f.IsNil() {
-// 		return "NULL"
-// 	} else {
-// 		return int64AsSql(f.Value)
-// 	}
-// }

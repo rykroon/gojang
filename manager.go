@@ -40,7 +40,7 @@ func (m Manager) Get(lookups ...lookup) (object, error) {
 	return qs.Get(lookups...)
 }
 
-func (m Manager) Create(assignments ...assignment) error {
+func (m Manager) Create(assignments ...assignment) (object, error) {
 	qs := newQuerySet(m.model)
 	return qs.Create(assignments...)
 }
