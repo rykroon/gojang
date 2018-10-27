@@ -1,7 +1,6 @@
 package gojang
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -14,30 +13,6 @@ type function struct {
 }
 
 type aggregate function
-
-func (f function) asSql() string {
-	return fmt.Sprintf(f.template, f.args...)
-}
-
-func (f function) Scan(v interface{}) error {
-	return f.outputField.Scan(v)
-}
-
-func (f function) getValue() interface{} {
-	return f.outputField.getValue()
-}
-
-func (a aggregate) asSql() string {
-	return function(a).asSql()
-}
-
-func (a aggregate) Scan(v interface{}) error {
-	return function(a).Scan(v)
-}
-
-func (a aggregate) getValue() interface{} {
-	return function(a).getValue()
-}
 
 func (a aggregate) As(alias string) aggregate {
 	a.outputField.setDbColumn(alias)

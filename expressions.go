@@ -1,9 +1,9 @@
 package gojang
 
 import (
-//"fmt"
-//"reflect"
-//"unsafe"
+	"fmt"
+	//"reflect"
+	//"unsafe"
 )
 
 //Expressions describe a value or a computation that can be used as part of an
@@ -16,12 +16,7 @@ type selectExpression interface {
 	expression
 	Scan(interface{}) error
 	getValue() interface{}
-	//getGoType() string //only commented out because I realized I am not using it
-}
-
-type valueExpression interface {
-	expression
-	valueAsSql() string //change valueToSql() methods to valueAsSql()
+	getAlias() string
 }
 
 // type annotation interface {
@@ -36,13 +31,13 @@ type sortExpression struct {
 
 type star string
 
-func (s star) asSql() string {
-	return "*"
+func (a aggregate) asSql() string {
+	return function(a).asSql()
 }
 
-// func (a aggregate) asSql() string {
-// 	return fmt.Sprintf(a.template, a.function, a.expression.asSql(), a.alias)
-// }
+func (f function) asSql() string {
+	return fmt.Sprintf(f.template, f.args...)
+}
 
 func (l lookup) asSql() string {
 	sql := l.lhs.asSql() + " " + l.lookupName + " " + l.rhs
@@ -61,6 +56,10 @@ func (e sortExpression) asSql() string {
 	}
 }
 
+func (s star) asSql() string {
+	return "*"
+}
+
 func fieldAsSql(field field) string {
 	if field.hasModel() {
 		return dbq(field.getModel().dbTable) + "." + dbq(field.getDbColumn())
@@ -68,14 +67,6 @@ func fieldAsSql(field field) string {
 		return field.getExpr().asSql() + " AS " + dbq(field.getDbColumn())
 	}
 }
-
-// func (f *AutoField) asSql() string {
-// 	return fieldAsSql(f)
-// }
-//
-// func (f *BigAutoField) asSql() string {
-// 	return fieldAsSql(f)
-// }
 
 func (f *BigIntegerField) asSql() string {
 	return fieldAsSql(f)
@@ -101,28 +92,17 @@ func (f *TextField) asSql() string {
 	return fieldAsSql(f)
 }
 
-// func (f *ForeignKey) asSql() string {
-// 	return fieldAsSql(f)
-// }
+func (a aggregate) Scan(v interface{}) error {
+	return function(a).Scan(v)
+}
+
 //
-// func (f *OneToOneField) asSql() string {
-// 	return fieldAsSql(f)
-// }
+//Select Expression Method Set
+//
 
-// func (a aggregate) Scan(value interface{}) error {
-// 	return a.outputField.Scan(value)
-// }
-
-// func (f *AutoField) Scan(value interface{}) error {
-// 	result, ok := value.(int64)
-// 	f.Value, f.valid = int32(result), ok
-// 	return nil
-// }
-
-// func (f *BigAutoField) Scan(value interface{}) error {
-// 	f.Value, f.valid = value.(int64)
-// 	return nil
-// }
+func (f function) Scan(v interface{}) error {
+	return f.outputField.Scan(v)
+}
 
 func (f *BigIntegerField) Scan(value interface{}) error {
 	f.Value, f.valid = value.(int64)
@@ -156,27 +136,13 @@ func (f *TextField) Scan(value interface{}) error {
 	return nil
 }
 
-// func (f *ForeignKey) Scan(value interface{}) error {
-// 	f.Value, f.valid = value.(int64)
-// 	return nil
-// }
-//
-// func (f *OneToOneField) Scan(value interface{}) error {
-// 	f.Value, f.valid = value.(int64)
-// 	return nil
-// }
+func (a aggregate) getValue() interface{} {
+	return function(a).getValue()
+}
 
-// func (a aggregate) getValue() interface{} {
-// 	return a.outputField.getValue()
-// }
-
-// func (f *AutoField) getValue() interface{} {
-// 	return f.Value
-// }
-//
-// func (f *BigAutoField) getValue() interface{} {
-// 	return f.Value
-// }
+func (f function) getValue() interface{} {
+	return f.outputField.getValue()
+}
 
 func (f *BigIntegerField) getValue() interface{} {
 	return f.Value
@@ -202,65 +168,41 @@ func (f *TextField) getValue() interface{} {
 	return f.Value
 }
 
-// func (f *ForeignKey) getValue() interface{} {
-// 	return f.Value
-// }
-//
-// func (f *OneToOneField) getValue() interface{} {
-// 	return f.Value
-// }
+func (a aggregate) getAlias() string {
+	return function(a).getAlias()
+}
 
-// func (a aggregate) getGoType() string {
-// 	return a.outputField.getGoType()
-// }
-//
-// func (f *AutoField) getGoType() string {
-// 	return reflect.TypeOf(f.Value).String()
-// }
-//
-// func (f *BigAutoField) getGoType() string {
-// 	return reflect.TypeOf(f.Value).String()
-// }
-//
-// func (f *BigIntegerField) getGoType() string {
-// 	return reflect.TypeOf(f.Value).String()
-// }
-//
-// func (f *BooleanField) getGoType() string {
-// 	return reflect.TypeOf(f.Value).String()
-// }
-//
-// func (f *FloatField) getGoType() string {
-// 	return reflect.TypeOf(f.Value).String()
-// }
-//
-// func (f *IntegerField) getGoType() string {
-// 	return reflect.TypeOf(f.Value).String()
-// }
-//
-// func (f *SmallIntegerField) getGoType() string {
-// 	return reflect.TypeOf(f.Value).String()
-// }
-//
-// func (f *TextField) getGoType() string {
-// 	return reflect.TypeOf(f.Value).String()
-// }
-//
-// func (f *ForeignKey) getGoType() string {
-// 	return reflect.TypeOf(f.Value).String()
-// }
-//
-// func (f *OneToOneField) getGoType() string {
-// 	return reflect.TypeOf(f.Value).String()
-// }
+func (f function) getAlias() string {
+	return f.outputField.getDbColumn()
+}
 
-// func (f *AutoField) Asc() sortExpression {
-// 	return sortExpression{field: f}
-// }
+func (f *BigIntegerField) getAlias() string {
+	return f.dbColumn
+}
+
+func (f *BooleanField) getAlias() string {
+	return f.dbColumn
+}
+
+func (f *FloatField) getAlias() string {
+	return f.dbColumn
+}
+
+func (f *IntegerField) getAlias() string {
+	return f.dbColumn
+}
+
+func (f *SmallIntegerField) getAlias() string {
+	return f.dbColumn
+}
+
+func (f *TextField) getAlias() string {
+	return f.dbColumn
+}
+
 //
-// func (f *BigAutoField) Asc() sortExpression {
-// 	return sortExpression{field: f}
-// }
+//Methods that return Sort Expressions
+//
 
 func (f *BigIntegerField) Asc() sortExpression {
 	return sortExpression{field: f}
@@ -286,22 +228,6 @@ func (f *TextField) Asc() sortExpression {
 	return sortExpression{field: f}
 }
 
-// func (f *ForeignKey) Asc() sortExpression {
-// 	return sortExpression{field: f}
-// }
-//
-// func (f *OneToOneField) Asc() sortExpression {
-// 	return sortExpression{field: f}
-// }
-//
-// func (f *AutoField) Desc() sortExpression {
-// 	return sortExpression{field: f, desc: true}
-// }
-//
-// func (f *BigAutoField) Desc() sortExpression {
-// 	return sortExpression{field: f, desc: true}
-// }
-
 func (f *BigIntegerField) Desc() sortExpression {
 	return sortExpression{field: f, desc: true}
 }
@@ -325,11 +251,3 @@ func (f *SmallIntegerField) Desc() sortExpression {
 func (f *TextField) Desc() sortExpression {
 	return sortExpression{field: f, desc: true}
 }
-
-// func (f *ForeignKey) Desc() sortExpression {
-// 	return sortExpression{field: f, desc: true}
-// }
-//
-// func (f *OneToOneField) Desc() sortExpression {
-// 	return sortExpression{field: f, desc: true}
-// }

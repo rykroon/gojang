@@ -2,7 +2,7 @@ package gojang
 
 import (
 	"database/sql"
-	//"fmt"
+	"fmt"
 	//"reflect"
 )
 
@@ -29,7 +29,7 @@ type QuerySet struct {
 	//rows sql.Rows //cache
 	//rows []row
 
-	//resultCache
+	ResultCache []Object
 }
 
 func newQuerySet(model *Model) QuerySet {
@@ -40,6 +40,16 @@ func newQuerySet(model *Model) QuerySet {
 
 	q.Query = q.buildQuery()
 	return q
+}
+
+func (q *QuerySet) Evaluate() ([]Object, error) {
+	objects, err := q.queryAndScan()
+	if err != nil {
+		return nil, err
+	}
+
+	q.ResultCache = objects
+	return q.ResultCache, nil
 }
 
 //Functions that return QuerySets
@@ -92,7 +102,7 @@ func (q QuerySet) All() QuerySet {
 //Functions that do not return Querysets
 
 //populates the Model associated with the queryset with the data returned from the query
-func (q QuerySet) Get(lookups ...lookup) ([]interface{}, error) {
+func (q QuerySet) Get(lookups ...lookup) (Object, error) {
 	if len(lookups) > 0 {
 		q = q.Filter(lookups...)
 	}
@@ -104,8 +114,7 @@ func (q QuerySet) Get(lookups ...lookup) ([]interface{}, error) {
 
 	numOfRows := 0
 	dest := q.getDest()
-
-	var result []interface{}
+	obj := newObj()
 
 	for rows.Next() {
 		numOfRows += 1
@@ -119,7 +128,9 @@ func (q QuerySet) Get(lookups ...lookup) ([]interface{}, error) {
 			return nil, err
 		}
 
-		result = q.getScannedValues()
+		//result = q.getScannedValues()
+		obj = q.getObject()
+
 	}
 
 	err = rows.Err()
@@ -131,7 +142,8 @@ func (q QuerySet) Get(lookups ...lookup) ([]interface{}, error) {
 		return nil, NewObjectDoesNotExist()
 	}
 
-	return result, nil
+	fmt.Println(obj.Dirs())
+	return obj, nil
 }
 
 func (q QuerySet) Create(assignments ...assignment) error {
@@ -161,39 +173,42 @@ func (q QuerySet) Count() (int, error) {
 	q.selected = append(q.selected, countExpr)
 	q.Query = q.buildQuery()
 
-	err := q.queryRowAndScan()
+	row := q.queryRow()
+	result := 0
+
+	err := row.Scan(&result)
 	if err != nil {
 		return 0, err
 	}
 
-	result := int(countExpr.getValue().(int32))
+	//result := int(countExpr.getValue().(int32))
 	return result, nil
 }
 
 //Returns a map of aggregate values (averages, sums, etc.) calculated over
 //the QuerySet. Each argument to aggregate() specifies a value that will
 //be included in the map that is returned.
-func (q *QuerySet) Aggregate(aggregates ...aggregate) (map[string]interface{}, error) {
+func (q *QuerySet) Aggregate(aggregates ...aggregate) (Object, error) {
 	q.selected = nil
 	q.orderBy = nil
-	result := make(map[string]interface{})
+	//result := make(map[string]interface{})
 
 	for _, expr := range aggregates {
 		q.selected = append(q.selected, expr)
 	}
 
 	q.Query = q.buildQuery()
-	err := q.queryRowAndScan()
+	obj, err := q.queryRowAndScan()
 
 	if err != nil {
 		return nil, err
 	}
 
-	for _, agg := range aggregates {
-		result[agg.outputField.getDbColumn()] = agg.getValue()
-	}
+	// for _, agg := range aggregates {
+	// 	result[agg.outputField.getDbColumn()] = agg.getValue()
+	// }
 
-	return result, nil
+	return obj, nil
 }
 
 //Returns True if the QuerySet contains any results, and False if not.
@@ -250,8 +265,9 @@ func (q QuerySet) Delete() (int, error) {
 	return int(rowsAffected), nil
 }
 
-//database/sql wrappers an auxillary functions
-
+//
+//database/sql wrappers
+//
 func (q QuerySet) exec() (sql.Result, error) {
 	return q.db.Exec(q.Query)
 }
@@ -275,6 +291,16 @@ func (q *QuerySet) getDest() []interface{} {
 	return result
 }
 
+//Returns an object of the values returned from the previous Scan()
+func (q *QuerySet) getObject() Object {
+	obj := newObj()
+	for _, expr := range q.selected {
+		obj.SetAttr(expr.getAlias(), expr.getValue())
+	}
+
+	return obj
+}
+
 //return the values from the previous call to scan
 func (q *QuerySet) getScannedValues() []interface{} {
 	var result []interface{}
@@ -286,22 +312,27 @@ func (q *QuerySet) getScannedValues() []interface{} {
 	return result
 }
 
-func (q QuerySet) queryRowAndScan() error {
+func (q QuerySet) queryRowAndScan() (Object, error) {
 	row := q.queryRow()
 	dest := q.getDest()
 	err := row.Scan(dest...)
-	return err
-}
 
-func (q QuerySet) queryAndScan() ([]interface{}, error) {
-	rows, err := q.query()
 	if err != nil {
 		return nil, err
 	}
 
-	dest := q.getDest()
+	return q.getObject(), nil
+}
 
-	var result []interface{}
+func (q QuerySet) queryAndScan() ([]Object, error) {
+	rows, err := q.query()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var objects []Object
+	dest := q.getDest()
 
 	for rows.Next() {
 		err := rows.Scan(dest...)
@@ -310,8 +341,8 @@ func (q QuerySet) queryAndScan() ([]interface{}, error) {
 			return nil, err
 		}
 
-		values := q.getScannedValues()
-		result = append(result, values)
+		//values := q.getScannedValues()
+		objects = append(objects, q.getObject())
 	}
 
 	err = rows.Err()
@@ -319,5 +350,5 @@ func (q QuerySet) queryAndScan() ([]interface{}, error) {
 		return nil, err
 	}
 
-	return result, nil
+	return objects, nil
 }

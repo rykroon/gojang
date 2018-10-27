@@ -44,14 +44,6 @@ type field interface {
 	valueAsSql() string
 }
 
-// func (f *AutoField) getExpr() expression {
-// 	return f.expr
-// }
-//
-// func (f *BigAutoField) getExpr() expression {
-// 	return f.expr
-// }
-
 func (f *BigIntegerField) getExpr() expression {
 	return f.expr
 }
@@ -76,22 +68,6 @@ func (f *TextField) getExpr() expression {
 	return f.expr
 }
 
-// func (f *ForeignKey) getExpr() expression {
-// 	return f.expr
-// }
-//
-// func (f *OneToOneField) getExpr() expression {
-// 	return f.expr
-// }
-
-// func (f *AutoField) setExpr(expr expression) {
-// 	f.expr = expr
-// }
-//
-// func (f *BigAutoField) setExpr(expr expression) {
-// 	f.expr = expr
-// }
-
 func (f *BigIntegerField) setExpr(expr expression) {
 	f.expr = expr
 }
@@ -115,14 +91,6 @@ func (f *SmallIntegerField) setExpr(expr expression) {
 func (f *TextField) setExpr(expr expression) {
 	f.expr = expr
 }
-
-// func (f *ForeignKey) setExpr(expr expression) {
-// 	f.expr = expr
-// }
-//
-// func (f *OneToOneField) setExpr(expr expression) {
-// 	f.expr = expr
-// }
 
 // func (f *AutoField) copy() field {
 // 	copy := NewAutoField()
@@ -303,30 +271,6 @@ func (f *SmallIntegerField) hasNullConstraint() bool {
 func (f *TextField) hasNullConstraint() bool {
 	return f.null
 }
-
-// func (f *ForeignKey) hasNullConstraint() bool {
-// 	return f.null
-// }
-//
-// func (f *OneToOneField) hasNullConstraint() bool {
-// 	return f.null
-// }
-
-// func (f *AutoField) setNullConstraint(null bool) {
-// 	f.null = null
-//
-// 	if f.null {
-// 		f.valid = false
-// 	}
-// }
-//
-// func (f *BigAutoField) setNullConstraint(null bool) {
-// 	f.null = null
-//
-// 	if f.null {
-// 		f.valid = false
-// 	}
-// }
 
 func (f *BigIntegerField) setNullConstraint(null bool) {
 	f.null = null
