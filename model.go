@@ -77,8 +77,6 @@ func MakeModel(i interface{}) error {
 			}
 
 			setFieldOptions(field, options)
-			field.setModel(model)
-			field.validate()
 			model.addField(field)
 
 			if field.hasPrimaryKeyConstraint() {
@@ -106,8 +104,6 @@ func MakeModel(i interface{}) error {
 		model.Pk = NewAutoField()
 		model.Pk.setDbColumn("id")
 		model.Pk.setPrimaryKeyConstraint(true)
-		model.Pk.setModel(model)
-		model.Pk.validate()
 		model.addField(model.Pk)
 	}
 
@@ -116,6 +112,9 @@ func MakeModel(i interface{}) error {
 
 //Add Field to the model
 func (m *Model) addField(f field) {
+	f.setModel(m)
+	f.validate()
+
 	columnName := f.getDbColumn()
 
 	_, duplicate := m.colToFields[columnName]

@@ -339,8 +339,8 @@ func (f *TextField) Range(from string, to string) lookup {
 // 	return lookup
 // }
 
-func (f *BigIntegerField) IsNull(value bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "IS"}
+func fieldIsNull(field field, value bool) lookup {
+	lookup := lookup{lhs: field, lookupName: "IS"}
 
 	if value {
 		lookup.rhs = "NULL"
@@ -349,54 +349,26 @@ func (f *BigIntegerField) IsNull(value bool) lookup {
 	}
 
 	return lookup
+}
+
+func (f *BigIntegerField) IsNull(value bool) lookup {
+	return fieldIsNull(f, value)
 }
 
 func (f *BooleanField) IsNull(value bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "IS"}
-
-	if value {
-		lookup.rhs = "NULL"
-	} else {
-		lookup.rhs = "NOT NULL"
-	}
-
-	return lookup
+	return fieldIsNull(f, value)
 }
 
 func (f *FloatField) IsNull(value bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "IS"}
-
-	if value {
-		lookup.rhs = "NULL"
-	} else {
-		lookup.rhs = "NOT NULL"
-	}
-
-	return lookup
+	return fieldIsNull(f, value)
 }
 
 func (f *IntegerField) IsNull(value bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "IS"}
-
-	if value {
-		lookup.rhs = "NULL"
-	} else {
-		lookup.rhs = "NOT NULL"
-	}
-
-	return lookup
+	return fieldIsNull(f, value)
 }
 
 func (f *TextField) IsNull(value bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "IS"}
-
-	if value {
-		lookup.rhs = "NULL"
-	} else {
-		lookup.rhs = "NOT NULL"
-	}
-
-	return lookup
+	return fieldIsNull(f, value)
 }
 
 // func (f *ForeignKey) IsNull(value bool) lookup {
