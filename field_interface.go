@@ -34,7 +34,7 @@ type field interface {
 	Desc() sortExpression
 	Count(bool) aggregate
 
-	valueToSql() string
+	valueAsSql() string
 	copy() field
 }
 
@@ -134,8 +134,9 @@ func (f *TextField) setExpr(expr expression) {
 
 func (f *BigIntegerField) copy() field {
 	copy := NewBigIntegerField()
-	copy.model = f.model
+	copy.model = f.model //maybe change to be a copy of the model
 	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
 	return copy
 }
 
@@ -143,6 +144,7 @@ func (f *BooleanField) copy() field {
 	copy := NewBooleanField()
 	copy.model = f.model
 	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
 	return copy
 }
 
@@ -150,6 +152,7 @@ func (f *FloatField) copy() field {
 	copy := NewFloatField()
 	copy.model = f.model
 	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
 	return copy
 }
 
@@ -157,6 +160,7 @@ func (f *IntegerField) copy() field {
 	copy := NewIntegerField()
 	copy.model = f.model
 	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
 	return copy
 }
 
@@ -164,6 +168,7 @@ func (f *SmallIntegerField) copy() field {
 	copy := NewSmallIntegerField()
 	copy.model = f.model
 	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
 	return copy
 }
 
@@ -171,6 +176,7 @@ func (f *TextField) copy() field {
 	copy := NewTextField()
 	copy.model = f.model
 	copy.dbColumn = f.dbColumn
+	copy.constraints = f.constraints
 	return copy
 }
 
@@ -178,6 +184,7 @@ func (f *TextField) copy() field {
 // 	copy := NewForeignKey(f.relatedModel, f.onDelete)
 // 	copy.model = f.model
 // 	copy.dbColumn = f.dbColumn
+//	copy.constraints = f.constraints
 // 	return copy
 // }
 //
@@ -185,6 +192,7 @@ func (f *TextField) copy() field {
 // 	copy := NewOneToOneField(f.relatedModel, f.onDelete)
 // 	copy.model = f.model
 // 	copy.dbColumn = f.dbColumn
+//	copy.constraints = f.constraints
 // 	return copy
 // }
 
@@ -931,82 +939,82 @@ func (f *TextField) IsNil() bool {
 // 	return !f.valid
 // }
 
-// func (f *AutoField) valueToSql() string {
+// func (f *AutoField) valueAsSql() string {
 // 	if f.IsNil() {
 // 		return "NULL"
 // 	} else {
-// 		return int32ToSql(f.Value)
+// 		return int32AsSql(f.Value)
 // 	}
 // }
 //
-// func (f *BigAutoField) valueToSql() string {
+// func (f *BigAutoField) valueAsSql() string {
 // 	if f.IsNil() {
 // 		return "NULL"
 // 	} else {
-// 		return int64ToSql(f.Value)
+// 		return int64AsSql(f.Value)
 // 	}
 // }
 
-func (f *BigIntegerField) valueToSql() string {
+func (f *BigIntegerField) valueAsSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return int64ToSql(f.Value)
+		return int64AsSql(f.Value)
 	}
 }
 
-func (f *BooleanField) valueToSql() string {
+func (f *BooleanField) valueAsSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return boolToSql(f.Value)
+		return boolAsSql(f.Value)
 	}
 }
 
-func (f *FloatField) valueToSql() string {
+func (f *FloatField) valueAsSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return float64ToSql(f.Value)
+		return float64AsSql(f.Value)
 	}
 }
 
-func (f *IntegerField) valueToSql() string {
+func (f *IntegerField) valueAsSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return int32ToSql(f.Value)
+		return int32AsSql(f.Value)
 	}
 }
 
-func (f *SmallIntegerField) valueToSql() string {
+func (f *SmallIntegerField) valueAsSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return int16ToSql(f.Value)
+		return int16AsSql(f.Value)
 	}
 }
 
-func (f *TextField) valueToSql() string {
+func (f *TextField) valueAsSql() string {
 	if f.IsNil() {
 		return "NULL"
 	} else {
-		return stringToSql(f.Value)
+		return stringAsSql(f.Value)
 	}
 }
 
-// func (f *ForeignKey) valueToSql() string {
+// func (f *ForeignKey) valueAsSql() string {
 // 	if f.IsNil() {
 // 		return "NULL"
 // 	} else {
-// 		return int64ToSql(f.Value)
+// 		return int64AsSql(f.Value)
 // 	}
 // }
 //
-// func (f *OneToOneField) valueToSql() string {
+// func (f *OneToOneField) valueAsSql() string {
 // 	if f.IsNil() {
 // 		return "NULL"
 // 	} else {
-// 		return int64ToSql(f.Value)
+// 		return int64AsSql(f.Value)
 // 	}
 // }

@@ -133,6 +133,10 @@ func (m *Model) addField(f field) {
 	}
 }
 
+// func (m *Model) copy() *Model {
+// 	copy := NewModel()
+// }
+
 //If instance does not have a primary key then it will insert into the database
 //Otherwise it updates the record
 func (m *Model) Save() error {
@@ -172,7 +176,7 @@ func (m *Model) insert() string {
 		}
 
 		columns += dbq(field.getDbColumn()) + ", "
-		values += field.valueToSql() + ", "
+		values += field.valueAsSql() + ", "
 	}
 
 	columns = columns[:len(columns)-2] + ")"

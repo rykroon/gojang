@@ -19,6 +19,11 @@ type selectExpression interface {
 	//getGoType() string //only commented out because I realized I am not using it
 }
 
+type valueExpression interface {
+	expression
+	valueAsSql() string //change valueToSql() methods to valueAsSql()
+}
+
 // type annotation interface {
 // 	expression
 // 	As()

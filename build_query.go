@@ -76,7 +76,7 @@ func (q QuerySet) processInsert() string {
 
 	for _, field := range q.set {
 		columns += dbq(field.getDbColumn()) + ", "
-		values += field.valueToSql() + ", "
+		values += field.valueAsSql() + ", "
 	}
 
 	columns = columns[:len(columns)-2] + ")"
@@ -89,7 +89,7 @@ func (q QuerySet) processUpdate() string {
 	sql := " SET "
 
 	for _, field := range q.set {
-		sql += dbq(field.getDbColumn()) + " = " + field.valueToSql() + ", "
+		sql += dbq(field.getDbColumn()) + " = " + field.valueAsSql() + ", "
 	}
 
 	sql = sql[:len(sql)-2]
