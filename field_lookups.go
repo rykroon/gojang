@@ -11,13 +11,13 @@ type lookup struct {
 	rhs        string
 }
 
-func (f *AutoField) Exact(value int) lookup {
-	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
-}
-
-func (f *BigAutoField) Exact(value int) lookup {
-	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
-}
+// func (f *AutoField) Exact(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
+// }
+//
+// func (f *BigAutoField) Exact(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
+// }
 
 func (f *BigIntegerField) Exact(value int) lookup {
 	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
@@ -39,13 +39,13 @@ func (f *TextField) Exact(value string) lookup {
 	return lookup{lhs: f, lookupName: "=", rhs: stringToSql(value)}
 }
 
-func (f *ForeignKey) Exact(value int) lookup {
-	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
-}
-
-func (f *OneToOneField) Exact(value int) lookup {
-	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
-}
+// func (f *ForeignKey) Exact(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
+// }
+//
+// func (f *OneToOneField) Exact(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "=", rhs: intToSql(value)}
+// }
 
 func (f *TextField) IExact(value string) lookup {
 	return lookup{lhs: f, lookupName: "ILIKE", rhs: stringToSql(value)}
@@ -61,13 +61,13 @@ func (f *TextField) IContains(value string) lookup {
 	return lookup{lhs: f, lookupName: "ILIKE", rhs: stringToSql(value)}
 }
 
-func (f *AutoField) In(values ...int) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: intSliceToSql(values)}
-}
-
-func (f *BigAutoField) In(values ...int) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: intSliceToSql(values)}
-}
+// func (f *AutoField) In(values ...int) lookup {
+// 	return lookup{lhs: f, lookupName: "IN", rhs: intSliceToSql(values)}
+// }
+//
+// func (f *BigAutoField) In(values ...int) lookup {
+// 	return lookup{lhs: f, lookupName: "IN", rhs: intSliceToSql(values)}
+// }
 
 func (f *BigIntegerField) In(values ...int) lookup {
 	return lookup{lhs: f, lookupName: "IN", rhs: intSliceToSql(values)}
@@ -89,21 +89,21 @@ func (f *TextField) In(values ...string) lookup {
 	return lookup{lhs: f, lookupName: "IN", rhs: stringSliceToSql(values)}
 }
 
-func (f *ForeignKey) In(values ...int) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: intSliceToSql(values)}
-}
+// func (f *ForeignKey) In(values ...int) lookup {
+// 	return lookup{lhs: f, lookupName: "IN", rhs: intSliceToSql(values)}
+// }
+//
+// func (f *OneToOneField) In(values ...int) lookup {
+// 	return lookup{lhs: f, lookupName: "IN", rhs: intSliceToSql(values)}
+// }
 
-func (f *OneToOneField) In(values ...int) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: intSliceToSql(values)}
-}
-
-func (f *AutoField) Gt(value int) lookup {
-	return lookup{lhs: f, lookupName: ">", rhs: intToSql(value)}
-}
-
-func (f *BigAutoField) Gt(value int) lookup {
-	return lookup{lhs: f, lookupName: ">", rhs: intToSql(value)}
-}
+// func (f *AutoField) Gt(value int) lookup {
+// 	return lookup{lhs: f, lookupName: ">", rhs: intToSql(value)}
+// }
+//
+// func (f *BigAutoField) Gt(value int) lookup {
+// 	return lookup{lhs: f, lookupName: ">", rhs: intToSql(value)}
+// }
 
 func (f *BigIntegerField) Gt(value int) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: intToSql(value)}
@@ -125,21 +125,21 @@ func (f *TextField) Gt(value string) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: stringToSql(value)}
 }
 
-func (f *ForeignKey) Gt(value int) lookup {
-	return lookup{lhs: f, lookupName: ">", rhs: intToSql(value)}
-}
+// func (f *ForeignKey) Gt(value int) lookup {
+// 	return lookup{lhs: f, lookupName: ">", rhs: intToSql(value)}
+// }
+//
+// func (f *OneToOneField) Gt(value int) lookup {
+// 	return lookup{lhs: f, lookupName: ">", rhs: intToSql(value)}
+// }
 
-func (f *OneToOneField) Gt(value int) lookup {
-	return lookup{lhs: f, lookupName: ">", rhs: intToSql(value)}
-}
-
-func (f *AutoField) Gte(value int) lookup {
-	return lookup{lhs: f, lookupName: ">=", rhs: intToSql(value)}
-}
-
-func (f *BigAutoField) Gte(value int) lookup {
-	return lookup{lhs: f, lookupName: ">=", rhs: intToSql(value)}
-}
+// func (f *AutoField) Gte(value int) lookup {
+// 	return lookup{lhs: f, lookupName: ">=", rhs: intToSql(value)}
+// }
+//
+// func (f *BigAutoField) Gte(value int) lookup {
+// 	return lookup{lhs: f, lookupName: ">=", rhs: intToSql(value)}
+// }
 
 func (f *BigIntegerField) Gte(value int) lookup {
 	return lookup{lhs: f, lookupName: ">=", rhs: intToSql(value)}
@@ -161,21 +161,21 @@ func (f *TextField) Gte(value string) lookup {
 	return lookup{lhs: f, lookupName: ">=", rhs: stringToSql(value)}
 }
 
-func (f *ForeignKey) Gte(value int) lookup {
-	return lookup{lhs: f, lookupName: ">=", rhs: intToSql(value)}
-}
+// func (f *ForeignKey) Gte(value int) lookup {
+// 	return lookup{lhs: f, lookupName: ">=", rhs: intToSql(value)}
+// }
+//
+// func (f *OneToOneField) Gte(value int) lookup {
+// 	return lookup{lhs: f, lookupName: ">=", rhs: intToSql(value)}
+// }
 
-func (f *OneToOneField) Gte(value int) lookup {
-	return lookup{lhs: f, lookupName: ">=", rhs: intToSql(value)}
-}
-
-func (f *AutoField) Lt(value int) lookup {
-	return lookup{lhs: f, lookupName: "<", rhs: intToSql(value)}
-}
-
-func (f *BigAutoField) Lt(value int) lookup {
-	return lookup{lhs: f, lookupName: "<", rhs: intToSql(value)}
-}
+// func (f *AutoField) Lt(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "<", rhs: intToSql(value)}
+// }
+//
+// func (f *BigAutoField) Lt(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "<", rhs: intToSql(value)}
+// }
 
 func (f *BigIntegerField) Lt(value int) lookup {
 	return lookup{lhs: f, lookupName: "<", rhs: intToSql(value)}
@@ -197,21 +197,21 @@ func (f *TextField) Lt(value string) lookup {
 	return lookup{lhs: f, lookupName: "<", rhs: stringToSql(value)}
 }
 
-func (f *ForeignKey) Lt(value int) lookup {
-	return lookup{lhs: f, lookupName: "<", rhs: intToSql(value)}
-}
+// func (f *ForeignKey) Lt(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "<", rhs: intToSql(value)}
+// }
+//
+// func (f *OneToOneField) Lt(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "<", rhs: intToSql(value)}
+// }
 
-func (f *OneToOneField) Lt(value int) lookup {
-	return lookup{lhs: f, lookupName: "<", rhs: intToSql(value)}
-}
-
-func (f *AutoField) Lte(value int) lookup {
-	return lookup{lhs: f, lookupName: "<=", rhs: intToSql(value)}
-}
-
-func (f *BigAutoField) Lte(value int) lookup {
-	return lookup{lhs: f, lookupName: "<=", rhs: intToSql(value)}
-}
+// func (f *AutoField) Lte(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "<=", rhs: intToSql(value)}
+// }
+//
+// func (f *BigAutoField) Lte(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "<=", rhs: intToSql(value)}
+// }
 
 func (f *BigIntegerField) Lte(value int) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: intToSql(value)}
@@ -233,13 +233,13 @@ func (f *TextField) Lte(value string) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: stringToSql(value)}
 }
 
-func (f *ForeignKey) Lte(value int) lookup {
-	return lookup{lhs: f, lookupName: "<=", rhs: intToSql(value)}
-}
-
-func (f *OneToOneField) Lte(value int) lookup {
-	return lookup{lhs: f, lookupName: "<=", rhs: intToSql(value)}
-}
+// func (f *ForeignKey) Lte(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "<=", rhs: intToSql(value)}
+// }
+//
+// func (f *OneToOneField) Lte(value int) lookup {
+// 	return lookup{lhs: f, lookupName: "<=", rhs: intToSql(value)}
+// }
 
 func (f *TextField) StartsWith(value string) lookup {
 	value = value + "%"
@@ -261,17 +261,17 @@ func (f *TextField) IEndsWith(value string) lookup {
 	return lookup{lhs: f, lookupName: "ILIKE", rhs: stringToSql(value)}
 }
 
-func (f *AutoField) Range(from int, to int) lookup {
-	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
-	lookup.rhs = intToSql(from) + " AND " + intToSql(to)
-	return lookup
-}
-
-func (f *BigAutoField) Range(from int, to int) lookup {
-	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
-	lookup.rhs = intToSql(from) + " AND " + intToSql(to)
-	return lookup
-}
+// func (f *AutoField) Range(from int, to int) lookup {
+// 	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
+// 	lookup.rhs = intToSql(from) + " AND " + intToSql(to)
+// 	return lookup
+// }
+//
+// func (f *BigAutoField) Range(from int, to int) lookup {
+// 	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
+// 	lookup.rhs = intToSql(from) + " AND " + intToSql(to)
+// 	return lookup
+// }
 
 func (f *BigIntegerField) Range(from int, to int) lookup {
 	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
@@ -303,41 +303,41 @@ func (f *TextField) Range(from string, to string) lookup {
 	return lookup
 }
 
-func (f *ForeignKey) Range(from int, to int) lookup {
-	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
-	lookup.rhs = intToSql(from) + " AND " + intToSql(to)
-	return lookup
-}
+// func (f *ForeignKey) Range(from int, to int) lookup {
+// 	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
+// 	lookup.rhs = intToSql(from) + " AND " + intToSql(to)
+// 	return lookup
+// }
+//
+// func (f *OneToOneField) Range(from int, to int) lookup {
+// 	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
+// 	lookup.rhs = intToSql(from) + " AND " + intToSql(to)
+// 	return lookup
+// }
 
-func (f *OneToOneField) Range(from int, to int) lookup {
-	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
-	lookup.rhs = intToSql(from) + " AND " + intToSql(to)
-	return lookup
-}
-
-func (f *AutoField) IsNull(value bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "IS"}
-
-	if value {
-		lookup.rhs = "NULL"
-	} else {
-		lookup.rhs = "NOT NULL"
-	}
-
-	return lookup
-}
-
-func (f *BigAutoField) IsNull(value bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "IS"}
-
-	if value {
-		lookup.rhs = "NULL"
-	} else {
-		lookup.rhs = "NOT NULL"
-	}
-
-	return lookup
-}
+// func (f *AutoField) IsNull(value bool) lookup {
+// 	lookup := lookup{lhs: f, lookupName: "IS"}
+//
+// 	if value {
+// 		lookup.rhs = "NULL"
+// 	} else {
+// 		lookup.rhs = "NOT NULL"
+// 	}
+//
+// 	return lookup
+// }
+//
+// func (f *BigAutoField) IsNull(value bool) lookup {
+// 	lookup := lookup{lhs: f, lookupName: "IS"}
+//
+// 	if value {
+// 		lookup.rhs = "NULL"
+// 	} else {
+// 		lookup.rhs = "NOT NULL"
+// 	}
+//
+// 	return lookup
+// }
 
 func (f *BigIntegerField) IsNull(value bool) lookup {
 	lookup := lookup{lhs: f, lookupName: "IS"}
@@ -399,26 +399,26 @@ func (f *TextField) IsNull(value bool) lookup {
 	return lookup
 }
 
-func (f *ForeignKey) IsNull(value bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "IS"}
-
-	if value {
-		lookup.rhs = "NULL"
-	} else {
-		lookup.rhs = "NOT NULL"
-	}
-
-	return lookup
-}
-
-func (f *OneToOneField) IsNull(value bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "IS"}
-
-	if value {
-		lookup.rhs = "NULL"
-	} else {
-		lookup.rhs = "NOT NULL"
-	}
-
-	return lookup
-}
+// func (f *ForeignKey) IsNull(value bool) lookup {
+// 	lookup := lookup{lhs: f, lookupName: "IS"}
+//
+// 	if value {
+// 		lookup.rhs = "NULL"
+// 	} else {
+// 		lookup.rhs = "NOT NULL"
+// 	}
+//
+// 	return lookup
+// }
+//
+// func (f *OneToOneField) IsNull(value bool) lookup {
+// 	lookup := lookup{lhs: f, lookupName: "IS"}
+//
+// 	if value {
+// 		lookup.rhs = "NULL"
+// 	} else {
+// 		lookup.rhs = "NOT NULL"
+// 	}
+//
+// 	return lookup
+// }

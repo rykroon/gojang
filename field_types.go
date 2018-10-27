@@ -13,36 +13,18 @@ const Protect onDelete = "RESTRICT"
 const SetNull onDelete = "SET NULL"
 const SetDefault onDelete = "SET DEFAULT"
 
-type AutoField struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-
+type constraints struct {
 	null       bool
 	unique     bool
 	primaryKey bool
-	isRelation bool
+}
 
-	expr expression
-
-	valid bool
-	Value int32
+type AutoField struct {
+	*IntegerField
 }
 
 type BigAutoField struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-
-	null       bool
-	unique     bool
-	primaryKey bool
-	isRelation bool
-
-	expr expression
-
-	valid bool
-	Value int64
+	*BigIntegerField
 }
 
 type BigIntegerField struct {
@@ -50,9 +32,7 @@ type BigIntegerField struct {
 	dbColumn string
 	dbType   string
 
-	null       bool
-	unique     bool
-	primaryKey bool
+	constraints
 	isRelation bool
 
 	expr expression
@@ -66,9 +46,7 @@ type BooleanField struct {
 	dbColumn string
 	dbType   string
 
-	null       bool
-	unique     bool
-	primaryKey bool
+	constraints
 	isRelation bool
 
 	expr expression
@@ -82,9 +60,7 @@ type FloatField struct {
 	dbColumn string
 	dbType   string
 
-	null       bool
-	unique     bool
-	primaryKey bool
+	constraints
 	isRelation bool
 
 	expr expression
@@ -98,9 +74,7 @@ type IntegerField struct {
 	dbColumn string
 	dbType   string
 
-	null       bool
-	unique     bool
-	primaryKey bool
+	constraints
 	isRelation bool
 
 	expr expression
@@ -114,9 +88,7 @@ type SmallIntegerField struct {
 	dbColumn string
 	dbType   string
 
-	null       bool
-	unique     bool
-	primaryKey bool
+	constraints
 	isRelation bool
 
 	expr expression
@@ -130,9 +102,7 @@ type TextField struct {
 	dbColumn string
 	dbType   string
 
-	null       bool
-	unique     bool
-	primaryKey bool
+	constraints
 	isRelation bool
 
 	expr expression
@@ -142,16 +112,7 @@ type TextField struct {
 }
 
 type ForeignKey struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-
-	null       bool
-	unique     bool
-	primaryKey bool
-	isRelation bool
-
-	expr expression
+	*BigIntegerField
 
 	//specific for related fields
 	manyToMany   bool
@@ -160,46 +121,25 @@ type ForeignKey struct {
 	oneToOne     bool
 	relatedModel *Model
 	onDelete     onDelete
-
-	valid bool
-	Value int64
 }
 
 type OneToOneField struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-
-	null       bool
-	unique     bool
-	primaryKey bool
-	isRelation bool
-
-	expr expression
-
-	//specific for related fields
-	manyToMany   bool
-	manyToOne    bool
-	oneToMany    bool
-	oneToOne     bool
-	relatedModel *Model
-	onDelete     onDelete
-
-	valid bool
-	Value int64
+	*ForeignKey
 }
 
 //Constructors
 
 func NewAutoField() *AutoField {
-	field := &AutoField{dbType: "SERIAL4"}
-	field.valid = true
+	field := &AutoField{}
+	field.IntegerField = NewIntegerField()
+	field.dbType = "SERIAL4"
 	return field
 }
 
 func NewBigAutoField() *BigAutoField {
-	field := &BigAutoField{dbType: "SERIAL8"}
-	field.valid = true
+	field := &BigAutoField{}
+	field.BigIntegerField = NewBigIntegerField()
+	field.dbType = "SERIAL8"
 	return field
 }
 
@@ -240,8 +180,8 @@ func NewTextField() *TextField {
 }
 
 func NewForeignKey(to *Model, onDelete onDelete) *ForeignKey {
-	field := &ForeignKey{dbType: "INT8"}
-	field.valid = true
+	field := &ForeignKey{}
+	field.BigIntegerField = NewBigIntegerField()
 
 	field.isRelation = true
 	field.manyToOne = true
@@ -252,13 +192,11 @@ func NewForeignKey(to *Model, onDelete onDelete) *ForeignKey {
 }
 
 func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
-	field := &OneToOneField{dbType: "INT8"}
-	field.valid = true
+	field := &OneToOneField{}
+	field.ForeignKey = NewForeignKey(to, onDelete)
 
-	field.isRelation = true
+	field.manyToOne = false
 	field.oneToOne = true
-	field.relatedModel = to
-	field.onDelete = onDelete
 
 	//unique constraint must be true for OneToOne Field
 	field.unique = true
@@ -266,13 +204,13 @@ func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 	return field
 }
 
-func (f *AutoField) SetNil() error {
-	return NewNotNullConstraintViolation()
-}
-
-func (f *BigAutoField) SetNil() error {
-	return NewNotNullConstraintViolation()
-}
+// func (f *AutoField) SetNil() error {
+// 	return NewNotNullConstraintViolation()
+// }
+//
+// func (f *BigAutoField) SetNil() error {
+// 	return NewNotNullConstraintViolation()
+// }
 
 func (f *BigIntegerField) SetNil() error {
 	if f.hasNullConstraint() {
@@ -334,33 +272,33 @@ func (f *TextField) SetNil() error {
 	}
 }
 
-func (f *ForeignKey) SetNil() error {
-	if f.hasNullConstraint() {
-		f.valid = false
-		f.Value = 0
-		return nil
-	} else {
-		return NewNotNullConstraintViolation()
-	}
-}
+// func (f *ForeignKey) SetNil() error {
+// 	if f.hasNullConstraint() {
+// 		f.valid = false
+// 		f.Value = 0
+// 		return nil
+// 	} else {
+// 		return NewNotNullConstraintViolation()
+// 	}
+// }
+//
+// func (f *OneToOneField) SetNil() error {
+// 	if f.hasNullConstraint() {
+// 		f.valid = false
+// 		f.Value = 0
+// 		return nil
+// 	} else {
+// 		return NewNotNullConstraintViolation()
+// 	}
+// }
 
-func (f *OneToOneField) SetNil() error {
-	if f.hasNullConstraint() {
-		f.valid = false
-		f.Value = 0
-		return nil
-	} else {
-		return NewNotNullConstraintViolation()
-	}
-}
-
-func (f AutoField) UnSetNil() {
-	f.valid = true
-}
-
-func (f BigAutoField) UnSetNil() {
-	f.valid = true
-}
+// func (f AutoField) UnSetNil() {
+// 	f.valid = true
+// }
+//
+// func (f BigAutoField) UnSetNil() {
+// 	f.valid = true
+// }
 
 func (f BigIntegerField) UnSetNil() {
 	f.valid = true
@@ -386,13 +324,13 @@ func (f TextField) UnSetNil() {
 	f.valid = true
 }
 
-func (f ForeignKey) UnSetNil() {
-	f.valid = true
-}
-
-func (f OneToOneField) UnSetNil() {
-	f.valid = true
-}
+// func (f ForeignKey) UnSetNil() {
+// 	f.valid = true
+// }
+//
+// func (f OneToOneField) UnSetNil() {
+// 	f.valid = true
+// }
 
 func create(f field) string {
 	s := dbq(f.getDbColumn()) + " " + f.getDbType()
