@@ -2,7 +2,7 @@ package gojang
 
 import (
 	"database/sql"
-	"fmt"
+	//"fmt"
 	//"reflect"
 )
 
@@ -218,7 +218,6 @@ func (q QuerySet) Update(assignments ...assignment) (int, error) {
 	}
 
 	q.Query = q.buildQuery()
-	fmt.Println(q.Query)
 	result, err := q.exec()
 
 	if err != nil {
