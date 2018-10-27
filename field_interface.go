@@ -5,37 +5,43 @@ import ()
 type field interface {
 	selectExpression
 
-	hasNullConstraint() bool
-	setNullConstraint(bool)
-	hasUniqueConstraint() bool
-	setUniqueConstraint(bool)
-	hasPrimaryKeyConstraint() bool
-	setPrimaryKeyConstraint(bool)
-
-	//setOptions(fieldOptions)
-	hasRelation() bool
-	validate()
-
-	setModel(*Model)
-	getModel() *Model
-	hasModel() bool
+	//getters and setters
 	getDbColumn() string
 	setDbColumn(string)
+
 	getDbType() string
 
 	getExpr() expression
 	setExpr(expression)
 
+	getModel() *Model
+	setModel(*Model)
+	hasModel() bool
+
+	hasNullConstraint() bool
+	setNullConstraint(bool)
+
+	hasUniqueConstraint() bool
+	setUniqueConstraint(bool)
+
+	hasPrimaryKeyConstraint() bool
+	setPrimaryKeyConstraint(bool)
+
+	//setOptions(fieldOptions)
+	hasRelation() bool
+
 	IsNil() bool
 	SetNil() error
 	UnSetNil()
 
+	asAssignment() assignment
 	Asc() sortExpression
 	Desc() sortExpression
+	copy() field
 	Count(bool) aggregate
 
+	validate()
 	valueAsSql() string
-	copy() field
 }
 
 // func (f *AutoField) getExpr() expression {

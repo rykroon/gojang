@@ -1,6 +1,8 @@
 package gojang
 
-import ()
+import (
+	"strings"
+)
 
 func (q QuerySet) buildQuery() string {
 	sql := ""
@@ -71,30 +73,28 @@ func (q QuerySet) processFrom() string {
 }
 
 func (q QuerySet) processInsert() string {
-	columns := "("
-	values := "("
+	var columnList []string
+	var valueList []string
 
-	for _, field := range q.set {
-		columns += dbq(field.getDbColumn()) + ", "
-		values += field.valueAsSql() + ", "
+	for _, assign := range q.set {
+		columnList = append(columnList, dbq(assign.lhs.getDbColumn()))
+		//valueList = append(valueList, assign.lhs.valueAsSql())
+		valueList = append(valueList, assign.rhs)
 	}
 
-	columns = columns[:len(columns)-2] + ")"
-	values = values[:len(values)-2] + ")"
+	columns := "(" + strings.Join(columnList, ", ") + ")"
+	values := "(" + strings.Join(valueList, ", ") + ")"
 
 	return columns + " VALUES " + values
 }
 
 func (q QuerySet) processUpdate() string {
-	sql := " SET "
-
-	for _, field := range q.set {
-		sql += dbq(field.getDbColumn()) + " = " + field.valueAsSql() + ", "
+	var assignList []string
+	for _, assign := range q.set {
+		assignList = append(assignList, assign.asSql())
 	}
 
-	sql = sql[:len(sql)-2]
-	return sql
-
+	return " SET " + strings.Join(assignList, ", ")
 }
 
 func (q QuerySet) processWhere() string {

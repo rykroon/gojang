@@ -2,7 +2,7 @@ package gojang
 
 import (
 	"database/sql"
-	//"fmt"
+	"fmt"
 	//"reflect"
 )
 
@@ -18,7 +18,7 @@ type QuerySet struct {
 	update bool
 	delete bool
 
-	set []field
+	set []assignment
 
 	joins   []relatedField
 	lookups []lookup
@@ -134,11 +134,11 @@ func (q QuerySet) Get(lookups ...lookup) ([]interface{}, error) {
 	return result, nil
 }
 
-func (q QuerySet) Create(fields ...field) error {
+func (q QuerySet) Create(assignments ...assignment) error {
 	q.insert = true
 
-	for _, field := range fields {
-		q.set = append(q.set, field)
+	for _, assign := range assignments {
+		q.set = append(q.set, assign)
 	}
 
 	q.Query = q.buildQuery()
@@ -210,14 +210,15 @@ func (q QuerySet) Exists() (bool, error) {
 	return false, rows.Err()
 }
 
-func (q QuerySet) Update(fields ...field) (int, error) {
+func (q QuerySet) Update(assignments ...assignment) (int, error) {
 	q.update = true
 
-	for _, field := range fields {
-		q.set = append(q.set, field)
+	for _, assign := range assignments {
+		q.set = append(q.set, assign)
 	}
 
 	q.Query = q.buildQuery()
+	fmt.Println(q.Query)
 	result, err := q.exec()
 
 	if err != nil {

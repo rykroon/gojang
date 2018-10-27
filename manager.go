@@ -40,9 +40,9 @@ func (m Manager) Get(lookups ...lookup) (interface{}, error) {
 	return qs.Get(lookups...)
 }
 
-func (m Manager) Create(fields ...field) error {
+func (m Manager) Create(assignments ...assignment) error {
 	qs := newQuerySet(m.model)
-	return qs.Create(fields...)
+	return qs.Create(assignments...)
 }
 
 func (m Manager) Count() (int, error) {
@@ -60,9 +60,9 @@ func (m Manager) Exists() (bool, error) {
 	return qs.Exists()
 }
 
-func (m Manager) Update(fields ...field) (int, error) {
+func (m Manager) Update(assignments ...assignment) (int, error) {
 	qs := newQuerySet(m.model)
-	return qs.Update(fields...)
+	return qs.Update(assignments...)
 }
 
 func (m Manager) Delete() (int, error) {

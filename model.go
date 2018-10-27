@@ -188,10 +188,11 @@ func (m *Model) insert() string {
 
 //
 func (m *Model) update() error {
-	var updateList []field
+	var updateList []assignment
+
 	for _, field := range m.fields {
 		if !field.hasPrimaryKeyConstraint() {
-			updateList = append(updateList, field)
+			updateList = append(updateList, field.asAssignment())
 		}
 	}
 
