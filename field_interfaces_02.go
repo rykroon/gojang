@@ -9,7 +9,7 @@ import ()
 
 type numericField interface {
 	field
-	Avg() aggregate
+	Avg() *aggregate
 	//Sum() aggregate
 }
 

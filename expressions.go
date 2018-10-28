@@ -25,15 +25,16 @@ type sortExpression struct {
 
 type star string
 
-func (a aggregate) asSql() string {
-	return function(a).asSql()
+func (a *aggregate) asSql() string {
+	f := function(*a)
+	return f.asSql()
 }
 
 func (a assignment) asSql() string {
 	return dbq(a.lhs.getDbColumn()) + " " + a.lookupName + " " + a.rhs
 }
 
-func (f function) asSql() string {
+func (f *function) asSql() string {
 	return fmt.Sprintf(f.template, f.args...)
 }
 

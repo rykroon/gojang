@@ -195,7 +195,7 @@ func (q QuerySet) Count() (int, error) {
 //Returns a map of aggregate values (averages, sums, etc.) calculated over
 //the QuerySet. Each argument to aggregate() specifies a value that will
 //be included in the map that is returned.
-func (q *QuerySet) Aggregate(aggregates ...aggregate) (object, error) {
+func (q *QuerySet) Aggregate(aggregates ...*aggregate) (object, error) {
 	q.selected = nil
 	q.orderBy = nil
 

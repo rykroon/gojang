@@ -36,7 +36,7 @@ type field interface {
 	asAssignment() assignment
 	Asc() sortExpression
 	Desc() sortExpression
-	Count(bool) aggregate
+	Count(bool) *aggregate
 
 	copyField() field
 	//new() field //haven't found a use for this yet
