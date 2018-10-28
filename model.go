@@ -5,15 +5,16 @@ import (
 	//"fmt"
 	"reflect"
 	//"strconv"
+	"errors"
 	"strings"
 )
 
 type Model struct {
-	dbTable     string
-	Objects     Manager
-	fields      []field
-	colToFields map[string]field
-	Pk          primaryKeyField
+	dbTable   string
+	Objects   Manager
+	fields    []field
+	colToAttr map[string]string
+	Pk        primaryKeyField
 
 	db *sql.DB
 
@@ -25,7 +26,7 @@ type Model struct {
 func NewModel(db Database) *Model {
 	model := &Model{}
 	model.fields = make([]field, 0)
-	model.colToFields = make(map[string]field)
+	model.colToAttr = make(map[string]string)
 	model.db, _ = db.toDB()
 	model.Objects = newManager(model)
 	return model
@@ -77,7 +78,7 @@ func MakeModel(i interface{}) error {
 			}
 
 			setFieldOptions(field, options)
-			model.addField(field)
+			model.addField(fieldType.Name, field)
 
 			if field.hasPrimaryKeyConstraint() {
 				//Use type assertion to make sure that even if the field has a
@@ -104,25 +105,25 @@ func MakeModel(i interface{}) error {
 		model.Pk = NewAutoField()
 		model.Pk.setDbColumn("id")
 		model.Pk.setPrimaryKeyConstraint(true)
-		model.addField(model.Pk)
+		model.addField("id", model.Pk)
 	}
 
 	return nil
 }
 
 //Add Field to the model
-func (m *Model) addField(f field) {
+func (m *Model) addField(attrName string, f field) {
 	f.setModel(m)
 	f.validate()
 
 	columnName := f.getDbColumn()
 
-	_, duplicate := m.colToFields[columnName]
+	_, duplicate := m.colToAttr[columnName]
 	if duplicate {
 		panic(NewDuplicateColumnError(columnName))
 	}
 
-	m.colToFields[columnName] = f
+	m.colToAttr[columnName] = attrName
 
 	//prepend primaryKeyField to the beginning of the slice
 	_, isAPrimaryKeyField := f.(primaryKeyField)
@@ -133,23 +134,27 @@ func (m *Model) addField(f field) {
 	}
 }
 
-// func (m *Model) copy() *Model {
-// 	copy := NewModel()
-// }
+func (m *Model) ToObj() object {
+	obj := newObj()
+
+	for _, field := range m.fields {
+		attrName := m.colToAttr[field.getDbColumn()]
+		obj.SetAttr(attrName, field.getValue())
+	}
+
+	return obj
+}
 
 //If instance does not have a primary key then it will insert into the database
 //Otherwise it updates the record
 func (m *Model) Save() error {
 	if m.Pk.Id() == 0 {
-		row := m.db.QueryRow(m.insert())
-
-		result := 0
-		err := row.Scan(&result)
+		id, err := m.insert()
 		if err != nil {
 			return err
 		}
 
-		m.Pk.setInt(result)
+		m.Pk.setInt(id)
 
 	} else {
 		err := m.update()
@@ -162,28 +167,26 @@ func (m *Model) Save() error {
 	return nil
 }
 
-//
-func (m *Model) insert() string {
-	sql := "INSERT INTO " + dbq(m.dbTable) + " "
-	columns := "("
-	values := "("
-	var pkFieldName string
+func (m *Model) insert() (int, error) {
+	var createList []assignment
 
 	for _, field := range m.fields {
-		if field.hasPrimaryKeyConstraint() {
-			pkFieldName = field.getDbColumn()
-			continue
+		if !field.hasPrimaryKeyConstraint() {
+			createList = append(createList, field.asAssignment())
 		}
-
-		columns += dbq(field.getDbColumn()) + ", "
-		values += field.valueAsSql() + ", "
 	}
 
-	columns = columns[:len(columns)-2] + ")"
-	values = values[:len(values)-2] + ")"
-	sql += columns + " VALUES " + values + " RETURNING " + dbq(pkFieldName) + ";"
+	obj, err := m.Objects.Create(createList...)
+	if err != nil {
+		return 0, err
+	}
 
-	return sql
+	pkeyAttr := m.colToAttr[m.Pk.getDbColumn()]
+	if obj.HasAttr(pkeyAttr) {
+		return obj.GetAttr(pkeyAttr).(int), nil
+	}
+
+	return 0, errors.New("gojang: idk, we lost the key, sorry")
 }
 
 //

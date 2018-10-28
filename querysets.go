@@ -164,7 +164,8 @@ func (q QuerySet) Create(assignments ...assignment) (object, error) {
 	}
 
 	for _, assign := range assignments {
-		obj.SetAttr(assign.lhs.getDbColumn(), assign.lhs.getValue())
+		attrName := q.model.colToAttr[assign.lhs.getDbColumn()]
+		obj.SetAttr(attrName, assign.lhs.getValue())
 	}
 
 	return obj, nil

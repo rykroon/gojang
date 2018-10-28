@@ -145,7 +145,7 @@ func (f function) getValue() interface{} {
 }
 
 func (f *BigIntegerField) getValue() interface{} {
-	return f.Value
+	return int(f.Value)
 }
 
 func (f *BooleanField) getValue() interface{} {
@@ -157,11 +157,11 @@ func (f *FloatField) getValue() interface{} {
 }
 
 func (f *IntegerField) getValue() interface{} {
-	return f.Value
+	return int(f.Value)
 }
 
 func (f *SmallIntegerField) getValue() interface{} {
-	return f.Value
+	return int(f.Value)
 }
 
 func (f *TextField) getValue() interface{} {
@@ -176,28 +176,39 @@ func (f function) getAlias() string {
 	return f.outputField.getDbColumn()
 }
 
+//Use the field's attribute name if it is part of a model
+func getFieldAlias(field field) string {
+	if field.hasModel() {
+		attrName, ok := field.getModel().colToAttr[field.getDbColumn()]
+		if ok {
+			return attrName
+		}
+	}
+	return field.getDbColumn()
+}
+
 func (f *BigIntegerField) getAlias() string {
-	return f.dbColumn
+	return getFieldAlias(f)
 }
 
 func (f *BooleanField) getAlias() string {
-	return f.dbColumn
+	return getFieldAlias(f)
 }
 
 func (f *FloatField) getAlias() string {
-	return f.dbColumn
+	return getFieldAlias(f)
 }
 
 func (f *IntegerField) getAlias() string {
-	return f.dbColumn
+	return getFieldAlias(f)
 }
 
 func (f *SmallIntegerField) getAlias() string {
-	return f.dbColumn
+	return getFieldAlias(f)
 }
 
 func (f *TextField) getAlias() string {
-	return f.dbColumn
+	return getFieldAlias(f)
 }
 
 //
