@@ -39,7 +39,7 @@ type field interface {
 	Count(bool) aggregate
 
 	copyField() field
-	new() field
+	//new() field //haven't found a use for this yet
 
 	validate()
 	valueAsSql() string

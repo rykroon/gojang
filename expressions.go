@@ -14,25 +14,25 @@ type expression interface {
 
 type selectExpression interface {
 	expression
-	Scan(interface{}) error
-	getValue() interface{}
 	getAlias() string
+	getValue() interface{}
+	//As(string)
+	Scan(interface{}) error
 }
 
-// type annotation interface {
-// 	expression
-// 	As()
-// }
-
 type sortExpression struct {
-	field field
 	desc  bool
+	field field
 }
 
 type star string
 
 func (a aggregate) asSql() string {
 	return function(a).asSql()
+}
+
+func (a assignment) asSql() string {
+	return dbq(a.lhs.getDbColumn()) + " " + a.lookupName + " " + a.rhs
 }
 
 func (f function) asSql() string {

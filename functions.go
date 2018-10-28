@@ -19,6 +19,11 @@ func (a aggregate) As(alias string) aggregate {
 	return a
 }
 
+func (f function) As(alias string) function {
+	f.outputField.setDbColumn(alias)
+	return f
+}
+
 //Create a new function
 func newFunc(name string, expr expression, outputField field) function {
 	funct := function{}
@@ -27,7 +32,8 @@ func newFunc(name string, expr expression, outputField field) function {
 	funct.args = []interface{}{funct.name, funct.expr.asSql()}
 	funct.template = "%v(%v)"
 	funct.outputField = outputField
-	funct.outputField.setDbColumn(strings.ToLower(name))
+	//funct.outputField.setDbColumn(strings.ToLower(name))
+	funct = funct.As(strings.ToLower(name))
 	funct.outputField.setExpr(funct)
 	return funct
 }
@@ -71,11 +77,13 @@ func newSum(expr expression, outputField field) function {
 func avgField(field field) aggregate {
 	avg := newAvg(field)
 	alias := field.getDbColumn() + "__avg"
-	avg.outputField.setDbColumn(alias)
+	//avg.outputField.setDbColumn(alias)
+	avg = avg.As(alias)
 
 	if field.getDbType() != avg.outputField.getDbType() {
 		cast := newCast(avg, avg.outputField)
-		cast.outputField.setDbColumn(alias)
+		//cast.outputField.setDbColumn(alias)
+		cast = cast.As(alias)
 		return aggregate(cast)
 	}
 
@@ -86,14 +94,16 @@ func avgField(field field) aggregate {
 func countField(field field, distinct bool) aggregate {
 	count := newCount(field, distinct)
 	alias := field.getDbColumn() + "__count"
-	count.outputField.setDbColumn(alias)
+	//count.outputField.setDbColumn(alias)
+	count = count.As(alias)
 	return count
 }
 
 // func sumField(field field) function {
 //   sum := newSum(field)
 //   alias := field.getDbColumn() + "__sum"
-//   sum.outputField.setDbColumn(alias)
+//   //sum.outputField.setDbColumn(alias)
+// 	sum = sum.As(alias)
 //   return sum
 // }
 
@@ -125,13 +135,13 @@ func (s star) Count() aggregate {
 	return newCount(s, false)
 }
 
-func (f *AutoField) Count(distinct bool) aggregate {
-	return countField(f, distinct)
-}
-
-func (f *BigAutoField) Count(distinct bool) aggregate {
-	return countField(f, distinct)
-}
+// func (f *AutoField) Count(distinct bool) aggregate {
+// 	return countField(f, distinct)
+// }
+//
+// func (f *BigAutoField) Count(distinct bool) aggregate {
+// 	return countField(f, distinct)
+// }
 
 func (f *BigIntegerField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
@@ -157,10 +167,10 @@ func (f *TextField) Count(distinct bool) aggregate {
 	return countField(f, distinct)
 }
 
-func (f *ForeignKey) Count(distinct bool) aggregate {
-	return countField(f, distinct)
-}
-
-func (f *OneToOneField) Count(distinct bool) aggregate {
-	return countField(f, distinct)
-}
+// func (f *ForeignKey) Count(distinct bool) aggregate {
+// 	return countField(f, distinct)
+// }
+//
+// func (f *OneToOneField) Count(distinct bool) aggregate {
+// 	return countField(f, distinct)
+// }
