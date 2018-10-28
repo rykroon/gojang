@@ -33,7 +33,6 @@ func (q QuerySet) buildQuery() string {
 		sql += q.processOrderBy()
 	}
 
-	//sql += ";"
 	return sql
 }
 

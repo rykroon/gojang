@@ -1,10 +1,6 @@
 package gojang
 
-import (
-//"strconv"
-//"reflect"
-//"fmt"
-)
+import ()
 
 type onDelete string
 

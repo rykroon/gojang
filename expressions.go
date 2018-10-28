@@ -2,8 +2,6 @@ package gojang
 
 import (
 	"fmt"
-	//"reflect"
-	//"unsafe"
 )
 
 //Expressions describe a value or a computation that can be used as part of an
