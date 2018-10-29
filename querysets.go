@@ -297,7 +297,7 @@ func (q *QuerySet) getDest() []interface{} {
 func (q *QuerySet) getObject() object {
 	obj := newObj()
 	for _, expr := range q.selected {
-		obj.SetAttr(expr.getAlias(), expr.getValue())
+		obj.SetAttr(expr.Alias(), expr.getValue())
 	}
 
 	return obj

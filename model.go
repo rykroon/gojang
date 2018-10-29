@@ -111,6 +111,7 @@ func MakeModel(i interface{}) error {
 
 //Add Field to the model
 func (m *Model) addField(attrName string, f field) {
+	f.As(attrName)
 	f.setModel(m)
 	f.validate()
 

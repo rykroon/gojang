@@ -27,6 +27,7 @@ type BigIntegerField struct {
 	model    *Model
 	dbColumn string
 	dbType   string
+	alias    string
 
 	constraints
 	isRelation bool
@@ -41,6 +42,7 @@ type BooleanField struct {
 	model    *Model
 	dbColumn string
 	dbType   string
+	alias    string
 
 	constraints
 	isRelation bool
@@ -55,6 +57,7 @@ type FloatField struct {
 	model    *Model
 	dbColumn string
 	dbType   string
+	alias    string
 
 	constraints
 	isRelation bool
@@ -69,6 +72,7 @@ type IntegerField struct {
 	model    *Model
 	dbColumn string
 	dbType   string
+	alias    string
 
 	constraints
 	isRelation bool
@@ -83,6 +87,7 @@ type SmallIntegerField struct {
 	model    *Model
 	dbColumn string
 	dbType   string
+	alias    string
 
 	constraints
 	isRelation bool
@@ -97,6 +102,7 @@ type TextField struct {
 	model    *Model
 	dbColumn string
 	dbType   string
+	alias    string
 
 	constraints
 	isRelation bool
@@ -204,6 +210,7 @@ func (f *BigIntegerField) copy() *BigIntegerField {
 	copy := NewBigIntegerField()
 	copy.model = f.model //maybe change to be a copy of the model
 	copy.dbColumn = f.dbColumn
+	copy.alias = f.alias
 	copy.constraints = f.constraints
 	return copy
 }
@@ -212,6 +219,7 @@ func (f *BooleanField) copy() *BooleanField {
 	copy := NewBooleanField()
 	copy.model = f.model
 	copy.dbColumn = f.dbColumn
+	copy.alias = f.alias
 	copy.constraints = f.constraints
 	return copy
 }
@@ -220,6 +228,7 @@ func (f *FloatField) copy() *FloatField {
 	copy := NewFloatField()
 	copy.model = f.model
 	copy.dbColumn = f.dbColumn
+	copy.alias = f.alias
 	copy.constraints = f.constraints
 	return copy
 }
@@ -228,6 +237,7 @@ func (f *IntegerField) copy() *IntegerField {
 	copy := NewIntegerField()
 	copy.model = f.model
 	copy.dbColumn = f.dbColumn
+	copy.alias = f.alias
 	copy.constraints = f.constraints
 	return copy
 }
@@ -236,6 +246,7 @@ func (f *SmallIntegerField) copy() *SmallIntegerField {
 	copy := NewSmallIntegerField()
 	copy.model = f.model
 	copy.dbColumn = f.dbColumn
+	copy.alias = f.alias
 	copy.constraints = f.constraints
 	return copy
 }
@@ -244,6 +255,7 @@ func (f *TextField) copy() *TextField {
 	copy := NewTextField()
 	copy.model = f.model
 	copy.dbColumn = f.dbColumn
+	copy.alias = f.alias
 	copy.constraints = f.constraints
 	return copy
 }

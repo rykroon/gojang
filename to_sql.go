@@ -1,9 +1,15 @@
 package gojang
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
+
+//auxillary print function for testing purposes
+func print(args ...interface{}) {
+	fmt.Println(args...)
+}
 
 func doubleQuotes(s string) string {
 	return "\"" + s + "\""

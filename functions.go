@@ -14,16 +14,6 @@ type function struct {
 
 type aggregate function
 
-func (a *aggregate) As(alias string) {
-	a.outputField.setDbColumn(alias)
-	//return a
-}
-
-func (f *function) As(alias string) {
-	f.outputField.setDbColumn(alias)
-	//return f
-}
-
 //Create a new function
 func newFunc(name string, expr expression, outputField field) *function {
 	funct := &function{}
@@ -31,9 +21,9 @@ func newFunc(name string, expr expression, outputField field) *function {
 	funct.expr = expr
 	funct.args = []interface{}{funct.name, funct.expr.asSql()}
 	funct.template = "%v(%v)"
+
 	funct.outputField = outputField
 	funct.As(strings.ToLower(name))
-	funct.outputField.setExpr(funct)
 	return funct
 }
 
@@ -53,7 +43,6 @@ func newCast(expr expression, outputField field) *function {
 	cast := newFunc("CAST", expr, outputField)
 	cast.args = append(cast.args, cast.outputField.getDbType())
 	cast.template = "%v(%v AS %v)"
-	cast.outputField.setExpr(cast)
 	return cast
 }
 
@@ -63,7 +52,6 @@ func newCount(expr expression, distinct bool) *aggregate {
 
 	if distinct {
 		count.template = "%v(DISTINCT %v)"
-		count.outputField.setExpr(count)
 	}
 
 	return count

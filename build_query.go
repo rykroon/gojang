@@ -37,20 +37,14 @@ func (q QuerySet) buildQuery() string {
 }
 
 func (q QuerySet) processSelect() string {
-	sql := "SELECT "
+	var selectList []string
 
-	if len(q.selected) == 0 {
-		sql += "*"
-	} else {
-
-		for _, expr := range q.selected {
-			sql += expr.asSql() + ", "
-		}
-
-		sql = sql[:len(sql)-2]
+	for _, expr := range q.selected {
+		selectExpr := expr.asSql() + " AS " + dbq(expr.Alias())
+		selectList = append(selectList, selectExpr)
 	}
 
-	return sql
+	return "SELECT " + strings.Join(selectList, ", ")
 }
 
 func (q QuerySet) processFrom() string {

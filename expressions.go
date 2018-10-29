@@ -12,9 +12,9 @@ type expression interface {
 
 type selectExpression interface {
 	expression
-	getAlias() string
 	getValue() interface{}
-	//As(string)
+	As(string) //is essentially the 'setter' method for alias
+	Alias() string
 	Scan(interface{}) error
 }
 
@@ -40,6 +40,7 @@ func (f *function) asSql() string {
 
 func (l lookup) asSql() string {
 	sql := l.lhs.asSql() + " " + l.lookupName + " " + l.rhs
+	//sql := fieldAsSql(l.lhs, false) + " " + l.lookupName + " " + l.rhs
 
 	if l.not {
 		sql = "NOT(" + sql + ")"
@@ -60,11 +61,18 @@ func (s star) asSql() string {
 }
 
 func fieldAsSql(field field) string {
+	sql := ""
+
 	if field.hasModel() {
-		return dbq(field.getModel().dbTable) + "." + dbq(field.getDbColumn())
+		tableName := dbq(field.getModel().dbTable)
+		colName := dbq(field.getDbColumn())
+		sql = tableName + "." + colName
+
 	} else {
-		return field.getExpr().asSql() + " AS " + dbq(field.getDbColumn())
+		sql = field.getDbColumn()
 	}
+
+	return sql
 }
 
 func (f *BigIntegerField) asSql() string {
@@ -91,13 +99,88 @@ func (f *TextField) asSql() string {
 	return fieldAsSql(f)
 }
 
-func (a aggregate) Scan(v interface{}) error {
-	return function(a).Scan(v)
-}
-
 //
 //Select Expression Method Set
 //
+
+func (a aggregate) Alias() string {
+	return function(a).Alias()
+}
+
+func (f function) Alias() string {
+	return f.outputField.Alias()
+}
+
+//Use the field's attribute name if it is part of a model
+// func getFieldAlias(field field) string {
+// 	if field.hasModel() {
+// 		attrName, ok := field.getModel().colToAttr[field.getDbColumn()]
+// 		if ok {
+// 			return attrName
+// 		}
+// 	}
+// 	return field.getDbColumn()
+// }
+
+func (f *BigIntegerField) Alias() string {
+	return f.alias
+}
+
+func (f *BooleanField) Alias() string {
+	return f.alias
+}
+
+func (f *FloatField) Alias() string {
+	return f.alias
+}
+
+func (f *IntegerField) Alias() string {
+	return f.alias
+}
+
+func (f *SmallIntegerField) Alias() string {
+	return f.alias
+}
+
+func (f *TextField) Alias() string {
+	return f.alias
+}
+
+func (a *aggregate) As(alias string) {
+	a.outputField.As(alias)
+}
+
+func (f *function) As(alias string) {
+	f.outputField.As(alias)
+}
+
+func (f *BigIntegerField) As(alias string) {
+	f.alias = alias
+}
+
+func (f *BooleanField) As(alias string) {
+	f.alias = alias
+}
+
+func (f *FloatField) As(alias string) {
+	f.alias = alias
+}
+
+func (f *IntegerField) As(alias string) {
+	f.alias = alias
+}
+
+func (f *SmallIntegerField) As(alias string) {
+	f.alias = alias
+}
+
+func (f *TextField) As(alias string) {
+	f.alias = alias
+}
+
+func (a aggregate) Scan(v interface{}) error {
+	return function(a).Scan(v)
+}
 
 func (f function) Scan(v interface{}) error {
 	return f.outputField.Scan(v)
@@ -165,49 +248,6 @@ func (f *SmallIntegerField) getValue() interface{} {
 
 func (f *TextField) getValue() interface{} {
 	return f.Value
-}
-
-func (a aggregate) getAlias() string {
-	return function(a).getAlias()
-}
-
-func (f function) getAlias() string {
-	return f.outputField.getDbColumn()
-}
-
-//Use the field's attribute name if it is part of a model
-func getFieldAlias(field field) string {
-	if field.hasModel() {
-		attrName, ok := field.getModel().colToAttr[field.getDbColumn()]
-		if ok {
-			return attrName
-		}
-	}
-	return field.getDbColumn()
-}
-
-func (f *BigIntegerField) getAlias() string {
-	return getFieldAlias(f)
-}
-
-func (f *BooleanField) getAlias() string {
-	return getFieldAlias(f)
-}
-
-func (f *FloatField) getAlias() string {
-	return getFieldAlias(f)
-}
-
-func (f *IntegerField) getAlias() string {
-	return getFieldAlias(f)
-}
-
-func (f *SmallIntegerField) getAlias() string {
-	return getFieldAlias(f)
-}
-
-func (f *TextField) getAlias() string {
-	return getFieldAlias(f)
 }
 
 //
