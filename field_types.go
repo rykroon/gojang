@@ -32,8 +32,6 @@ type BigIntegerField struct {
 	constraints
 	isRelation bool
 
-	expr expression
-
 	valid bool
 	Value int64
 }
@@ -46,8 +44,6 @@ type BooleanField struct {
 
 	constraints
 	isRelation bool
-
-	expr expression
 
 	valid bool
 	Value bool
@@ -62,8 +58,6 @@ type FloatField struct {
 	constraints
 	isRelation bool
 
-	expr expression
-
 	valid bool
 	Value float64
 }
@@ -77,8 +71,6 @@ type IntegerField struct {
 	constraints
 	isRelation bool
 
-	expr expression
-
 	valid bool
 	Value int32
 }
@@ -91,8 +83,6 @@ type SmallIntegerField struct {
 
 	constraints
 	isRelation bool
-
-	expr expression
 
 	valid bool
 	Value int16

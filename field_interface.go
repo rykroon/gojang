@@ -11,9 +11,6 @@ type field interface {
 
 	getDbType() string
 
-	getExpr() expression
-	setExpr(expression)
-
 	getModel() *Model
 	setModel(*Model)
 	hasModel() bool
@@ -43,54 +40,6 @@ type field interface {
 
 	validate()
 	valueAsSql() string
-}
-
-func (f *BigIntegerField) getExpr() expression {
-	return f.expr
-}
-
-func (f *BooleanField) getExpr() expression {
-	return f.expr
-}
-
-func (f *FloatField) getExpr() expression {
-	return f.expr
-}
-
-func (f *IntegerField) getExpr() expression {
-	return f.expr
-}
-
-func (f *SmallIntegerField) getExpr() expression {
-	return f.expr
-}
-
-func (f *TextField) getExpr() expression {
-	return f.expr
-}
-
-func (f *BigIntegerField) setExpr(expr expression) {
-	f.expr = expr
-}
-
-func (f *BooleanField) setExpr(expr expression) {
-	f.expr = expr
-}
-
-func (f *FloatField) setExpr(expr expression) {
-	f.expr = expr
-}
-
-func (f *IntegerField) setExpr(expr expression) {
-	f.expr = expr
-}
-
-func (f *SmallIntegerField) setExpr(expr expression) {
-	f.expr = expr
-}
-
-func (f *TextField) setExpr(expr expression) {
-	f.expr = expr
 }
 
 func (f *BigIntegerField) copyField() field {
