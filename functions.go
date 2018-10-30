@@ -41,7 +41,7 @@ func newAvg(expr expression) *aggregate {
 //Creates a new CAST Function
 func newCast(expr expression, outputField field) *function {
 	cast := newFunc("CAST", expr, outputField)
-	cast.args = append(cast.args, cast.outputField.getDbType())
+	cast.args = append(cast.args, cast.outputField.DbType())
 	cast.template = "%v(%v AS %v)"
 	return cast
 }
@@ -65,10 +65,10 @@ func newSum(expr expression, outputField field) *function {
 //Creates a new AVG function for a field
 func avgField(field field) *aggregate {
 	avg := newAvg(field)
-	alias := field.getDbColumn() + "__avg"
+	alias := field.DbColumn() + "__avg"
 	avg.As(alias)
 
-	if field.getDbType() != avg.outputField.getDbType() {
+	if field.DbType() != avg.outputField.DbType() {
 		cast := newCast(avg, avg.outputField)
 		cast.As(alias)
 		aggCast := aggregate(*cast)
@@ -81,14 +81,14 @@ func avgField(field field) *aggregate {
 //Creates a new Count function for a field
 func countField(field field, distinct bool) *aggregate {
 	count := newCount(field, distinct)
-	alias := field.getDbColumn() + "__count"
+	alias := field.DbColumn() + "__count"
 	count.As(alias)
 	return count
 }
 
 // func sumField(field field) function {
 //   sum := newSum(field)
-//   alias := field.getDbColumn() + "__sum"
+//   alias := field.DbColumn() + "__sum"
 //   //sum.outputField.setDbColumn(alias)
 // 	sum = sum.As(alias)
 //   return sum

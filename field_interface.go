@@ -6,25 +6,25 @@ type field interface {
 	selectExpression
 
 	//getters and setters
-	getDbColumn() string
+	DbColumn() string
 	setDbColumn(string)
 
-	getDbType() string
+	DbType() string
 
-	getModel() *Model
+	Model() *Model
 	setModel(*Model)
-	hasModel() bool
+	HasModel() bool
 
-	hasNullConstraint() bool
+	HasNullConstraint() bool
 	setNullConstraint(bool)
 
-	hasUniqueConstraint() bool
+	HasUniqueConstraint() bool
 	setUniqueConstraint(bool)
 
-	hasPrimaryKeyConstraint() bool
+	HasPrimaryKeyConstraint() bool
 	setPrimaryKeyConstraint(bool)
 
-	hasRelation() bool
+	HasRelation() bool
 
 	IsNil() bool
 	SetNil() error
@@ -90,27 +90,7 @@ func (f *TextField) new() field {
 	return NewTextField()
 }
 
-func (f *BigIntegerField) hasNullConstraint() bool {
-	return f.null
-}
-
-func (f *BooleanField) hasNullConstraint() bool {
-	return f.null
-}
-
-func (f *FloatField) hasNullConstraint() bool {
-	return f.null
-}
-
-func (f *IntegerField) hasNullConstraint() bool {
-	return f.null
-}
-
-func (f *SmallIntegerField) hasNullConstraint() bool {
-	return f.null
-}
-
-func (f *TextField) hasNullConstraint() bool {
+func (f *column) HasNullConstraint() bool {
 	return f.null
 }
 
@@ -162,124 +142,24 @@ func (f *TextField) setNullConstraint(null bool) {
 	}
 }
 
-func (f *BigIntegerField) hasUniqueConstraint() bool {
+func (f *column) HasUniqueConstraint() bool {
 	return f.unique
 }
 
-func (f *BooleanField) hasUniqueConstraint() bool {
-	return f.unique
+func (c *column) setUniqueConstraint(unique bool) {
+	c.unique = unique
 }
 
-func (f *FloatField) hasUniqueConstraint() bool {
-	return f.unique
+func (c *column) HasPrimaryKeyConstraint() bool {
+	return c.primaryKey
 }
 
-func (f *IntegerField) hasUniqueConstraint() bool {
-	return f.unique
+func (c *column) setPrimaryKeyConstraint(primaryKey bool) {
+	c.primaryKey = primaryKey
 }
 
-func (f *SmallIntegerField) hasUniqueConstraint() bool {
-	return f.unique
-}
-
-func (f *TextField) hasUniqueConstraint() bool {
-	return f.unique
-}
-
-func (f *BigIntegerField) setUniqueConstraint(unique bool) {
-	f.unique = unique
-}
-
-func (f *BooleanField) setUniqueConstraint(unique bool) {
-	f.unique = unique
-}
-
-func (f *FloatField) setUniqueConstraint(unique bool) {
-	f.unique = unique
-}
-
-func (f *IntegerField) setUniqueConstraint(unique bool) {
-	f.unique = unique
-}
-
-func (f *SmallIntegerField) setUniqueConstraint(unique bool) {
-	f.unique = unique
-}
-
-func (f *TextField) setUniqueConstraint(unique bool) {
-	f.unique = unique
-}
-
-func (f *BigIntegerField) hasPrimaryKeyConstraint() bool {
-	return f.primaryKey
-}
-
-func (f *BooleanField) hasPrimaryKeyConstraint() bool {
-	return f.primaryKey
-}
-
-func (f *FloatField) hasPrimaryKeyConstraint() bool {
-	return f.primaryKey
-}
-
-func (f *IntegerField) hasPrimaryKeyConstraint() bool {
-	return f.primaryKey
-}
-
-func (f *SmallIntegerField) hasPrimaryKeyConstraint() bool {
-	return f.primaryKey
-}
-
-func (f *TextField) hasPrimaryKeyConstraint() bool {
-	return f.primaryKey
-}
-
-func (f *BigIntegerField) setPrimaryKeyConstraint(primaryKey bool) {
-	f.primaryKey = primaryKey
-}
-
-func (f *BooleanField) setPrimaryKeyConstraint(primaryKey bool) {
-	f.primaryKey = primaryKey
-}
-
-func (f *FloatField) setPrimaryKeyConstraint(primaryKey bool) {
-	f.primaryKey = primaryKey
-}
-
-func (f *IntegerField) setPrimaryKeyConstraint(primaryKey bool) {
-	f.primaryKey = primaryKey
-}
-
-func (f *SmallIntegerField) setPrimaryKeyConstraint(primaryKey bool) {
-	f.primaryKey = primaryKey
-}
-
-func (f *TextField) setPrimaryKeyConstraint(primaryKey bool) {
-	f.primaryKey = primaryKey
-}
-
-func (f *BigIntegerField) hasRelation() bool {
-	return f.isRelation
-}
-
-func (f *BooleanField) hasRelation() bool {
-	return f.isRelation
-}
-
-func (f *FloatField) hasRelation() bool {
-	return f.isRelation
-}
-
-func (f *IntegerField) hasRelation() bool {
-	return f.isRelation
-}
-
-func (f *SmallIntegerField) hasRelation() bool {
-	return f.isRelation
-}
-
-func (f *TextField) hasRelation() bool {
-	return f.isRelation
+func (c *column) HasRelation() bool {
+	return c.isRelation
 }
 
 func (f *AutoField) validate() {
@@ -354,147 +234,27 @@ func (f *OneToOneField) validate() {
 	}
 }
 
-func (f *BigIntegerField) setModel(model *Model) {
+func (f *column) setModel(model *Model) {
 	f.model = model
 }
 
-func (f *BooleanField) setModel(model *Model) {
-	f.model = model
+func (c *column) Model() *Model {
+	return c.model
 }
 
-func (f *FloatField) setModel(model *Model) {
-	f.model = model
-}
-
-func (f *IntegerField) setModel(model *Model) {
-	f.model = model
-}
-
-func (f *SmallIntegerField) setModel(model *Model) {
-	f.model = model
-}
-
-func (f *TextField) setModel(model *Model) {
-	f.model = model
-}
-
-func (f *BigIntegerField) getModel() *Model {
-	return f.model
-}
-
-func (f *BooleanField) getModel() *Model {
-	return f.model
-}
-
-func (f *FloatField) getModel() *Model {
-	return f.model
-}
-
-func (f *IntegerField) getModel() *Model {
-	return f.model
-}
-
-func (f *SmallIntegerField) getModel() *Model {
-	return f.model
-}
-
-func (f *TextField) getModel() *Model {
-	return f.model
-}
-
-func (f *BigIntegerField) hasModel() bool {
+func (f *column) HasModel() bool {
 	return f.model != nil
 }
 
-func (f *BooleanField) hasModel() bool {
-	return f.model != nil
-}
-
-func (f *FloatField) hasModel() bool {
-	return f.model != nil
-}
-
-func (f *IntegerField) hasModel() bool {
-	return f.model != nil
-}
-
-func (f *SmallIntegerField) hasModel() bool {
-	return f.model != nil
-}
-
-func (f *TextField) hasModel() bool {
-	return f.model != nil
-}
-
-func (f *BigIntegerField) getDbColumn() string {
+func (f *column) DbColumn() string {
 	return f.dbColumn
 }
 
-func (f *BooleanField) getDbColumn() string {
-	return f.dbColumn
+func (f *column) setDbColumn(col string) {
+	f.dbColumn = col
 }
 
-func (f *FloatField) getDbColumn() string {
-	return f.dbColumn
-}
-
-func (f *IntegerField) getDbColumn() string {
-	return f.dbColumn
-}
-
-func (f *SmallIntegerField) getDbColumn() string {
-	return f.dbColumn
-}
-
-func (f *TextField) getDbColumn() string {
-	return f.dbColumn
-}
-
-func (f *BigIntegerField) setDbColumn(columnName string) {
-	f.dbColumn = columnName
-}
-
-func (f *BooleanField) setDbColumn(columnName string) {
-	f.dbColumn = columnName
-}
-
-func (f *FloatField) setDbColumn(columnName string) {
-	f.dbColumn = columnName
-}
-
-func (f *IntegerField) setDbColumn(columnName string) {
-	f.dbColumn = columnName
-}
-
-func (f *SmallIntegerField) setDbColumn(columnName string) {
-	f.dbColumn = columnName
-}
-
-func (f *TextField) setDbColumn(columnName string) {
-	f.dbColumn = columnName
-}
-
-func (f *BigIntegerField) getDbType() string {
-	return f.dbType
-}
-
-func (f *BooleanField) getDbType() string {
-	return f.dbType
-}
-
-func (f *FloatField) getDbType() string {
-	return f.dbType
-}
-
-func (f *IntegerField) getDbType() string {
-	return f.dbType
-}
-
-func (f *SmallIntegerField) getDbType() string {
-	return f.dbType
-}
-
-func (f *TextField) getDbType() string {
+func (f *column) DbType() string {
 	return f.dbType
 }
 

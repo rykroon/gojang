@@ -78,7 +78,7 @@ func MakeModel(i interface{}) error {
 			setFieldOptions(field, options)
 			model.addField(fieldType.Name, field)
 
-			if field.hasPrimaryKeyConstraint() {
+			if field.HasPrimaryKeyConstraint() {
 				//Use type assertion to make sure that even if the field has a
 				//Primary Key Constraint that it can still implement the
 				//primaryKeyField interface
@@ -115,7 +115,7 @@ func (m *Model) addField(attrName string, f field) {
 	f.setModel(m)
 	f.validate()
 
-	columnName := f.getDbColumn()
+	columnName := f.DbColumn()
 
 	_, duplicate := m.colToAttr[columnName]
 	if duplicate {

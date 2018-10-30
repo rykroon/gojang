@@ -155,7 +155,7 @@ func (q QuerySet) Create(assignments ...assignment) (object, error) {
 	}
 
 	q.Query = q.buildQuery()
-	pkeyName := q.model.Pk.getDbColumn()
+	pkeyName := q.model.Pk.DbColumn()
 	q.Query += " RETURNING " + dbq(pkeyName)
 
 	obj, err := q.queryRowAndScan()
@@ -164,7 +164,7 @@ func (q QuerySet) Create(assignments ...assignment) (object, error) {
 	}
 
 	for _, assign := range assignments {
-		attrName := q.model.colToAttr[assign.lhs.getDbColumn()]
+		attrName := q.model.colToAttr[assign.lhs.DbColumn()]
 		obj.SetAttr(attrName, assign.lhs.getValue())
 	}
 

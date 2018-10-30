@@ -8,7 +8,7 @@ func (m *Model) ToObj() object {
 	obj := newObj()
 
 	for _, field := range m.fields {
-		attrName := m.colToAttr[field.getDbColumn()]
+		attrName := m.colToAttr[field.DbColumn()]
 		obj.SetAttr(attrName, field.getValue())
 	}
 
@@ -51,7 +51,7 @@ func (m *Model) insert() (int, error) {
 	var createList []assignment
 
 	for _, field := range m.fields {
-		if !field.hasPrimaryKeyConstraint() {
+		if !field.HasPrimaryKeyConstraint() {
 			createList = append(createList, field.asAssignment())
 		}
 	}
@@ -61,7 +61,7 @@ func (m *Model) insert() (int, error) {
 		return 0, err
 	}
 
-	pkeyAttr := m.colToAttr[m.Pk.getDbColumn()]
+	pkeyAttr := m.colToAttr[m.Pk.DbColumn()]
 	if obj.HasAttr(pkeyAttr) {
 		return obj.GetAttr(pkeyAttr).(int), nil
 	}
@@ -74,7 +74,7 @@ func (m *Model) update() error {
 	var updateList []assignment
 
 	for _, field := range m.fields {
-		if !field.hasPrimaryKeyConstraint() {
+		if !field.HasPrimaryKeyConstraint() {
 			updateList = append(updateList, field.asAssignment())
 		}
 	}

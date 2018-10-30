@@ -31,7 +31,7 @@ func (a *aggregate) asSql() string {
 }
 
 func (a assignment) asSql() string {
-	return dbq(a.lhs.getDbColumn()) + " " + a.lookupName + " " + a.rhs
+	return dbq(a.lhs.DbColumn()) + " " + a.lookupName + " " + a.rhs
 }
 
 func (f *function) asSql() string {
@@ -62,13 +62,13 @@ func (s star) asSql() string {
 func fieldAsSql(field field) string {
 	sql := ""
 
-	if field.hasModel() {
-		tableName := dbq(field.getModel().dbTable)
-		colName := dbq(field.getDbColumn())
+	if field.HasModel() {
+		tableName := dbq(field.Model().dbTable)
+		colName := dbq(field.DbColumn())
 		sql = tableName + "." + colName
 
 	} else {
-		sql = field.getDbColumn()
+		sql = field.DbColumn()
 	}
 
 	return sql

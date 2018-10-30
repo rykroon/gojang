@@ -15,92 +15,65 @@ type constraints struct {
 	primaryKey bool
 }
 
-type AutoField struct {
-	*IntegerField
-}
-
-type BigAutoField struct {
-	*BigIntegerField
-}
-
-type BigIntegerField struct {
+type column struct {
 	model    *Model
 	dbColumn string
 	dbType   string
 	alias    string
 
 	constraints
-	isRelation bool
+	isRelation bool //foreignKey
+}
+
+//A field type for each data type
+type BigIntegerField struct {
+	*column
 
 	valid bool
 	Value int64
 }
 
 type BooleanField struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-	alias    string
-
-	constraints
-	isRelation bool
+	*column
 
 	valid bool
 	Value bool
 }
 
 type FloatField struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-	alias    string
-
-	constraints
-	isRelation bool
+	*column
 
 	valid bool
 	Value float64
 }
 
 type IntegerField struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-	alias    string
-
-	constraints
-	isRelation bool
+	*column
 
 	valid bool
 	Value int32
 }
 
 type SmallIntegerField struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-	alias    string
-
-	constraints
-	isRelation bool
+	*column
 
 	valid bool
 	Value int16
 }
 
 type TextField struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-	alias    string
-
-	constraints
-	isRelation bool
-
-	expr expression
+	*column
 
 	valid bool
 	Value string
+}
+
+type AutoField struct {
+	*IntegerField
+}
+
+type BigAutoField struct {
+	*BigIntegerField
 }
 
 type ForeignKey struct {
@@ -121,6 +94,52 @@ type OneToOneField struct {
 
 //Constructors
 
+func NewColumn(dbType string) *column {
+	return &column{dbType: dbType}
+}
+
+func NewBigIntegerField() *BigIntegerField {
+	field := &BigIntegerField{}
+	field.column = NewColumn("INT8")
+	field.valid = true
+	return field
+}
+
+func NewBooleanField() *BooleanField {
+	field := &BooleanField{}
+	field.column = NewColumn("BOOL")
+	field.valid = true
+	return field
+}
+
+func NewFloatField() *FloatField {
+	field := &FloatField{}
+	field.column = NewColumn("FLOAT8")
+	field.valid = true
+	return field
+}
+
+func NewIntegerField() *IntegerField {
+	field := &IntegerField{}
+	field.column = NewColumn("INT4")
+	field.valid = true
+	return field
+}
+
+func NewSmallIntegerField() *SmallIntegerField {
+	field := &SmallIntegerField{}
+	field.column = NewColumn("INT2")
+	field.valid = true
+	return field
+}
+
+func NewTextField() *TextField {
+	field := &TextField{}
+	field.column = NewColumn("TEXT")
+	field.valid = true
+	return field
+}
+
 func NewAutoField() *AutoField {
 	field := &AutoField{}
 	field.IntegerField = NewIntegerField()
@@ -132,42 +151,6 @@ func NewBigAutoField() *BigAutoField {
 	field := &BigAutoField{}
 	field.BigIntegerField = NewBigIntegerField()
 	field.dbType = "SERIAL8"
-	return field
-}
-
-func NewBigIntegerField() *BigIntegerField {
-	field := &BigIntegerField{dbType: "INT8"}
-	field.valid = true
-	return field
-}
-
-func NewBooleanField() *BooleanField {
-	field := &BooleanField{dbType: "BOOL"}
-	field.valid = true
-	return field
-}
-
-func NewFloatField() *FloatField {
-	field := &FloatField{dbType: "FLOAT8"}
-	field.valid = true
-	return field
-}
-
-func NewIntegerField() *IntegerField {
-	field := &IntegerField{dbType: "INT4"}
-	field.valid = true
-	return field
-}
-
-func NewSmallIntegerField() *SmallIntegerField {
-	field := &SmallIntegerField{dbType: "INT2"}
-	field.valid = true
-	return field
-}
-
-func NewTextField() *TextField {
-	field := &TextField{dbType: "TEXT"}
-	field.valid = true
 	return field
 }
 
@@ -251,7 +234,7 @@ func (f *TextField) copy() *TextField {
 }
 
 func (f *BigIntegerField) SetNil() error {
-	if f.hasNullConstraint() {
+	if f.HasNullConstraint() {
 		f.valid = false
 		f.Value = 0
 		return nil
@@ -261,7 +244,7 @@ func (f *BigIntegerField) SetNil() error {
 }
 
 func (f *BooleanField) SetNil() error {
-	if f.hasNullConstraint() {
+	if f.HasNullConstraint() {
 		f.valid = false
 		f.Value = false
 		return nil
@@ -271,7 +254,7 @@ func (f *BooleanField) SetNil() error {
 }
 
 func (f *FloatField) SetNil() error {
-	if f.hasNullConstraint() {
+	if f.HasNullConstraint() {
 		f.valid = false
 		f.Value = 0
 		return nil
@@ -281,7 +264,7 @@ func (f *FloatField) SetNil() error {
 }
 
 func (f *IntegerField) SetNil() error {
-	if f.hasNullConstraint() {
+	if f.HasNullConstraint() {
 		f.valid = false
 		f.Value = 0
 		return nil
@@ -291,7 +274,7 @@ func (f *IntegerField) SetNil() error {
 }
 
 func (f *SmallIntegerField) SetNil() error {
-	if f.hasNullConstraint() {
+	if f.HasNullConstraint() {
 		f.valid = false
 		f.Value = 0
 		return nil
@@ -301,7 +284,7 @@ func (f *SmallIntegerField) SetNil() error {
 }
 
 func (f *TextField) SetNil() error {
-	if f.hasNullConstraint() {
+	if f.HasNullConstraint() {
 		f.valid = false
 		f.Value = ""
 		return nil
@@ -335,24 +318,24 @@ func (f TextField) UnSetNil() {
 }
 
 func create(f field) string {
-	s := dbq(f.getDbColumn()) + " " + f.getDbType()
+	s := dbq(f.DbColumn()) + " " + f.DbType()
 
-	if f.hasPrimaryKeyConstraint() {
+	if f.HasPrimaryKeyConstraint() {
 		s += " PRIMARY KEY"
 	} else {
 
-		if f.hasRelation() {
+		if f.HasRelation() {
 			fkey := f.(relatedField)
 			s += " REFERENCES " + dbq(fkey.getRelatedModel().dbTable) + " ON DELETE " + fkey.getOnDelete()
 		}
 
-		if f.hasNullConstraint() {
+		if f.HasNullConstraint() {
 			s += " NULL"
 		} else {
 			s += " NOT NULL"
 		}
 
-		if f.hasUniqueConstraint() {
+		if f.HasUniqueConstraint() {
 			s += " UNIQUE"
 		}
 	}

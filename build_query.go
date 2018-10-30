@@ -70,7 +70,7 @@ func (q QuerySet) processInsert() string {
 	var valueList []string
 
 	for _, assign := range q.set {
-		columnList = append(columnList, dbq(assign.lhs.getDbColumn()))
+		columnList = append(columnList, dbq(assign.lhs.DbColumn()))
 		//valueList = append(valueList, assign.lhs.valueAsSql())
 		valueList = append(valueList, assign.rhs)
 	}
