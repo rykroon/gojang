@@ -15,6 +15,16 @@ func (m *Model) ToObj() object {
 	return obj
 }
 
+func (m *Model) FromObj(obj object) error {
+	for _, field := range m.fields {
+		if obj.HasAttr(field.Alias()) {
+			//some sort of switch statement
+		}
+	}
+
+	return nil
+}
+
 //If instance does not have a primary key then it will insert into the database
 //Otherwise it updates the record
 func (m *Model) Save() error {
@@ -72,4 +82,24 @@ func (m *Model) update() error {
 	qs := m.Objects.Filter(m.Pk.Exact(m.Pk.Id()))
 	_, err := qs.Update(updateList...)
 	return err
+}
+
+func (m *Model) Delete() error {
+	qs := m.Objects.Filter(m.Pk.Exact(m.Pk.Id()))
+	_, err := qs.Delete()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Model) RefreshFromDb() error {
+	obj, err := m.Objects.Get(m.Pk.Exact(m.Pk.Id()))
+	if err != nil {
+		return err
+	}
+
+	m.FromObj(obj)
+	return nil
 }

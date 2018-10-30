@@ -40,7 +40,6 @@ func (f *function) asSql() string {
 
 func (l lookup) asSql() string {
 	sql := l.lhs.asSql() + " " + l.lookupName + " " + l.rhs
-	//sql := fieldAsSql(l.lhs, false) + " " + l.lookupName + " " + l.rhs
 
 	if l.not {
 		sql = "NOT(" + sql + ")"
@@ -110,17 +109,6 @@ func (a aggregate) Alias() string {
 func (f function) Alias() string {
 	return f.outputField.Alias()
 }
-
-//Use the field's attribute name if it is part of a model
-// func getFieldAlias(field field) string {
-// 	if field.hasModel() {
-// 		attrName, ok := field.getModel().colToAttr[field.getDbColumn()]
-// 		if ok {
-// 			return attrName
-// 		}
-// 	}
-// 	return field.getDbColumn()
-// }
 
 func (f *BigIntegerField) Alias() string {
 	return f.alias
