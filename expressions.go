@@ -59,43 +59,19 @@ func (s star) asSql() string {
 	return "*"
 }
 
-func fieldAsSql(field field) string {
+func (c *column) asSql() string {
 	sql := ""
 
-	if field.HasModel() {
-		tableName := dbq(field.Model().dbTable)
-		colName := dbq(field.DbColumn())
+	if c.HasModel() {
+		tableName := dbq(c.model.dbTable)
+		colName := dbq(c.dbColumn)
 		sql = tableName + "." + colName
 
 	} else {
-		sql = field.DbColumn()
+		sql = c.dbColumn
 	}
 
 	return sql
-}
-
-func (f *BigIntegerField) asSql() string {
-	return fieldAsSql(f)
-}
-
-func (f *BooleanField) asSql() string {
-	return fieldAsSql(f)
-}
-
-func (f *FloatField) asSql() string {
-	return fieldAsSql(f)
-}
-
-func (f *IntegerField) asSql() string {
-	return fieldAsSql(f)
-}
-
-func (f *SmallIntegerField) asSql() string {
-	return fieldAsSql(f)
-}
-
-func (f *TextField) asSql() string {
-	return fieldAsSql(f)
 }
 
 //
@@ -110,28 +86,8 @@ func (f function) Alias() string {
 	return f.outputField.Alias()
 }
 
-func (f *BigIntegerField) Alias() string {
-	return f.alias
-}
-
-func (f *BooleanField) Alias() string {
-	return f.alias
-}
-
-func (f *FloatField) Alias() string {
-	return f.alias
-}
-
-func (f *IntegerField) Alias() string {
-	return f.alias
-}
-
-func (f *SmallIntegerField) Alias() string {
-	return f.alias
-}
-
-func (f *TextField) Alias() string {
-	return f.alias
+func (c *column) Alias() string {
+	return c.alias
 }
 
 func (a *aggregate) As(alias string) {
@@ -142,28 +98,8 @@ func (f *function) As(alias string) {
 	f.outputField.As(alias)
 }
 
-func (f *BigIntegerField) As(alias string) {
-	f.alias = alias
-}
-
-func (f *BooleanField) As(alias string) {
-	f.alias = alias
-}
-
-func (f *FloatField) As(alias string) {
-	f.alias = alias
-}
-
-func (f *IntegerField) As(alias string) {
-	f.alias = alias
-}
-
-func (f *SmallIntegerField) As(alias string) {
-	f.alias = alias
-}
-
-func (f *TextField) As(alias string) {
-	f.alias = alias
+func (c *column) As(alias string) {
+	c.alias = alias
 }
 
 func (a aggregate) Scan(v interface{}) error {
