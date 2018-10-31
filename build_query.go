@@ -112,13 +112,13 @@ func (q QuerySet) processOrderBy() string {
 	sql := ""
 
 	if len(q.orderBy) != 0 {
-		sql += " ORDER BY "
+		var orderByList []string
 
 		for _, sort := range q.orderBy {
-			sql += sort.asSql() + ", "
+			orderByList = append(orderByList, string(sort))
 		}
 
-		sql = sql[0 : len(sql)-2]
+		sql = " ORDER BY " + strings.Join(orderByList, ",")
 	}
 
 	return sql

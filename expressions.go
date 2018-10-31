@@ -18,10 +18,7 @@ type selectExpression interface {
 	Scan(interface{}) error
 }
 
-type sortExpression struct {
-	desc  bool
-	field field
-}
+type orderByExpression string
 
 type star string
 
@@ -45,14 +42,6 @@ func (l lookup) asSql() string {
 		sql = "NOT(" + sql + ")"
 	}
 	return sql
-}
-
-func (e sortExpression) asSql() string {
-	if e.desc {
-		return e.field.asSql() + " DESC"
-	} else {
-		return e.field.asSql() + " ASC"
-	}
 }
 
 func (s star) asSql() string {
@@ -175,53 +164,13 @@ func (f *TextField) getValue() interface{} {
 }
 
 //
-//Methods that return Sort Expressions
+//Methods that return Order By Expressions
 //
 
-func (f *BigIntegerField) Asc() sortExpression {
-	return sortExpression{field: f}
+func (c *column) Asc() orderByExpression {
+	return orderByExpression(c.asSql() + " ASC")
 }
 
-func (f *BooleanField) Asc() sortExpression {
-	return sortExpression{field: f}
-}
-
-func (f *FloatField) Asc() sortExpression {
-	return sortExpression{field: f}
-}
-
-func (f *IntegerField) Asc() sortExpression {
-	return sortExpression{field: f}
-}
-
-func (f *SmallIntegerField) Asc() sortExpression {
-	return sortExpression{field: f}
-}
-
-func (f *TextField) Asc() sortExpression {
-	return sortExpression{field: f}
-}
-
-func (f *BigIntegerField) Desc() sortExpression {
-	return sortExpression{field: f, desc: true}
-}
-
-func (f *BooleanField) Desc() sortExpression {
-	return sortExpression{field: f, desc: true}
-}
-
-func (f *FloatField) Desc() sortExpression {
-	return sortExpression{field: f, desc: true}
-}
-
-func (f *IntegerField) Desc() sortExpression {
-	return sortExpression{field: f, desc: true}
-}
-
-func (f *SmallIntegerField) Desc() sortExpression {
-	return sortExpression{field: f, desc: true}
-}
-
-func (f *TextField) Desc() sortExpression {
-	return sortExpression{field: f, desc: true}
+func (c *column) Desc() orderByExpression {
+	return orderByExpression(c.asSql() + " DESC")
 }

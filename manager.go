@@ -29,7 +29,7 @@ func (m Manager) Exclude(lookups ...lookup) QuerySet {
 	return qs
 }
 
-func (m Manager) OrderBy(orderBys ...sortExpression) QuerySet {
+func (m Manager) OrderBy(orderBys ...orderByExpression) QuerySet {
 	qs := newQuerySet(m.model)
 	qs = qs.OrderBy(orderBys...)
 	return qs

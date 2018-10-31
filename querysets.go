@@ -23,7 +23,7 @@ type QuerySet struct {
 	lookups []lookup
 
 	Ordered bool
-	orderBy []sortExpression
+	orderBy []orderByExpression
 
 	ResultCache []object
 }
@@ -73,7 +73,7 @@ func (q QuerySet) Exclude(lookups ...lookup) QuerySet {
 	return q
 }
 
-func (q QuerySet) OrderBy(orderBys ...sortExpression) QuerySet {
+func (q QuerySet) OrderBy(orderBys ...orderByExpression) QuerySet {
 	for _, orderBy := range orderBys {
 		q.orderBy = append(q.orderBy, orderBy)
 	}
