@@ -4,6 +4,12 @@ import (
 	"errors"
 )
 
+type ModelInstance interface {
+	Save() error
+	Delete() error
+	RefreshFromDb() error
+}
+
 func (m *Model) ToObj() object {
 	obj := newObj()
 

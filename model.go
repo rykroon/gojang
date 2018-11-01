@@ -31,7 +31,8 @@ func NewModel(db Database) *Model {
 }
 
 //initializes a Model
-func MakeModel(i interface{}) error {
+//func MakeModel(i interface{}) error {
+func MakeModel(i ModelInstance) error {
 	v := reflect.ValueOf(i)
 
 	if v.Kind() != reflect.Ptr {
