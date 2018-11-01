@@ -179,57 +179,48 @@ func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 	return field
 }
 
+func (c *column) copy() *column {
+	copy := NewColumn(c.dbType)
+	copy.model = c.model
+	copy.dbColumn = c.dbColumn
+	copy.alias = c.alias
+	copy.constraints = c.constraints
+	return copy
+}
+
 func (f *BigIntegerField) copy() *BigIntegerField {
 	copy := NewBigIntegerField()
-	copy.model = f.model //maybe change to be a copy of the model
-	copy.dbColumn = f.dbColumn
-	copy.alias = f.alias
-	copy.constraints = f.constraints
+	copy.column = f.column.copy()
 	return copy
 }
 
 func (f *BooleanField) copy() *BooleanField {
 	copy := NewBooleanField()
-	copy.model = f.model
-	copy.dbColumn = f.dbColumn
-	copy.alias = f.alias
-	copy.constraints = f.constraints
+	copy.column = f.column.copy()
 	return copy
 }
 
 func (f *FloatField) copy() *FloatField {
 	copy := NewFloatField()
-	copy.model = f.model
-	copy.dbColumn = f.dbColumn
-	copy.alias = f.alias
-	copy.constraints = f.constraints
+	copy.column = f.column.copy()
 	return copy
 }
 
 func (f *IntegerField) copy() *IntegerField {
 	copy := NewIntegerField()
-	copy.model = f.model
-	copy.dbColumn = f.dbColumn
-	copy.alias = f.alias
-	copy.constraints = f.constraints
+	copy.column = f.column.copy()
 	return copy
 }
 
 func (f *SmallIntegerField) copy() *SmallIntegerField {
 	copy := NewSmallIntegerField()
-	copy.model = f.model
-	copy.dbColumn = f.dbColumn
-	copy.alias = f.alias
-	copy.constraints = f.constraints
+	copy.column = f.column.copy()
 	return copy
 }
 
 func (f *TextField) copy() *TextField {
 	copy := NewTextField()
-	copy.model = f.model
-	copy.dbColumn = f.dbColumn
-	copy.alias = f.alias
-	copy.constraints = f.constraints
+	copy.column = f.column.copy()
 	return copy
 }
 

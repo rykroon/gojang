@@ -31,8 +31,8 @@ type field interface {
 	UnSetNil()
 
 	asAssignment() assignment
-	Asc() orderByExpression
-	Desc() orderByExpression
+	//Asc() orderByExpression
+	//Desc() orderByExpression
 	Count(bool) *aggregate
 
 	copyField() field
