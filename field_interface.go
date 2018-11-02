@@ -9,7 +9,7 @@ type field interface {
 	DbColumn() string
 	setDbColumn(string)
 
-	DbType() string
+	//DbType() string
 
 	Model() *Model
 	setModel(*Model)
@@ -252,10 +252,6 @@ func (f *column) DbColumn() string {
 
 func (f *column) setDbColumn(col string) {
 	f.dbColumn = col
-}
-
-func (f *column) DbType() string {
-	return f.dbType
 }
 
 func (f *BigIntegerField) IsNil() bool {

@@ -13,60 +13,36 @@ type function struct {
 
 type aggregate function
 
-
 func newFunction(name string, expr selectExpression, outputField field) *function {
 	funct := &function{}
 	funct.name = strings.ToUpper(name)
+	funct.template = "%v(%v)"
 	funct.args = []interface{}{funct.name, expr.asSql()}
 	funct.outputField = outputField
-	funct.outputField.setDbColumn(funct.asSql())
-	funct.As(strings.ToLower(name))
 	return funct
 }
 
-func newAggregate(name string, expr selectExpression, outputField field) *aggregate {
-	f := newFunction(name, expr, outputField)
-	a := &aggregate{}
-	a = *f
-	return a
-}
-
-func Avg(expr selectExpression) *aggregate {
-	agg := NewAggregate("AVG", expr, NewFloatField())
-	agg.As(expr.Alias() + "__avg")
-	return agg
-}
-
-func Count(expr selectExpression, distinct bool) *aggregate {
-	agg := NewAggregate("COUNT", expr, NewBigIntegerField())
-
-	if distinct {
-		agg.template = "%v(DISTINCT %v)"
-		agg.outputField.setDbColumn(agg.asSql())
-	}
-
-	agg.As(expr.Alias() + "__count")
-	return agg
-}
-
-
 //Creates a new CAST Function
-func newCast(expr expression, outputField field) *function {
-	cast := newFunc("CAST", expr, outputField)
+func Cast(expr selectExpression, outputField field) *function {
+	cast := newFunction("CAST", expr, outputField)
 	cast.args = append(cast.args, cast.outputField.DbType())
 	cast.template = "%v(%v AS %v)"
 	return cast
 }
 
-//Creates a new AVG function for a field
-func avgField(field field) *aggregate {
-	avg := newAvg(field)
-	alias := field.DbColumn() + "__avg"
-	avg.As(alias)
+func newAggregate(name string, expr selectExpression, outputField field) *aggregate {
+	f := newFunction(name, expr, outputField)
+	f.As(expr.Alias() + "__" + strings.ToLower(name))
+	a := aggregate(*f)
+	return &a
+}
 
-	if field.DbType() != avg.outputField.DbType() {
-		cast := newCast(avg, avg.outputField)
-		cast.As(alias)
+func Avg(expr selectExpression) *aggregate {
+	avg := newAggregate("AVG", expr, NewFloatField())
+
+	//Once I create Decimal Field use that for certain cases
+	if expr.DbType() != avg.outputField.DbType() {
+		cast := Cast(avg, avg.outputField)
 		aggCast := aggregate(*cast)
 		return &aggCast
 	}
@@ -74,29 +50,29 @@ func avgField(field field) *aggregate {
 	return avg
 }
 
-// //Creates a new Count function for a field
-// func countField(field field, distinct bool) *aggregate {
-// 	count := newCount(field, distinct)
-// 	alias := field.DbColumn() + "__count"
-// 	count.As(alias)
-// 	return count
+func Count(expr selectExpression, distinct bool) *aggregate {
+	agg := newAggregate("COUNT", expr, NewBigIntegerField())
+
+	if distinct {
+		agg.template = "%v(DISTINCT %v)"
+	}
+
+	if expr.Alias() != "*" {
+		agg.As(expr.Alias() + "__count")
+	}
+
+	return agg
+}
+
+// func Min(expr selectExpression) *aggregate {
+// 	//min := newAggregate("MIN", expr, )
 // }
 
-// func sumField(field field) function {
-//   sum := newSum(field)
-//   alias := field.DbColumn() + "__sum"
-//   //sum.outputField.setDbColumn(alias)
-// 	sum = sum.As(alias)
-//   return sum
-// }
-
-// func (f *AutoField) Avg() *aggregate {
-// 	return avgField(f)
-// }
-//
-// func (f *BigAutoField) Avg() *aggregate {
-// 	return avgField(f)
-// }
+func Sum(expr selectExpression) *aggregate {
+	sum := newAggregate("SUM", expr, NewBigIntegerField())
+	sum.As(expr.Alias() + "__sum")
+	return sum
+}
 
 func (f *BigIntegerField) Avg() *aggregate {
 	return Avg(f)
@@ -140,4 +116,20 @@ func (f *SmallIntegerField) Count(distinct bool) *aggregate {
 
 func (f *TextField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
+}
+
+func (f *BigIntegerField) Sum() *aggregate {
+	return Sum(f)
+}
+
+func (f *FloatField) Sum() *aggregate {
+	return Sum(f)
+}
+
+func (f *IntegerField) Sum() *aggregate {
+	return Sum(f)
+}
+
+func (f *SmallIntegerField) Sum() *aggregate {
+	return Sum(f)
 }

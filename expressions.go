@@ -15,6 +15,8 @@ type selectExpression interface {
 	getValue() interface{}
 	As(string) //is essentially the 'setter' method for alias
 	Alias() string
+	DbType() string
+	//newField() field
 	Scan(interface{}) error
 }
 
@@ -79,6 +81,10 @@ func (c *column) Alias() string {
 	return c.alias
 }
 
+func (s star) Alias() string {
+	return "*"
+}
+
 func (a *aggregate) As(alias string) {
 	a.outputField.As(alias)
 }
@@ -91,12 +97,36 @@ func (c *column) As(alias string) {
 	c.alias = alias
 }
 
+func (s star) As(string) {
+	return
+}
+
+func (a aggregate) DbType() string {
+	return function(a).DbType()
+}
+
+func (f function) DbType() string {
+	return f.outputField.DbType()
+}
+
+func (f *column) DbType() string {
+	return f.dbType
+}
+
+func (s star) DbType() string {
+	return ""
+}
+
 func (a aggregate) Scan(v interface{}) error {
 	return function(a).Scan(v)
 }
 
 func (f function) Scan(v interface{}) error {
 	return f.outputField.Scan(v)
+}
+
+func (s star) Scan(interface{}) error {
+	return nil
 }
 
 func (f *BigIntegerField) Scan(value interface{}) error {
@@ -137,6 +167,10 @@ func (a aggregate) getValue() interface{} {
 
 func (f function) getValue() interface{} {
 	return f.outputField.getValue()
+}
+
+func (s star) getValue() interface{} {
+	return nil
 }
 
 func (f *BigIntegerField) getValue() interface{} {
