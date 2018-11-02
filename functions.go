@@ -6,7 +6,6 @@ import (
 
 type function struct {
 	name        string
-	expr        expression
 	args        []interface{}
 	template    string
 	outputField field
@@ -14,29 +13,42 @@ type function struct {
 
 type aggregate function
 
-//Create a new function
-func newFunc(name string, expr expression, outputField field) *function {
+
+func newFunction(name string, expr selectExpression, outputField field) *function {
 	funct := &function{}
 	funct.name = strings.ToUpper(name)
-	funct.expr = expr
-	funct.args = []interface{}{funct.name, funct.expr.asSql()}
-	funct.template = "%v(%v)"
-
+	funct.args = []interface{}{funct.name, expr.asSql()}
 	funct.outputField = outputField
+	funct.outputField.setDbColumn(funct.asSql())
 	funct.As(strings.ToLower(name))
 	return funct
 }
 
-func newAgg(name string, expr expression, outputField field) *aggregate {
-	f := newFunc(name, expr, outputField)
-	a := aggregate(*f)
-	return &a
+func newAggregate(name string, expr selectExpression, outputField field) *aggregate {
+	f := newFunction(name, expr, outputField)
+	a := &aggregate{}
+	a = *f
+	return a
 }
 
-//Creates a new AVG Function
-func newAvg(expr expression) *aggregate {
-	return newAgg("AVG", expr, NewFloatField())
+func Avg(expr selectExpression) *aggregate {
+	agg := NewAggregate("AVG", expr, NewFloatField())
+	agg.As(expr.Alias() + "__avg")
+	return agg
 }
+
+func Count(expr selectExpression, distinct bool) *aggregate {
+	agg := NewAggregate("COUNT", expr, NewBigIntegerField())
+
+	if distinct {
+		agg.template = "%v(DISTINCT %v)"
+		agg.outputField.setDbColumn(agg.asSql())
+	}
+
+	agg.As(expr.Alias() + "__count")
+	return agg
+}
+
 
 //Creates a new CAST Function
 func newCast(expr expression, outputField field) *function {
@@ -44,22 +56,6 @@ func newCast(expr expression, outputField field) *function {
 	cast.args = append(cast.args, cast.outputField.DbType())
 	cast.template = "%v(%v AS %v)"
 	return cast
-}
-
-//Creates a new COUNT Function
-func newCount(expr expression, distinct bool) *aggregate {
-	count := newAgg("COUNT", expr, NewIntegerField())
-
-	if distinct {
-		count.template = "%v(DISTINCT %v)"
-	}
-
-	return count
-}
-
-//Creates a new SUM Function
-func newSum(expr expression, outputField field) *function {
-	return newFunc("SUM", expr, outputField)
 }
 
 //Creates a new AVG function for a field
@@ -78,13 +74,13 @@ func avgField(field field) *aggregate {
 	return avg
 }
 
-//Creates a new Count function for a field
-func countField(field field, distinct bool) *aggregate {
-	count := newCount(field, distinct)
-	alias := field.DbColumn() + "__count"
-	count.As(alias)
-	return count
-}
+// //Creates a new Count function for a field
+// func countField(field field, distinct bool) *aggregate {
+// 	count := newCount(field, distinct)
+// 	alias := field.DbColumn() + "__count"
+// 	count.As(alias)
+// 	return count
+// }
 
 // func sumField(field field) function {
 //   sum := newSum(field)
@@ -94,54 +90,54 @@ func countField(field field, distinct bool) *aggregate {
 //   return sum
 // }
 
-func (f *AutoField) Avg() *aggregate {
-	return avgField(f)
-}
-
-func (f *BigAutoField) Avg() *aggregate {
-	return avgField(f)
-}
+// func (f *AutoField) Avg() *aggregate {
+// 	return avgField(f)
+// }
+//
+// func (f *BigAutoField) Avg() *aggregate {
+// 	return avgField(f)
+// }
 
 func (f *BigIntegerField) Avg() *aggregate {
-	return avgField(f)
+	return Avg(f)
 }
 
 func (f *FloatField) Avg() *aggregate {
-	return avgField(f)
+	return Avg(f)
 }
 
 func (f *IntegerField) Avg() *aggregate {
-	return avgField(f)
+	return Avg(f)
 }
 
 func (f *SmallIntegerField) Avg() *aggregate {
-	return avgField(f)
+	return Avg(f)
 }
 
 func (s star) Count() *aggregate {
-	return newCount(s, false)
+	return Count(s, false)
 }
 
 func (f *BigIntegerField) Count(distinct bool) *aggregate {
-	return countField(f, distinct)
+	return Count(f, distinct)
 }
 
 func (f *BooleanField) Count(distinct bool) *aggregate {
-	return countField(f, distinct)
+	return Count(f, distinct)
 }
 
 func (f *FloatField) Count(distinct bool) *aggregate {
-	return countField(f, distinct)
+	return Count(f, distinct)
 }
 
 func (f *IntegerField) Count(distinct bool) *aggregate {
-	return countField(f, distinct)
+	return Count(f, distinct)
 }
 
 func (f *SmallIntegerField) Count(distinct bool) *aggregate {
-	return countField(f, distinct)
+	return Count(f, distinct)
 }
 
 func (f *TextField) Count(distinct bool) *aggregate {
-	return countField(f, distinct)
+	return Count(f, distinct)
 }
