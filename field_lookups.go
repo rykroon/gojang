@@ -9,7 +9,7 @@ type lookup struct {
 	rhs        string
 }
 
-func exactIntField(field intField, value int) lookup {
+func exactIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: "=", rhs: intAsSql(value)}
 }
 
@@ -51,7 +51,7 @@ func (f *TextField) IContains(value string) lookup {
 	return lookup{lhs: f, lookupName: "ILIKE", rhs: stringAsSql(value)}
 }
 
-func inIntField(field intField, values []int) lookup {
+func inIntField(field IntField, values []int) lookup {
 	return lookup{lhs: field, lookupName: "IN", rhs: integersAsSql(values)}
 }
 
@@ -79,7 +79,7 @@ func (f *TextField) In(values ...string) lookup {
 	return lookup{lhs: f, lookupName: "IN", rhs: stringSliceAsSql(values)}
 }
 
-func gtIntField(field intField, value int) lookup {
+func gtIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: ">", rhs: intAsSql(value)}
 }
 
@@ -107,7 +107,7 @@ func (f *TextField) Gt(value string) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: stringAsSql(value)}
 }
 
-func gteIntField(field intField, value int) lookup {
+func gteIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: ">=", rhs: intAsSql(value)}
 }
 
@@ -136,7 +136,7 @@ func (f *TextField) Gte(value string) lookup {
 	return lookup{lhs: f, lookupName: ">=", rhs: stringAsSql(value)}
 }
 
-func ltIntField(field intField, value int) lookup {
+func ltIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: "<", rhs: intAsSql(value)}
 }
 
@@ -165,7 +165,7 @@ func (f *TextField) Lt(value string) lookup {
 	return lookup{lhs: f, lookupName: "<", rhs: stringAsSql(value)}
 }
 
-func lteIntField(field intField, value int) lookup {
+func lteIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: "<=", rhs: intAsSql(value)}
 }
 
@@ -214,7 +214,7 @@ func (f *TextField) IEndsWith(value string) lookup {
 	return lookup{lhs: f, lookupName: "ILIKE", rhs: stringAsSql(value)}
 }
 
-func rangeIntField(field intField, from, to int) lookup {
+func rangeIntField(field IntField, from, to int) lookup {
 	lookup := lookup{lhs: field, lookupName: "BETWEEN"}
 	lookup.rhs = intAsSql(from) + " AND " + intAsSql(to)
 	return lookup

@@ -12,7 +12,7 @@ type Model struct {
 	Objects   Manager
 	fields    []field
 	colToAttr map[string]string
-	Pk        primaryKeyField
+	Pk        PrimaryKeyField
 
 	db *sql.DB
 
@@ -83,7 +83,7 @@ func MakeModel(i ModelInstance) error {
 				//Use type assertion to make sure that even if the field has a
 				//Primary Key Constraint that it can still implement the
 				//primaryKeyField interface
-				pkeyField, ok := field.(primaryKeyField)
+				pkeyField, ok := field.(PrimaryKeyField)
 
 				if !ok {
 					panic(NewInvalidConstraint(field, "primary key"))
@@ -126,7 +126,7 @@ func (m *Model) addField(attrName string, f field) {
 	m.colToAttr[columnName] = attrName
 
 	//prepend primaryKeyField to the beginning of the slice
-	_, isAPrimaryKeyField := f.(primaryKeyField)
+	_, isAPrimaryKeyField := f.(PrimaryKeyField)
 	if isAPrimaryKeyField && len(m.fields) != 0 {
 		m.fields = append([]field{f}, m.fields...)
 	} else {

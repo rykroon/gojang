@@ -7,14 +7,14 @@ import ()
 // 	set(string)
 // }
 
-type numericField interface {
+type NumericField interface {
 	field
 	Avg() *aggregate
 	Sum() *aggregate
 }
 
-type intField interface {
-	numericField
+type IntField interface {
+	NumericField
 	Val() int
 	setInt(int)
 
@@ -28,8 +28,8 @@ type intField interface {
 	Range(int, int) lookup
 }
 
-type primaryKeyField interface {
-	intField
+type PrimaryKeyField interface {
+	IntField
 	Id() int
 	isAutoField() bool
 }
