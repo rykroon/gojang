@@ -131,12 +131,12 @@ func (s star) Scan(interface{}) error {
 }
 
 func (f *BigIntegerField) Scan(value interface{}) error {
-	f.Value, f.valid = value.(int64)
+	f.Value, f.Valid = value.(int64)
 	return nil
 }
 
 func (f *BooleanField) Scan(value interface{}) error {
-	f.Value, f.valid = value.(bool)
+	f.Value, f.Valid = value.(bool)
 	return nil
 }
 
@@ -145,13 +145,13 @@ func (f *FloatField) Scan(value interface{}) error {
 	case []uint8:
 		float, err := strconv.ParseFloat(string(v), 64)
 		f.Value = float
-		f.valid = err == nil
+		f.Valid = err == nil
 
 	case float64:
-		f.Value, f.valid = v, true
+		f.Value, f.Valid = v, true
 
 	default:
-		f.Value, f.valid = 0, false
+		f.Value, f.Valid = 0, false
 	}
 
 	return nil
@@ -159,18 +159,18 @@ func (f *FloatField) Scan(value interface{}) error {
 
 func (f *IntegerField) Scan(value interface{}) error {
 	result, ok := value.(int64)
-	f.Value, f.valid = int32(result), ok
+	f.Value, f.Valid = int32(result), ok
 	return nil
 }
 
 func (f *SmallIntegerField) Scan(value interface{}) error {
 	result, ok := value.(int64)
-	f.Value, f.valid = int16(result), ok
+	f.Value, f.Valid = int16(result), ok
 	return nil
 }
 
 func (f *TextField) Scan(value interface{}) error {
-	f.Value, f.valid = value.(string)
+	f.Value, f.Valid = value.(string)
 	return nil
 }
 
