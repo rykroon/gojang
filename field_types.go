@@ -29,42 +29,42 @@ type column struct {
 type BigIntegerField struct {
 	*column
 
-	valid bool
+	Valid bool
 	Value int64
 }
 
 type BooleanField struct {
 	*column
 
-	valid bool
+	Valid bool
 	Value bool
 }
 
 type FloatField struct {
 	*column
 
-	valid bool
+	Valid bool
 	Value float64
 }
 
 type IntegerField struct {
 	*column
 
-	valid bool
+	Valid bool
 	Value int32
 }
 
 type SmallIntegerField struct {
 	*column
 
-	valid bool
+	Valid bool
 	Value int16
 }
 
 type TextField struct {
 	*column
 
-	valid bool
+	Valid bool
 	Value string
 }
 
@@ -101,42 +101,42 @@ func NewColumn(dbType string) *column {
 func NewBigIntegerField() *BigIntegerField {
 	field := &BigIntegerField{}
 	field.column = NewColumn("INT8")
-	field.valid = true
+	field.Valid = true
 	return field
 }
 
 func NewBooleanField() *BooleanField {
 	field := &BooleanField{}
 	field.column = NewColumn("BOOL")
-	field.valid = true
+	field.Valid = true
 	return field
 }
 
 func NewFloatField() *FloatField {
 	field := &FloatField{}
 	field.column = NewColumn("FLOAT8")
-	field.valid = true
+	field.Valid = true
 	return field
 }
 
 func NewIntegerField() *IntegerField {
 	field := &IntegerField{}
 	field.column = NewColumn("INT4")
-	field.valid = true
+	field.Valid = true
 	return field
 }
 
 func NewSmallIntegerField() *SmallIntegerField {
 	field := &SmallIntegerField{}
 	field.column = NewColumn("INT2")
-	field.valid = true
+	field.Valid = true
 	return field
 }
 
 func NewTextField() *TextField {
 	field := &TextField{}
 	field.column = NewColumn("TEXT")
-	field.valid = true
+	field.Valid = true
 	return field
 }
 
@@ -222,90 +222,6 @@ func (f *TextField) copy() *TextField {
 	copy := NewTextField()
 	copy.column = f.column.copy()
 	return copy
-}
-
-func (f *BigIntegerField) SetNil() error {
-	if f.HasNullConstraint() {
-		f.valid = false
-		f.Value = 0
-		return nil
-	} else {
-		return NewNotNullConstraintViolation()
-	}
-}
-
-func (f *BooleanField) SetNil() error {
-	if f.HasNullConstraint() {
-		f.valid = false
-		f.Value = false
-		return nil
-	} else {
-		return NewNotNullConstraintViolation()
-	}
-}
-
-func (f *FloatField) SetNil() error {
-	if f.HasNullConstraint() {
-		f.valid = false
-		f.Value = 0
-		return nil
-	} else {
-		return NewNotNullConstraintViolation()
-	}
-}
-
-func (f *IntegerField) SetNil() error {
-	if f.HasNullConstraint() {
-		f.valid = false
-		f.Value = 0
-		return nil
-	} else {
-		return NewNotNullConstraintViolation()
-	}
-}
-
-func (f *SmallIntegerField) SetNil() error {
-	if f.HasNullConstraint() {
-		f.valid = false
-		f.Value = 0
-		return nil
-	} else {
-		return NewNotNullConstraintViolation()
-	}
-}
-
-func (f *TextField) SetNil() error {
-	if f.HasNullConstraint() {
-		f.valid = false
-		f.Value = ""
-		return nil
-	} else {
-		return NewNotNullConstraintViolation()
-	}
-}
-
-func (f BigIntegerField) UnSetNil() {
-	f.valid = true
-}
-
-func (f BooleanField) UnSetNil() {
-	f.valid = true
-}
-
-func (f FloatField) UnSetNil() {
-	f.valid = true
-}
-
-func (f IntegerField) UnSetNil() {
-	f.valid = true
-}
-
-func (f SmallIntegerField) UnSetNil() {
-	f.valid = true
-}
-
-func (f TextField) UnSetNil() {
-	f.valid = true
 }
 
 func create(f field) string {

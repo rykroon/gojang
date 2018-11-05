@@ -26,9 +26,9 @@ type field interface {
 
 	HasRelation() bool
 
-	IsNil() bool
-	SetNil() error
-	UnSetNil()
+	//IsNil() bool
+	//SetNil() error
+	//UnSetNil()
 
 	asAssignment() assignment
 	Asc() orderByExpression
@@ -97,7 +97,7 @@ func (f *BigIntegerField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.valid = false
+		f.Valid = false
 	}
 }
 
@@ -105,7 +105,7 @@ func (f *BooleanField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.valid = false
+		f.Valid = false
 	}
 }
 
@@ -113,7 +113,7 @@ func (f *FloatField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.valid = false
+		f.Valid = false
 	}
 }
 
@@ -121,7 +121,7 @@ func (f *IntegerField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.valid = false
+		f.Valid = false
 	}
 }
 
@@ -129,7 +129,7 @@ func (f *SmallIntegerField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.valid = false
+		f.Valid = false
 	}
 }
 
@@ -137,7 +137,7 @@ func (f *TextField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
-		f.valid = false
+		f.Valid = false
 	}
 }
 
@@ -253,32 +253,8 @@ func (f *column) setDbColumn(col string) {
 	f.dbColumn = col
 }
 
-func (f *BigIntegerField) IsNil() bool {
-	return !f.valid
-}
-
-func (f *BooleanField) IsNil() bool {
-	return !f.valid
-}
-
-func (f *FloatField) IsNil() bool {
-	return !f.valid
-}
-
-func (f *IntegerField) IsNil() bool {
-	return !f.valid
-}
-
-func (f *SmallIntegerField) IsNil() bool {
-	return !f.valid
-}
-
-func (f *TextField) IsNil() bool {
-	return !f.valid
-}
-
 func (f *BigIntegerField) valueAsSql() string {
-	if f.IsNil() {
+	if f.null && !f.Valid {
 		return "NULL"
 	} else {
 		return int64AsSql(f.Value)
@@ -286,7 +262,7 @@ func (f *BigIntegerField) valueAsSql() string {
 }
 
 func (f *BooleanField) valueAsSql() string {
-	if f.IsNil() {
+	if f.null && !f.Valid {
 		return "NULL"
 	} else {
 		return boolAsSql(f.Value)
@@ -294,7 +270,7 @@ func (f *BooleanField) valueAsSql() string {
 }
 
 func (f *FloatField) valueAsSql() string {
-	if f.IsNil() {
+	if f.null && !f.Valid {
 		return "NULL"
 	} else {
 		return float64AsSql(f.Value)
@@ -302,7 +278,7 @@ func (f *FloatField) valueAsSql() string {
 }
 
 func (f *IntegerField) valueAsSql() string {
-	if f.IsNil() {
+	if f.null && !f.Valid {
 		return "NULL"
 	} else {
 		return int32AsSql(f.Value)
@@ -310,7 +286,7 @@ func (f *IntegerField) valueAsSql() string {
 }
 
 func (f *SmallIntegerField) valueAsSql() string {
-	if f.IsNil() {
+	if f.null && !f.Valid {
 		return "NULL"
 	} else {
 		return int16AsSql(f.Value)
@@ -318,7 +294,7 @@ func (f *SmallIntegerField) valueAsSql() string {
 }
 
 func (f *TextField) valueAsSql() string {
-	if f.IsNil() {
+	if f.null && !f.Valid {
 		return "NULL"
 	} else {
 		return stringAsSql(f.Value)
