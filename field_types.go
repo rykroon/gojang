@@ -2,6 +2,7 @@ package gojang
 
 import (
 	"fmt"
+	"github.com/shopspring/decimal"
 )
 
 type onDelete string
@@ -40,6 +41,16 @@ type BooleanField struct {
 
 	Valid bool
 	Value bool
+}
+
+type DecimalField struct {
+	*Column
+
+	Valid bool
+	Value decimal.Decimal
+
+	maxDigits int
+	decimalPlaces int
 }
 
 type FloatField struct {
