@@ -89,7 +89,7 @@ func (f *TextField) copyField() field {
 // 	return NewTextField()
 // }
 
-func (f *column) HasNullConstraint() bool {
+func (f *Column) HasNullConstraint() bool {
 	return f.null
 }
 
@@ -141,23 +141,23 @@ func (f *TextField) setNullConstraint(null bool) {
 	}
 }
 
-func (f *column) HasUniqueConstraint() bool {
+func (f *Column) HasUniqueConstraint() bool {
 	return f.unique
 }
 
-func (c *column) setUniqueConstraint(unique bool) {
+func (c *Column) setUniqueConstraint(unique bool) {
 	c.unique = unique
 }
 
-func (c *column) HasPrimaryKeyConstraint() bool {
+func (c *Column) HasPrimaryKeyConstraint() bool {
 	return c.primaryKey
 }
 
-func (c *column) setPrimaryKeyConstraint(primaryKey bool) {
+func (c *Column) setPrimaryKeyConstraint(primaryKey bool) {
 	c.primaryKey = primaryKey
 }
 
-func (c *column) HasRelation() bool {
+func (c *Column) HasRelation() bool {
 	return c.isRelation
 }
 
@@ -233,23 +233,23 @@ func (f *OneToOneField) validate() {
 	}
 }
 
-func (c *column) setModel(model *Model) {
+func (c *Column) setModel(model *Model) {
 	c.model = model
 }
 
-func (c *column) Model() *Model {
+func (c *Column) Model() *Model {
 	return c.model
 }
 
-func (f *column) HasModel() bool {
+func (f *Column) HasModel() bool {
 	return f.model != nil
 }
 
-func (f *column) DbColumn() string {
+func (f *Column) DbColumn() string {
 	return f.dbColumn
 }
 
-func (f *column) setDbColumn(col string) {
+func (f *Column) setDbColumn(col string) {
 	f.dbColumn = col
 }
 

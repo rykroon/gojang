@@ -51,7 +51,7 @@ func (s star) asSql() string {
 	return "*"
 }
 
-func (c *column) asSql() string {
+func (c *Column) asSql() string {
 	sql := ""
 
 	if c.HasModel() {
@@ -78,7 +78,7 @@ func (f function) Alias() string {
 	return f.outputField.Alias()
 }
 
-func (c *column) Alias() string {
+func (c *Column) Alias() string {
 	return c.alias
 }
 
@@ -94,7 +94,7 @@ func (f *function) As(alias string) {
 	f.outputField.As(alias)
 }
 
-func (c *column) As(alias string) {
+func (c *Column) As(alias string) {
 	c.alias = alias
 }
 
@@ -110,7 +110,7 @@ func (f function) DbType() string {
 	return f.outputField.DbType()
 }
 
-func (f *column) DbType() string {
+func (f *Column) DbType() string {
 	return f.dbType
 }
 
@@ -214,10 +214,10 @@ func (f *TextField) getValue() interface{} {
 //Methods that return Order By Expressions
 //
 
-func (c *column) Asc() orderByExpression {
+func (c *Column) Asc() orderByExpression {
 	return orderByExpression(c.asSql() + " ASC")
 }
 
-func (c *column) Desc() orderByExpression {
+func (c *Column) Desc() orderByExpression {
 	return orderByExpression(c.asSql() + " DESC")
 }

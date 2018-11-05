@@ -17,7 +17,7 @@ type constraints struct {
 	primaryKey bool
 }
 
-type column struct {
+type Column struct {
 	model    *Model
 	dbColumn string
 	dbType   string
@@ -29,42 +29,42 @@ type column struct {
 
 //A field type for each data type
 type BigIntegerField struct {
-	*column
+	*Column
 
 	Valid bool
 	Value int64
 }
 
 type BooleanField struct {
-	*column
+	*Column
 
 	Valid bool
 	Value bool
 }
 
 type FloatField struct {
-	*column
+	*Column
 
 	Valid bool
 	Value float64
 }
 
 type IntegerField struct {
-	*column
+	*Column
 
 	Valid bool
 	Value int32
 }
 
 type SmallIntegerField struct {
-	*column
+	*Column
 
 	Valid bool
 	Value int16
 }
 
 type TextField struct {
-	*column
+	*Column
 
 	Valid bool
 	Value string
@@ -101,20 +101,20 @@ type OneToOneField struct {
 
 //Constructors
 
-func NewColumn(dbType string) *column {
-	return &column{dbType: dbType}
+func newColumn(dbType string) *Column {
+	return &Column{dbType: dbType}
 }
 
 func NewBigIntegerField() *BigIntegerField {
 	field := &BigIntegerField{}
-	field.column = NewColumn("INT8")
+	field.Column = newColumn("INT8")
 	field.Valid = true
 	return field
 }
 
 func NewBooleanField() *BooleanField {
 	field := &BooleanField{}
-	field.column = NewColumn("BOOL")
+	field.Column = newColumn("BOOL")
 	field.Valid = true
 	return field
 }
@@ -129,28 +129,28 @@ func NewCharField(maxLength int) *CharField {
 
 func NewFloatField() *FloatField {
 	field := &FloatField{}
-	field.column = NewColumn("FLOAT8")
+	field.Column = newColumn("FLOAT8")
 	field.Valid = true
 	return field
 }
 
 func NewIntegerField() *IntegerField {
 	field := &IntegerField{}
-	field.column = NewColumn("INT4")
+	field.Column = newColumn("INT4")
 	field.Valid = true
 	return field
 }
 
 func NewSmallIntegerField() *SmallIntegerField {
 	field := &SmallIntegerField{}
-	field.column = NewColumn("INT2")
+	field.Column = newColumn("INT2")
 	field.Valid = true
 	return field
 }
 
 func NewTextField() *TextField {
 	field := &TextField{}
-	field.column = NewColumn("TEXT")
+	field.Column = newColumn("TEXT")
 	field.Valid = true
 	return field
 }
@@ -194,8 +194,8 @@ func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 	return field
 }
 
-func (c *column) copy() *column {
-	copy := NewColumn(c.dbType)
+func (c *Column) copy() *Column {
+	copy := newColumn(c.dbType)
 	copy.model = c.model
 	copy.dbColumn = c.dbColumn
 	copy.alias = c.alias
@@ -205,37 +205,37 @@ func (c *column) copy() *column {
 
 func (f *BigIntegerField) copy() *BigIntegerField {
 	copy := NewBigIntegerField()
-	copy.column = f.column.copy()
+	copy.Column = f.Column.copy()
 	return copy
 }
 
 func (f *BooleanField) copy() *BooleanField {
 	copy := NewBooleanField()
-	copy.column = f.column.copy()
+	copy.Column = f.Column.copy()
 	return copy
 }
 
 func (f *FloatField) copy() *FloatField {
 	copy := NewFloatField()
-	copy.column = f.column.copy()
+	copy.Column = f.Column.copy()
 	return copy
 }
 
 func (f *IntegerField) copy() *IntegerField {
 	copy := NewIntegerField()
-	copy.column = f.column.copy()
+	copy.Column = f.Column.copy()
 	return copy
 }
 
 func (f *SmallIntegerField) copy() *SmallIntegerField {
 	copy := NewSmallIntegerField()
-	copy.column = f.column.copy()
+	copy.Column = f.Column.copy()
 	return copy
 }
 
 func (f *TextField) copy() *TextField {
 	copy := NewTextField()
-	copy.column = f.column.copy()
+	copy.Column = f.Column.copy()
 	return copy
 }
 
