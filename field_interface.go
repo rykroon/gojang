@@ -43,6 +43,14 @@ func (f *BooleanField) copyField() field {
 	return f.copy()
 }
 
+func (f *CharField) copyField() field {
+	return f.copy()
+}
+
+func (f *DecimalField) copyField() field {
+	return f.copy()
+}
+
 func (f *FloatField) copyField() field {
 	return f.copy()
 }
@@ -72,6 +80,14 @@ func (f *BigIntegerField) setNullConstraint(null bool) {
 }
 
 func (f *BooleanField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.Valid = false
+	}
+}
+
+func (f *DecimalField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
@@ -163,6 +179,12 @@ func (f *BooleanField) validate() {
 	}
 }
 
+func (f *DecimalField) validate() {
+	if f.primaryKey {
+		panic(NewInvalidConstraint(f, "primary key"))
+	}
+}
+
 func (f *FloatField) validate() {
 	if f.primaryKey {
 		panic(NewInvalidConstraint(f, "primary key"))
@@ -236,6 +258,14 @@ func (f *BooleanField) valueAsSql() string {
 		return "NULL"
 	} else {
 		return boolAsSql(f.Value)
+	}
+}
+
+func (f *DecimalField) valueAsSql() string {
+	if f.null && !f.Valid {
+		return "NULL"
+	} else {
+		return f.Value.String()
 	}
 }
 

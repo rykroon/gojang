@@ -1,6 +1,8 @@
 package gojang
 
-import ()
+import (
+	"github.com/shopspring/decimal"
+)
 
 type lookup struct {
 	not        bool
@@ -19,6 +21,10 @@ func (f *BigIntegerField) Exact(value int) lookup {
 
 func (f *BooleanField) Exact(value bool) lookup {
 	return lookup{lhs: f, lookupName: "=", rhs: boolAsSql(value)}
+}
+
+func (f *DecimalField) Exact(value decimal.Decimal) lookup {
+	return lookup{lhs: f, lookupName: "=", rhs: f.Value.String()}
 }
 
 func (f *FloatField) Exact(value float64) lookup {
@@ -91,6 +97,10 @@ func (f *BooleanField) Gt(value bool) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: boolAsSql(value)}
 }
 
+func (f *DecimalField) Gt(value decimal.Decimal) lookup {
+	return lookup{lhs: f, lookupName: ">", rhs: f.Value.String()}
+}
+
 func (f *FloatField) Gt(value float64) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: float64AsSql(value)}
 }
@@ -118,6 +128,10 @@ func (f *BigIntegerField) Gte(value int) lookup {
 
 func (f *BooleanField) Gte(value bool) lookup {
 	return lookup{lhs: f, lookupName: ">=", rhs: boolAsSql(value)}
+}
+
+func (f *DecimalField) Gte(value decimal.Decimal) lookup {
+	return lookup{lhs: f, lookupName: "<=", rhs: f.Value.String()}
 }
 
 func (f *FloatField) Gte(value float64) lookup {
@@ -149,6 +163,10 @@ func (f *BooleanField) Lt(value bool) lookup {
 	return lookup{lhs: f, lookupName: "<", rhs: boolAsSql(value)}
 }
 
+func (f *DecimalField) Lt(value decimal.Decimal) lookup {
+	return lookup{lhs: f, lookupName: "<", rhs: f.Value.String()}
+}
+
 func (f *FloatField) Lt(value float64) lookup {
 	return lookup{lhs: f, lookupName: "<", rhs: float64AsSql(value)}
 }
@@ -176,6 +194,10 @@ func (f *BigIntegerField) Lte(value int) lookup {
 
 func (f *BooleanField) Lte(value bool) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: boolAsSql(value)}
+}
+
+func (f *DecimalField) Lte(value decimal.Decimal) lookup {
+	return lookup{lhs: f, lookupName: "<=", rhs: f.Value.String()}
 }
 
 func (f *FloatField) Lte(value float64) lookup {
@@ -230,6 +252,12 @@ func (f *BooleanField) Range(from, to bool) lookup {
 	return lookup
 }
 
+func (f *DecimalField) Range(from, to decimal.Decimal) lookup {
+	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
+	lookup.rhs = from.String() + " AND " + to.String()
+	return lookup
+}
+
 func (f *FloatField) Range(from, to float64) lookup {
 	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
 	lookup.rhs = float64AsSql(from) + " AND " + float64AsSql(to)
@@ -267,6 +295,10 @@ func (f *BigIntegerField) IsNull(value bool) lookup {
 }
 
 func (f *BooleanField) IsNull(value bool) lookup {
+	return fieldIsNull(f, value)
+}
+
+func (f *DecimalField) IsNull(value bool) lookup {
 	return fieldIsNull(f, value)
 }
 

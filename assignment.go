@@ -13,6 +13,10 @@ func (f *BooleanField) asAssignment() assignment {
 	return assignment(f.Exact(f.Value))
 }
 
+func (f *DecimalField) asAssignment() assignment {
+	return assignment(f.Exact(f.Value))
+}
+
 func (f *FloatField) asAssignment() assignment {
 	return assignment(f.Exact(f.Value))
 }

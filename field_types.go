@@ -49,7 +49,7 @@ type DecimalField struct {
 	Valid bool
 	Value decimal.Decimal
 
-	maxDigits int
+	maxDigits     int
 	decimalPlaces int
 }
 
@@ -138,6 +138,20 @@ func NewCharField(maxLength int) *CharField {
 	return field
 }
 
+func NewDecimalField(maxDigits int, decimalPlaces int) *DecimalField {
+	if maxDigits < decimalPlaces {
+		err := NewFieldError("The maximum digits cannot be less than the number of decimal places.")
+		panic(err)
+	}
+
+	field := &DecimalField{maxDigits: maxDigits, decimalPlaces: decimalPlaces}
+	dbType := fmt.Sprintf("NUMERIC(%v, %v)", maxDigits, decimalPlaces)
+	field.Column = newColumn(dbType)
+	field.Value = decimal.New(0, 0)
+	field.Valid = true
+	return field
+}
+
 func NewFloatField() *FloatField {
 	field := &FloatField{}
 	field.Column = newColumn("FLOAT8")
@@ -222,6 +236,18 @@ func (f *BigIntegerField) copy() *BigIntegerField {
 
 func (f *BooleanField) copy() *BooleanField {
 	copy := NewBooleanField()
+	copy.Column = f.Column.copy()
+	return copy
+}
+
+func (f *CharField) copy() *CharField {
+	copy := NewCharField(f.maxLength)
+	copy.Column = f.Column.copy()
+	return copy
+}
+
+func (f *DecimalField) copy() *DecimalField {
+	copy := NewDecimalField(f.maxDigits, f.decimalPlaces)
 	copy.Column = f.Column.copy()
 	return copy
 }

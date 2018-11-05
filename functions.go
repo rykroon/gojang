@@ -59,6 +59,10 @@ func (f *BigIntegerField) Avg() *aggregate {
 	return Avg(f, NewFloatField())
 }
 
+func (f *DecimalField) Avg() *aggregate {
+	return Avg(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
+}
+
 func (f *FloatField) Avg() *aggregate {
 	return Avg(f, NewFloatField())
 }
@@ -85,6 +89,10 @@ func (f *BooleanField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
+func (f *DecimalField) Count(distinct bool) *aggregate {
+	return Count(f, distinct)
+}
+
 func (f *FloatField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
@@ -107,6 +115,10 @@ func (f *BigIntegerField) Max() *aggregate {
 
 func (f *BooleanField) Max() *aggregate {
 	return Max(f, NewBooleanField())
+}
+
+func (f *DecimalField) Max() *aggregate {
+	return Max(f, NewFloatField())
 }
 
 func (f *FloatField) Max() *aggregate {

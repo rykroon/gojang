@@ -3,6 +3,7 @@ package gojang
 import (
 	"fmt"
 	//"reflect"
+	"github.com/shopspring/decimal"
 	"strconv"
 )
 
@@ -140,15 +141,37 @@ func (f *BooleanField) Scan(value interface{}) error {
 	return nil
 }
 
+func (f *DecimalField) Scan(value interface{}) error {
+	switch v := value.(type) {
+	case int64:
+		f.Value, f.Valid = decimal.New(v, 0), true
+
+	case float64:
+		f.Value, f.Valid = decimal.NewFromFloat(v), true
+
+	case []uint8:
+		dec, err := decimal.NewFromString(string(v))
+		f.Value = dec
+		f.Valid = err == nil
+		return err
+
+	default:
+		f.Value, f.Valid = decimal.New(0, 0), false
+	}
+
+	return nil
+}
+
 func (f *FloatField) Scan(value interface{}) error {
 	switch v := value.(type) {
+	case float64:
+		f.Value, f.Valid = v, true
+
 	case []uint8:
 		float, err := strconv.ParseFloat(string(v), 64)
 		f.Value = float
 		f.Valid = err == nil
-
-	case float64:
-		f.Value, f.Valid = v, true
+		return err
 
 	default:
 		f.Value, f.Valid = 0, false
@@ -191,6 +214,10 @@ func (f *BigIntegerField) getValue() interface{} {
 }
 
 func (f *BooleanField) getValue() interface{} {
+	return f.Value
+}
+
+func (f *DecimalField) getValue() interface{} {
 	return f.Value
 }
 
