@@ -2,6 +2,8 @@ package gojang
 
 import (
 	"fmt"
+	//"reflect"
+	"strconv"
 )
 
 //Expressions describe a value or a computation that can be used as part of an
@@ -16,7 +18,6 @@ type selectExpression interface {
 	As(string) //is essentially the 'setter' method for alias
 	Alias() string
 	DbType() string
-	//newField() field
 	Scan(interface{}) error
 }
 
@@ -140,7 +141,19 @@ func (f *BooleanField) Scan(value interface{}) error {
 }
 
 func (f *FloatField) Scan(value interface{}) error {
-	f.Value, f.valid = value.(float64)
+	switch v := value.(type) {
+	case []uint8:
+		float, err := strconv.ParseFloat(string(v), 64)
+		f.Value = float
+		f.valid = err == nil
+
+	case float64:
+		f.Value, f.valid = v, true
+
+	default:
+		f.Value, f.valid = 0, false
+	}
+
 	return nil
 }
 

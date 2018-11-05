@@ -22,14 +22,6 @@ func newFunction(name string, expr selectExpression, outputField field) *functio
 	return funct
 }
 
-//Creates a new CAST Function
-func Cast(expr selectExpression, outputField field) *function {
-	cast := newFunction("CAST", expr, outputField)
-	cast.args = append(cast.args, cast.outputField.DbType())
-	cast.template = "%v(%v AS %v)"
-	return cast
-}
-
 func newAggregate(name string, expr selectExpression, outputField field) *aggregate {
 	f := newFunction(name, expr, outputField)
 	f.As(expr.Alias() + "__" + strings.ToLower(name))
@@ -37,61 +29,52 @@ func newAggregate(name string, expr selectExpression, outputField field) *aggreg
 	return &a
 }
 
-func Avg(expr selectExpression) *aggregate {
-	avg := newAggregate("AVG", expr, NewFloatField())
-
-	//Once I create Decimal Field use that for certain cases
-	if expr.DbType() != avg.outputField.DbType() {
-		cast := Cast(avg, avg.outputField)
-		aggCast := aggregate(*cast)
-		return &aggCast
-	}
-
-	return avg
+func Avg(expr selectExpression, outputField field) *aggregate {
+	return newAggregate("AVG", expr, outputField)
 }
 
 func Count(expr selectExpression, distinct bool) *aggregate {
-	agg := newAggregate("COUNT", expr, NewBigIntegerField())
+	count := newAggregate("COUNT", expr, NewBigIntegerField())
 
 	if distinct {
-		agg.template = "%v(DISTINCT %v)"
+		count.template = "%v(DISTINCT %v)"
 	}
 
-	if expr.Alias() != "*" {
-		agg.As(expr.Alias() + "__count")
-	}
-
-	return agg
+	return count
 }
 
-// func Min(expr selectExpression) *aggregate {
-// 	//min := newAggregate("MIN", expr, )
-// }
+func Max(expr selectExpression, outputField field) *aggregate {
+	return newAggregate("MAX", expr, outputField)
+}
 
-func Sum(expr selectExpression) *aggregate {
-	sum := newAggregate("SUM", expr, NewBigIntegerField())
-	sum.As(expr.Alias() + "__sum")
-	return sum
+func Min(expr selectExpression, outputField field) *aggregate {
+	return newAggregate("MIN", expr, outputField)
+}
+
+func Sum(expr selectExpression, outputField field) *aggregate {
+	return newAggregate("SUM", expr, outputField)
 }
 
 func (f *BigIntegerField) Avg() *aggregate {
-	return Avg(f)
+	return Avg(f, NewFloatField())
 }
 
 func (f *FloatField) Avg() *aggregate {
-	return Avg(f)
+	return Avg(f, NewFloatField())
 }
 
 func (f *IntegerField) Avg() *aggregate {
-	return Avg(f)
+	return Avg(f, NewFloatField())
 }
 
 func (f *SmallIntegerField) Avg() *aggregate {
-	return Avg(f)
+	return Avg(f, NewFloatField())
 }
 
 func (s star) Count() *aggregate {
-	return Count(s, false)
+	count := Count(s, false)
+	count.As("count")
+	return count
 }
 
 func (f *BigIntegerField) Count(distinct bool) *aggregate {
@@ -118,18 +101,66 @@ func (f *TextField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
+func (f *BigIntegerField) Max() *aggregate {
+	return Max(f, NewBigIntegerField())
+}
+
+func (f *BooleanField) Max() *aggregate {
+	return Max(f, NewBooleanField())
+}
+
+func (f *FloatField) Max() *aggregate {
+	return Max(f, NewFloatField())
+}
+
+func (f *IntegerField) Max() *aggregate {
+	return Max(f, NewIntegerField())
+}
+
+func (f *SmallIntegerField) Max() *aggregate {
+	return Max(f, NewSmallIntegerField())
+}
+
+func (f *TextField) Max() *aggregate {
+	return Max(f, NewTextField())
+}
+
+func (f *BigIntegerField) Min() *aggregate {
+	return Min(f, NewBigIntegerField())
+}
+
+func (f *BooleanField) Min() *aggregate {
+	return Min(f, NewBooleanField())
+}
+
+func (f *FloatField) Min() *aggregate {
+	return Min(f, NewFloatField())
+}
+
+func (f *IntegerField) Min() *aggregate {
+	return Min(f, NewIntegerField())
+}
+
+func (f *SmallIntegerField) Min() *aggregate {
+	return Min(f, NewSmallIntegerField())
+}
+
+func (f *TextField) Min() *aggregate {
+	return Min(f, NewTextField())
+}
+
 func (f *BigIntegerField) Sum() *aggregate {
-	return Sum(f)
+	return Sum(f, NewBigIntegerField())
 }
 
 func (f *FloatField) Sum() *aggregate {
-	return Sum(f)
+	return Sum(f, NewFloatField())
 }
 
 func (f *IntegerField) Sum() *aggregate {
-	return Sum(f)
+	return Sum(f, NewIntegerField())
 }
 
 func (f *SmallIntegerField) Sum() *aggregate {
-	return Sum(f)
+	return Sum(f, NewSmallIntegerField())
 }

@@ -31,12 +31,11 @@ type field interface {
 	UnSetNil()
 
 	asAssignment() assignment
-	//Asc() orderByExpression
-	//Desc() orderByExpression
+	Asc() orderByExpression
+	Desc() orderByExpression
 	Count(bool) *aggregate
 
 	copyField() field
-	//new() field //haven't found a use for this yet
 
 	validate()
 	valueAsSql() string
@@ -66,29 +65,29 @@ func (f *TextField) copyField() field {
 	return f.copy()
 }
 
-func (f *BigIntegerField) new() field {
-	return NewBigIntegerField()
-}
-
-func (f *BooleanField) new() field {
-	return NewBooleanField()
-}
-
-func (f *FloatField) new() field {
-	return NewFloatField()
-}
-
-func (f *IntegerField) new() field {
-	return NewIntegerField()
-}
-
-func (f *SmallIntegerField) new() field {
-	return NewSmallIntegerField()
-}
-
-func (f *TextField) new() field {
-	return NewTextField()
-}
+// func (f *BigIntegerField) new() field {
+// 	return NewBigIntegerField()
+// }
+//
+// func (f *BooleanField) new() field {
+// 	return NewBooleanField()
+// }
+//
+// func (f *FloatField) new() field {
+// 	return NewFloatField()
+// }
+//
+// func (f *IntegerField) new() field {
+// 	return NewIntegerField()
+// }
+//
+// func (f *SmallIntegerField) new() field {
+// 	return NewSmallIntegerField()
+// }
+//
+// func (f *TextField) new() field {
+// 	return NewTextField()
+// }
 
 func (f *column) HasNullConstraint() bool {
 	return f.null
