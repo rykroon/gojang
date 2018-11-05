@@ -233,8 +233,8 @@ func (f *OneToOneField) validate() {
 	}
 }
 
-func (f *column) setModel(model *Model) {
-	f.model = model
+func (c *column) setModel(model *Model) {
+	c.model = model
 }
 
 func (c *column) Model() *Model {

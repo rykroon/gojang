@@ -1,6 +1,8 @@
 package gojang
 
-import ()
+import (
+	"fmt"
+)
 
 type onDelete string
 
@@ -76,6 +78,11 @@ type BigAutoField struct {
 	*BigIntegerField
 }
 
+type CharField struct {
+	*TextField
+	maxLength int
+}
+
 type ForeignKey struct {
 	*BigIntegerField
 
@@ -109,6 +116,14 @@ func NewBooleanField() *BooleanField {
 	field := &BooleanField{}
 	field.column = NewColumn("BOOL")
 	field.valid = true
+	return field
+}
+
+func NewCharField(maxLength int) *CharField {
+	field := &CharField{maxLength: maxLength}
+	field.TextField = NewTextField()
+	dbType := fmt.Sprintf("VARCHAR(%v)", maxLength)
+	field.dbType = dbType
 	return field
 }
 
