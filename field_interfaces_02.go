@@ -2,10 +2,14 @@ package gojang
 
 import ()
 
-// type stringField interface {
-// 	Val() string
-// 	set(string)
-// }
+type stringField interface {
+	Val() string
+	set(string)
+
+	Length() *IntegerField
+	Upper() *TextField
+	Lower() *TextField
+}
 
 type NumericField interface {
 	field
