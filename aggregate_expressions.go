@@ -1,7 +1,7 @@
 package gojang
 
 import (
-  "strings"
+	"strings"
 )
 
 type aggregate function

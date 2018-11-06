@@ -20,6 +20,11 @@ func newFunction(name string, expr selectExpression, outputField field) *functio
 	return funct
 }
 
+func (f *function) toField() field {
+	f.outputField.setDbColumn(f.asSql())
+	return f.outputField
+}
+
 //Comparison and conversion functions¶
 
 func Cast(expr selectExpression, outputField field) *function {
@@ -31,12 +36,10 @@ func Cast(expr selectExpression, outputField field) *function {
 
 //Coalesce
 
-
 //Date Functions
 
 //Extract
 //Now
-
 
 //Text Functions
 
@@ -54,15 +57,15 @@ func Lower(expr selectExpression) *function {
 
 func (f *TextField) Length() *IntegerField {
 	length := Length(f)
-	return length.outputField.(*IntegerField)
+	return length.toField().(*IntegerField)
 }
 
 func (f *TextField) Upper() *TextField {
 	upper := Upper(f)
-	return upper.outputField.(*TextField)
+	return upper.toField().(*TextField)
 }
 
 func (f *TextField) Lower() *TextField {
 	lower := Lower(f)
-	return lower.outputField.(*TextField)
+	return lower.toField().(*TextField)
 }

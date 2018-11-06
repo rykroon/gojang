@@ -67,7 +67,7 @@ func (c *Column) asSql() string {
 	return sql
 }
 
-func (v ValueExpression) asSql() string {
+func (v *ValueExpression) asSql() string {
 	return v.outputField.valueAsSql()
 }
 
