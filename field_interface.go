@@ -249,7 +249,7 @@ func (f *BigIntegerField) valueAsSql() string {
 	if f.null && !f.Valid {
 		return "NULL"
 	} else {
-		return int64AsSql(f.Value)
+		return intAsSql(int(f.Value))
 	}
 }
 
@@ -281,7 +281,7 @@ func (f *IntegerField) valueAsSql() string {
 	if f.null && !f.Valid {
 		return "NULL"
 	} else {
-		return int32AsSql(f.Value)
+		return intAsSql(int(f.Value))
 	}
 }
 
@@ -289,7 +289,7 @@ func (f *SmallIntegerField) valueAsSql() string {
 	if f.null && !f.Valid {
 		return "NULL"
 	} else {
-		return int16AsSql(f.Value)
+		return intAsSql(int(f.Value))
 	}
 }
 

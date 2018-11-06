@@ -67,6 +67,10 @@ func (c *Column) asSql() string {
 	return sql
 }
 
+func (v ValueExpression) asSql() string {
+	return v.outputField.valueAsSql()
+}
+
 //
 //Select Expression Method Set
 //
@@ -87,6 +91,10 @@ func (s star) Alias() string {
 	return "*"
 }
 
+func (v *ValueExpression) Alias() string {
+	return v.outputField.Alias()
+}
+
 func (a *aggregate) As(alias string) {
 	a.outputField.As(alias)
 }
@@ -101,6 +109,10 @@ func (c *Column) As(alias string) {
 
 func (s star) As(string) {
 	return
+}
+
+func (v *ValueExpression) As(alias string) {
+	v.outputField.As(alias)
 }
 
 func (a aggregate) DbType() string {
@@ -119,6 +131,10 @@ func (s star) DbType() string {
 	return ""
 }
 
+func (v *ValueExpression) DbType() string {
+	return v.outputField.DbType()
+}
+
 func (a aggregate) Scan(v interface{}) error {
 	return function(a).Scan(v)
 }
@@ -129,6 +145,10 @@ func (f function) Scan(v interface{}) error {
 
 func (s star) Scan(interface{}) error {
 	return nil
+}
+
+func (v *ValueExpression) Scan(value interface{}) error {
+	return v.outputField.Scan(value)
 }
 
 func (f *BigIntegerField) Scan(value interface{}) error {
@@ -193,6 +213,10 @@ func (f function) getValue() interface{} {
 
 func (s star) getValue() interface{} {
 	return nil
+}
+
+func (v *ValueExpression) getValue() interface{} {
+	return v.outputField.getValue()
 }
 
 func (f *BigIntegerField) getValue() interface{} {

@@ -66,11 +66,11 @@ func (f *BigIntegerField) In(values ...int) lookup {
 }
 
 func (f *BooleanField) In(values ...bool) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: boolSliceAsSql(values)}
+	return lookup{lhs: f, lookupName: "IN", rhs: boolsAsSql(values)}
 }
 
 func (f *FloatField) In(values ...float64) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: float64SliceAsSql(values)}
+	return lookup{lhs: f, lookupName: "IN", rhs: floatsAsSql(values)}
 }
 
 func (f *IntegerField) In(values ...int) lookup {
@@ -82,7 +82,7 @@ func (f *SmallIntegerField) In(values ...int) lookup {
 }
 
 func (f *TextField) In(values ...string) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: stringSliceAsSql(values)}
+	return lookup{lhs: f, lookupName: "IN", rhs: stringsAsSql(values)}
 }
 
 func gtIntField(field IntField, value int) lookup {
