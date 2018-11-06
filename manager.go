@@ -6,7 +6,7 @@ type Manager struct {
 	model *Model
 }
 
-func newManager(model *Model) Manager {
+func NewManager(model *Model) Manager {
 	manager := Manager{model: model}
 	return manager
 }

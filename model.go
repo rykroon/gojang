@@ -26,7 +26,7 @@ func NewModel(db Database) *Model {
 	model.fields = make([]field, 0)
 	model.colToAttr = make(map[string]string)
 	model.db, _ = db.toDB()
-	model.Objects = newManager(model)
+	model.Objects = NewManager(model)
 	return model
 }
 

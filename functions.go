@@ -118,7 +118,7 @@ func (f *BooleanField) Max() *aggregate {
 }
 
 func (f *DecimalField) Max() *aggregate {
-	return Max(f, NewFloatField())
+	return Max(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
 }
 
 func (f *FloatField) Max() *aggregate {
@@ -145,6 +145,10 @@ func (f *BooleanField) Min() *aggregate {
 	return Min(f, NewBooleanField())
 }
 
+func (f *DecimalField) Min() *aggregate {
+	return Min(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
+}
+
 func (f *FloatField) Min() *aggregate {
 	return Min(f, NewFloatField())
 }
@@ -163,6 +167,10 @@ func (f *TextField) Min() *aggregate {
 
 func (f *BigIntegerField) Sum() *aggregate {
 	return Sum(f, NewBigIntegerField())
+}
+
+func (f *DecimalField) Sum() *aggregate {
+	return Sum(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
 }
 
 func (f *FloatField) Sum() *aggregate {
