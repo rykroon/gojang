@@ -52,20 +52,7 @@ func (s star) asSql() string {
 	return "*"
 }
 
-func (c *Column) asSql() string {
-	sql := ""
 
-	if c.HasModel() {
-		tableName := dbq(c.model.dbTable)
-		colName := dbq(c.dbColumn)
-		sql = tableName + "." + colName
-
-	} else {
-		sql = c.dbColumn
-	}
-
-	return sql
-}
 
 func (v *ValueExpression) asSql() string {
 	return v.outputField.valueAsSql()
@@ -83,9 +70,7 @@ func (f function) Alias() string {
 	return f.outputField.Alias()
 }
 
-func (c *Column) Alias() string {
-	return c.alias
-}
+
 
 func (s star) Alias() string {
 	return "*"
@@ -101,10 +86,6 @@ func (a *aggregate) As(alias string) {
 
 func (f *function) As(alias string) {
 	f.outputField.As(alias)
-}
-
-func (c *Column) As(alias string) {
-	c.alias = alias
 }
 
 func (s star) As(string) {
@@ -151,15 +132,9 @@ func (v *ValueExpression) Scan(value interface{}) error {
 	return v.outputField.Scan(value)
 }
 
-func (f *BigIntegerField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(int64)
-	return nil
-}
 
-func (f *BooleanField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(bool)
-	return nil
-}
+
+
 
 func (f *DecimalField) Scan(value interface{}) error {
 	return f.Value.Scan(value)
@@ -219,14 +194,6 @@ func (v *ValueExpression) getValue() interface{} {
 	return v.outputField.getValue()
 }
 
-func (f *BigIntegerField) getValue() interface{} {
-	return int(f.Value)
-}
-
-func (f *BooleanField) getValue() interface{} {
-	return f.Value
-}
-
 func (f *DecimalField) getValue() interface{} {
 	return f.Value
 }
@@ -250,11 +217,3 @@ func (f *TextField) getValue() interface{} {
 //
 //Methods that return Order By Expressions
 //
-
-func (c *Column) Asc() orderByExpression {
-	return orderByExpression(c.asSql() + " ASC")
-}
-
-func (c *Column) Desc() orderByExpression {
-	return orderByExpression(c.asSql() + " DESC")
-}

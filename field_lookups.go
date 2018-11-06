@@ -15,13 +15,6 @@ func exactIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: "=", rhs: intAsSql(value)}
 }
 
-func (f *BigIntegerField) Exact(value int) lookup {
-	return exactIntField(f, value)
-}
-
-func (f *BooleanField) Exact(value bool) lookup {
-	return lookup{lhs: f, lookupName: "=", rhs: boolAsSql(value)}
-}
 
 func (f *DecimalField) Exact(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "=", rhs: f.Value.String()}
@@ -61,13 +54,7 @@ func inIntField(field IntField, values []int) lookup {
 	return lookup{lhs: field, lookupName: "IN", rhs: integersAsSql(values)}
 }
 
-func (f *BigIntegerField) In(values ...int) lookup {
-	return inIntField(f, values)
-}
 
-func (f *BooleanField) In(values ...bool) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: boolsAsSql(values)}
-}
 
 func (f *FloatField) In(values ...float64) lookup {
 	return lookup{lhs: f, lookupName: "IN", rhs: floatsAsSql(values)}
@@ -89,13 +76,9 @@ func gtIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: ">", rhs: intAsSql(value)}
 }
 
-func (f *BigIntegerField) Gt(value int) lookup {
-	return gtIntField(f, value)
-}
 
-func (f *BooleanField) Gt(value bool) lookup {
-	return lookup{lhs: f, lookupName: ">", rhs: boolAsSql(value)}
-}
+
+
 
 func (f *DecimalField) Gt(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: f.Value.String()}
@@ -121,14 +104,9 @@ func gteIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: ">=", rhs: intAsSql(value)}
 }
 
-func (f *BigIntegerField) Gte(value int) lookup {
-	return gteIntField(f, value)
-	//return lookup{lhs: f, lookupName: ">=", rhs: intAsSql(value)}
-}
 
-func (f *BooleanField) Gte(value bool) lookup {
-	return lookup{lhs: f, lookupName: ">=", rhs: boolAsSql(value)}
-}
+
+
 
 func (f *DecimalField) Gte(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: f.Value.String()}
@@ -154,14 +132,9 @@ func ltIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: "<", rhs: intAsSql(value)}
 }
 
-func (f *BigIntegerField) Lt(value int) lookup {
-	return ltIntField(f, value)
-	//return lookup{lhs: f, lookupName: "<", rhs: intAsSql(value)}
-}
 
-func (f *BooleanField) Lt(value bool) lookup {
-	return lookup{lhs: f, lookupName: "<", rhs: boolAsSql(value)}
-}
+
+
 
 func (f *DecimalField) Lt(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "<", rhs: f.Value.String()}
@@ -185,15 +158,6 @@ func (f *TextField) Lt(value string) lookup {
 
 func lteIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: "<=", rhs: intAsSql(value)}
-}
-
-func (f *BigIntegerField) Lte(value int) lookup {
-	return lteIntField(f, value)
-	//return lookup{lhs: f, lookupName: "<=", rhs: intAsSql(value)}
-}
-
-func (f *BooleanField) Lte(value bool) lookup {
-	return lookup{lhs: f, lookupName: "<=", rhs: boolAsSql(value)}
 }
 
 func (f *DecimalField) Lte(value decimal.Decimal) lookup {
@@ -242,16 +206,6 @@ func rangeIntField(field IntField, from, to int) lookup {
 	return lookup
 }
 
-func (f *BigIntegerField) Range(from, to int) lookup {
-	return rangeIntField(f, from, to)
-}
-
-func (f *BooleanField) Range(from, to bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
-	lookup.rhs = boolAsSql(from) + " AND " + boolAsSql(to)
-	return lookup
-}
-
 func (f *DecimalField) Range(from, to decimal.Decimal) lookup {
 	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
 	lookup.rhs = from.String() + " AND " + to.String()
@@ -288,14 +242,6 @@ func fieldIsNull(field field, value bool) lookup {
 	}
 
 	return lookup
-}
-
-func (f *BigIntegerField) IsNull(value bool) lookup {
-	return fieldIsNull(f, value)
-}
-
-func (f *BooleanField) IsNull(value bool) lookup {
-	return fieldIsNull(f, value)
 }
 
 func (f *DecimalField) IsNull(value bool) lookup {

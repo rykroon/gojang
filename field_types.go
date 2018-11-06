@@ -12,29 +12,10 @@ const Protect onDelete = "RESTRICT"
 const SetNull onDelete = "SET NULL"
 const SetDefault onDelete = "SET DEFAULT"
 
-type constraints struct {
-	null       bool
-	unique     bool
-	primaryKey bool
-}
 
-type Column struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-	alias    string
-
-	constraints
-	isRelation bool //foreignKey
-}
 
 //A field type for each data type
-type BigIntegerField struct {
-	*Column
 
-	Valid bool
-	Value int64
-}
 
 type BooleanField struct {
 	*Column
@@ -111,24 +92,6 @@ type OneToOneField struct {
 }
 
 //Constructors
-
-func newColumn(dbType string) *Column {
-	return &Column{dbType: dbType}
-}
-
-func NewBigIntegerField() *BigIntegerField {
-	field := &BigIntegerField{}
-	field.Column = newColumn("INT8")
-	field.Valid = true
-	return field
-}
-
-func NewBooleanField() *BooleanField {
-	field := &BooleanField{}
-	field.Column = newColumn("BOOL")
-	field.Valid = true
-	return field
-}
 
 func NewCharField(maxLength int) *CharField {
 	field := &CharField{maxLength: maxLength}
@@ -217,27 +180,6 @@ func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 	field.unique = true
 
 	return field
-}
-
-func (c *Column) copy() *Column {
-	copy := newColumn(c.dbType)
-	copy.model = c.model
-	copy.dbColumn = c.dbColumn
-	copy.alias = c.alias
-	copy.constraints = c.constraints
-	return copy
-}
-
-func (f *BigIntegerField) copy() *BigIntegerField {
-	copy := NewBigIntegerField()
-	copy.Column = f.Column.copy()
-	return copy
-}
-
-func (f *BooleanField) copy() *BooleanField {
-	copy := NewBooleanField()
-	copy.Column = f.Column.copy()
-	return copy
 }
 
 func (f *CharField) copy() *CharField {
