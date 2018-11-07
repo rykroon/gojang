@@ -79,7 +79,7 @@ func MakeModel(i ModelInstance) error {
 			setFieldOptions(field, options)
 			model.addField(fieldType.Name, field)
 
-			if field.HasPrimaryKeyConstraint() {
+			if field.PrimaryKey() {
 				//Use type assertion to make sure that even if the field has a
 				//Primary Key Constraint that it can still implement the
 				//primaryKeyField interface
@@ -103,7 +103,7 @@ func MakeModel(i ModelInstance) error {
 	if numOfPKs < 1 {
 		model.Pk = NewAutoField()
 		model.Pk.setColumnName("id")
-		model.Pk.setPrimaryKeyConstraint(true)
+		model.Pk.setPrimaryKey(true)
 		model.addField("id", model.Pk)
 	}
 

@@ -57,7 +57,7 @@ func (m *Model) insert() (int, error) {
 	var createList []assignment
 
 	for _, field := range m.fields {
-		if !field.HasPrimaryKeyConstraint() {
+		if !field.PrimaryKey() {
 			createList = append(createList, field.asAssignment())
 		}
 	}
@@ -80,7 +80,7 @@ func (m *Model) update() error {
 	var updateList []assignment
 
 	for _, field := range m.fields {
-		if !field.HasPrimaryKeyConstraint() {
+		if !field.PrimaryKey() {
 			updateList = append(updateList, field.asAssignment())
 		}
 	}

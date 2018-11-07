@@ -15,14 +15,14 @@ type field interface {
 	setModel(*Model)
 	HasModel() bool
 
-	HasNullConstraint() bool
-	setNullConstraint(bool)
+	Null() bool
+	setNull(bool)
 
-	HasUniqueConstraint() bool
-	setUniqueConstraint(bool)
+	Unique() bool
+	setUnique(bool)
 
-	HasPrimaryKeyConstraint() bool
-	setPrimaryKeyConstraint(bool)
+	PrimaryKey() bool
+	setPrimaryKey(bool)
 
 	HasRelation() bool
 

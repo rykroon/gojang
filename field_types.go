@@ -124,7 +124,7 @@ func (f *DecimalField) copy() *DecimalField {
 func create(f field) string {
 	s := dbq(f.ColumnName()) + " " + f.DataType()
 
-	if f.HasPrimaryKeyConstraint() {
+	if f.PrimaryKey() {
 		s += " PRIMARY KEY"
 	} else {
 
@@ -133,13 +133,13 @@ func create(f field) string {
 			s += " REFERENCES " + dbq(fkey.getRelatedModel().dbTable) + " ON DELETE " + fkey.getOnDelete()
 		}
 
-		if f.HasNullConstraint() {
+		if f.Null() {
 			s += " NULL"
 		} else {
 			s += " NOT NULL"
 		}
 
-		if f.HasUniqueConstraint() {
+		if f.Unique() {
 			s += " UNIQUE"
 		}
 	}

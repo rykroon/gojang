@@ -26,9 +26,9 @@ func getFieldOptions(structField reflect.StructField) (fieldOptions, error) {
 
 func setFieldOptions(field field, options fieldOptions) {
 	field.setColumnName(options.dbColumn)
-	field.setPrimaryKeyConstraint(options.primaryKey)
-	field.setNullConstraint(options.null)
-	field.setUniqueConstraint(options.unique)
+	field.setPrimaryKey(options.primaryKey)
+	field.setNull(options.null)
+	field.setUnique(options.unique)
 }
 
 func lookupFieldOptionTags(tag reflect.StructTag) (fieldOptions, error) {
