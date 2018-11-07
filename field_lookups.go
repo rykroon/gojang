@@ -11,6 +11,8 @@ type lookup struct {
 	rhs        string
 }
 
+//type lookup string
+
 func exactIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: "=", rhs: intAsSql(value)}
 }

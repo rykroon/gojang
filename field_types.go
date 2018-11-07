@@ -17,14 +17,6 @@ type DecimalField struct {
 	decimalPlaces int
 }
 
-type AutoField struct {
-	*IntegerField
-}
-
-type BigAutoField struct {
-	*BigIntegerField
-}
-
 type CharField struct {
 	*TextField
 	maxLength int
@@ -67,20 +59,6 @@ func NewDecimalField(maxDigits int, decimalPlaces int) *DecimalField {
 	field.Column = newColumn(dataType)
 	field.Value = decimal.New(0, 0)
 	field.Valid = true
-	return field
-}
-
-func NewAutoField() *AutoField {
-	field := &AutoField{}
-	field.IntegerField = NewIntegerField()
-	field.dataType = "SERIAL4"
-	return field
-}
-
-func NewBigAutoField() *BigAutoField {
-	field := &BigAutoField{}
-	field.BigIntegerField = NewBigIntegerField()
-	field.dataType = "SERIAL8"
 	return field
 }
 

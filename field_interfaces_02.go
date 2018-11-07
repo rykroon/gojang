@@ -6,6 +6,21 @@ type stringField interface {
 	Val() string
 	set(string)
 
+	Contains(string) lookup
+	IContains(string) lookup
+	Exact(string) lookup
+	IExact(string) lookup
+	In(...string) lookup
+	Gt(string) lookup
+	Gte(string) lookup
+	Lt(string) lookup
+	Lte(string) lookup
+	Range(string, string) lookup
+	StartsWith(string) lookup
+	IStartsWith(string) lookup
+	EndsWith(string) lookup
+	IEndsWith(string) lookup
+
 	Length() *IntegerField
 	Upper() *TextField
 	Lower() *TextField
@@ -36,22 +51,6 @@ type PrimaryKeyField interface {
 	IntField
 	Id() int
 	isAutoField() bool
-}
-
-func (f *AutoField) Id() int {
-	return f.Val()
-}
-
-func (f *BigAutoField) Id() int {
-	return f.Val()
-}
-
-func (f *AutoField) isAutoField() bool {
-	return true
-}
-
-func (f *BigAutoField) isAutoField() bool {
-	return true
 }
 
 func (f *BigIntegerField) setInt(num int) {

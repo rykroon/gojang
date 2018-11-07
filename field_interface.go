@@ -53,26 +53,6 @@ func (f *DecimalField) setNullConstraint(null bool) {
 	}
 }
 
-func (f *AutoField) validate() {
-	if !f.primaryKey {
-		panic(NewForceConstraint(f, "primary key"))
-	}
-
-	if f.primaryKey && f.null {
-		panic(NewConstraintConflict(f, "primary key", "null"))
-	}
-}
-
-func (f *BigAutoField) validate() {
-	if !f.primaryKey {
-		panic(NewForceConstraint(f, "primary key"))
-	}
-
-	if f.primaryKey && f.null {
-		panic(NewConstraintConflict(f, "primary key", "null"))
-	}
-}
-
 func (f *DecimalField) validate() {
 	if f.primaryKey {
 		panic(NewInvalidConstraint(f, "primary key"))
