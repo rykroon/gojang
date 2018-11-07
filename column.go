@@ -29,6 +29,25 @@ type Column struct {
 	isRelation bool //foreignKey
 }
 
+type columner interface {
+	asSql() string
+
+	ColumnName() string
+	setColumnName(string)
+
+	DataType() string
+	setDataType(string)
+
+	Null() bool
+	setNull(bool)
+
+	Unique() bool
+	setUnique(bool)
+
+	PrimaryKey() bool
+	setPrimaryKey(bool)
+}
+
 //Constructor
 func newColumn(dataType string) *Column {
 	return &Column{dataType: dataType}
