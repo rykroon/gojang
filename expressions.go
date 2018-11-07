@@ -132,23 +132,8 @@ func (v *ValueExpression) Scan(value interface{}) error {
 	return v.outputField.Scan(value)
 }
 
-
-
-
-
 func (f *DecimalField) Scan(value interface{}) error {
 	return f.Value.Scan(value)
-}
-
-func (f *SmallIntegerField) Scan(value interface{}) error {
-	result, ok := value.(int64)
-	f.Value, f.Valid = int16(result), ok
-	return nil
-}
-
-func (f *TextField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(string)
-	return nil
 }
 
 func (a aggregate) getValue() interface{} {
@@ -168,14 +153,6 @@ func (v *ValueExpression) getValue() interface{} {
 }
 
 func (f *DecimalField) getValue() interface{} {
-	return f.Value
-}
-
-func (f *SmallIntegerField) getValue() interface{} {
-	return int(f.Value)
-}
-
-func (f *TextField) getValue() interface{} {
 	return f.Value
 }
 

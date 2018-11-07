@@ -43,10 +43,6 @@ func (f *DecimalField) Avg() *aggregate {
 	return Avg(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
 }
 
-func (f *SmallIntegerField) Avg() *aggregate {
-	return Avg(f, NewFloatField())
-}
-
 func (s star) Count() *aggregate {
 	count := Count(s, false)
 	count.As("count")
@@ -57,42 +53,14 @@ func (f *DecimalField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
-func (f *SmallIntegerField) Count(distinct bool) *aggregate {
-	return Count(f, distinct)
-}
-
-func (f *TextField) Count(distinct bool) *aggregate {
-	return Count(f, distinct)
-}
-
 func (f *DecimalField) Max() *aggregate {
 	return Max(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
-}
-
-func (f *SmallIntegerField) Max() *aggregate {
-	return Max(f, NewSmallIntegerField())
-}
-
-func (f *TextField) Max() *aggregate {
-	return Max(f, NewTextField())
 }
 
 func (f *DecimalField) Min() *aggregate {
 	return Min(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
 }
 
-func (f *SmallIntegerField) Min() *aggregate {
-	return Min(f, NewSmallIntegerField())
-}
-
-func (f *TextField) Min() *aggregate {
-	return Min(f, NewTextField())
-}
-
 func (f *DecimalField) Sum() *aggregate {
 	return Sum(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
-}
-
-func (f *SmallIntegerField) Sum() *aggregate {
-	return Sum(f, NewSmallIntegerField())
 }

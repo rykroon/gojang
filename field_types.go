@@ -26,20 +26,6 @@ type DecimalField struct {
 	decimalPlaces int
 }
 
-type SmallIntegerField struct {
-	*Column
-
-	Valid bool
-	Value int16
-}
-
-type TextField struct {
-	*Column
-
-	Valid bool
-	Value string
-}
-
 type AutoField struct {
 	*IntegerField
 }
@@ -93,20 +79,6 @@ func NewDecimalField(maxDigits int, decimalPlaces int) *DecimalField {
 	return field
 }
 
-func NewSmallIntegerField() *SmallIntegerField {
-	field := &SmallIntegerField{}
-	field.Column = newColumn("INT2")
-	field.Valid = true
-	return field
-}
-
-func NewTextField() *TextField {
-	field := &TextField{}
-	field.Column = newColumn("TEXT")
-	field.Valid = true
-	return field
-}
-
 func NewAutoField() *AutoField {
 	field := &AutoField{}
 	field.IntegerField = NewIntegerField()
@@ -154,18 +126,6 @@ func (f *CharField) copy() *CharField {
 
 func (f *DecimalField) copy() *DecimalField {
 	copy := NewDecimalField(f.maxDigits, f.decimalPlaces)
-	copy.Column = f.Column.copy()
-	return copy
-}
-
-func (f *SmallIntegerField) copy() *SmallIntegerField {
-	copy := NewSmallIntegerField()
-	copy.Column = f.Column.copy()
-	return copy
-}
-
-func (f *TextField) copy() *TextField {
-	copy := NewTextField()
 	copy.Column = f.Column.copy()
 	return copy
 }

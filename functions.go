@@ -54,18 +54,3 @@ func Upper(expr selectExpression) *function {
 func Lower(expr selectExpression) *function {
 	return newFunction("LOWER", expr, NewTextField())
 }
-
-func (f *TextField) Length() *IntegerField {
-	length := Length(f)
-	return length.toField().(*IntegerField)
-}
-
-func (f *TextField) Upper() *TextField {
-	upper := Upper(f)
-	return upper.toField().(*TextField)
-}
-
-func (f *TextField) Lower() *TextField {
-	lower := Lower(f)
-	return lower.toField().(*TextField)
-}

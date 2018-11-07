@@ -20,6 +20,11 @@ func (f *BooleanField) asAssignment() assignment {
 	return assignment(f.Exact(f.Value))
 }
 
+func (f *BooleanField) Assign(value bool) assignment {
+	field := f.copy()
+	field.Value = value
+	return field.asAssignment()
+}
 
 func (f *BooleanField) copy() *BooleanField {
 	copy := NewBooleanField()

@@ -20,6 +20,12 @@ func (f *IntegerField) asAssignment() assignment {
 	return assignment(f.Exact(int(f.Value)))
 }
 
+func (f *IntegerField) Assign(value int32) assignment {
+	field := f.copy()
+	field.Value = value
+	return field.asAssignment()
+}
+
 func (f *IntegerField) Avg() *aggregate {
 	return Avg(f, NewFloatField())
 }

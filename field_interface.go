@@ -43,37 +43,7 @@ func (f *DecimalField) copyField() field {
 	return f.copy()
 }
 
-func (f *SmallIntegerField) copyField() field {
-	return f.copy()
-}
-
-func (f *TextField) copyField() field {
-	return f.copy()
-}
-
-
-
-
-
-
-
 func (f *DecimalField) setNullConstraint(null bool) {
-	f.null = null
-
-	if f.null {
-		f.Valid = false
-	}
-}
-
-func (f *SmallIntegerField) setNullConstraint(null bool) {
-	f.null = null
-
-	if f.null {
-		f.Valid = false
-	}
-}
-
-func (f *TextField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
@@ -101,21 +71,7 @@ func (f *BigAutoField) validate() {
 	}
 }
 
-
-
 func (f *DecimalField) validate() {
-	if f.primaryKey {
-		panic(NewInvalidConstraint(f, "primary key"))
-	}
-}
-
-func (f *SmallIntegerField) validate() {
-	if f.primaryKey && f.null {
-		panic(NewConstraintConflict(f, "primary key", "null"))
-	}
-}
-
-func (f *TextField) validate() {
 	if f.primaryKey {
 		panic(NewInvalidConstraint(f, "primary key"))
 	}
@@ -137,28 +93,10 @@ func (f *OneToOneField) validate() {
 	}
 }
 
-
-
 func (f *DecimalField) valueAsSql() string {
 	if f.null && !f.Valid {
 		return "NULL"
 	} else {
 		return f.Value.String()
-	}
-}
-
-func (f *SmallIntegerField) valueAsSql() string {
-	if f.null && !f.Valid {
-		return "NULL"
-	} else {
-		return intAsSql(int(f.Value))
-	}
-}
-
-func (f *TextField) valueAsSql() string {
-	if f.null && !f.Valid {
-		return "NULL"
-	} else {
-		return stringAsSql(f.Value)
 	}
 }

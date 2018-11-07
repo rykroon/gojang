@@ -22,6 +22,12 @@ func (f *FloatField) asAssignment() assignment {
 	return assignment(f.Exact(f.Value))
 }
 
+func (f *FloatField) Assign(value float64) assignment {
+	field := f.copy()
+	field.Value = value
+	return field.asAssignment()
+}
+
 func (f *FloatField) Avg() *aggregate {
 	return Avg(f, NewFloatField())
 }
