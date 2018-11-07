@@ -15,7 +15,6 @@ func exactIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: "=", rhs: intAsSql(value)}
 }
 
-
 func (f *DecimalField) Exact(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "=", rhs: f.Value.String()}
 }
@@ -31,8 +30,6 @@ func gtIntField(field IntField, value int) lookup {
 func (f *DecimalField) Gt(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: f.Value.String()}
 }
-
-
 
 func gteIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: ">=", rhs: intAsSql(value)}

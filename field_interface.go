@@ -6,8 +6,10 @@ type field interface {
 	selectExpression
 
 	//getters and setters
-	DbColumn() string
-	setDbColumn(string)
+	// DbColumn() string
+	// setDbColumn(string)
+	ColumnName() string
+	setColumnName(string)
 
 	Model() *Model
 	setModel(*Model)

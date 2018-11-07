@@ -102,7 +102,7 @@ func MakeModel(i ModelInstance) error {
 
 	if numOfPKs < 1 {
 		model.Pk = NewAutoField()
-		model.Pk.setDbColumn("id")
+		model.Pk.setColumnName("id")
 		model.Pk.setPrimaryKeyConstraint(true)
 		model.addField("id", model.Pk)
 	}
@@ -116,7 +116,7 @@ func (m *Model) addField(attrName string, f field) {
 	f.setModel(m)
 	f.validate()
 
-	columnName := f.DbColumn()
+	columnName := f.ColumnName()
 
 	_, duplicate := m.colToAttr[columnName]
 	if duplicate {

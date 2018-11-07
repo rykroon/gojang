@@ -14,7 +14,7 @@ func (m *Model) ToObj() object {
 	obj := newObj()
 
 	for _, field := range m.fields {
-		attrName := m.colToAttr[field.DbColumn()]
+		attrName := m.colToAttr[field.ColumnName()]
 		obj.SetAttr(attrName, field.getValue())
 	}
 
@@ -67,7 +67,7 @@ func (m *Model) insert() (int, error) {
 		return 0, err
 	}
 
-	pkeyAttr := m.colToAttr[m.Pk.DbColumn()]
+	pkeyAttr := m.colToAttr[m.Pk.ColumnName()]
 	if obj.HasAttr(pkeyAttr) {
 		return obj.GetAttr(pkeyAttr).(int), nil
 	}

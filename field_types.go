@@ -5,15 +5,6 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type onDelete string
-
-const Cascade onDelete = "CASCADE"
-const Protect onDelete = "RESTRICT"
-const SetNull onDelete = "SET NULL"
-const SetDefault onDelete = "SET DEFAULT"
-
-
-
 //A field type for each data type
 
 type DecimalField struct {
@@ -60,8 +51,8 @@ type OneToOneField struct {
 func NewCharField(maxLength int) *CharField {
 	field := &CharField{maxLength: maxLength}
 	field.TextField = NewTextField()
-	dbType := fmt.Sprintf("VARCHAR(%v)", maxLength)
-	field.dbType = dbType
+	dataType := fmt.Sprintf("VARCHAR(%v)", maxLength)
+	field.dataType = dataType
 	return field
 }
 
@@ -72,8 +63,8 @@ func NewDecimalField(maxDigits int, decimalPlaces int) *DecimalField {
 	}
 
 	field := &DecimalField{maxDigits: maxDigits, decimalPlaces: decimalPlaces}
-	dbType := fmt.Sprintf("NUMERIC(%v, %v)", maxDigits, decimalPlaces)
-	field.Column = newColumn(dbType)
+	dataType := fmt.Sprintf("NUMERIC(%v, %v)", maxDigits, decimalPlaces)
+	field.Column = newColumn(dataType)
 	field.Value = decimal.New(0, 0)
 	field.Valid = true
 	return field
@@ -82,14 +73,14 @@ func NewDecimalField(maxDigits int, decimalPlaces int) *DecimalField {
 func NewAutoField() *AutoField {
 	field := &AutoField{}
 	field.IntegerField = NewIntegerField()
-	field.dbType = "SERIAL4"
+	field.dataType = "SERIAL4"
 	return field
 }
 
 func NewBigAutoField() *BigAutoField {
 	field := &BigAutoField{}
 	field.BigIntegerField = NewBigIntegerField()
-	field.dbType = "SERIAL8"
+	field.dataType = "SERIAL8"
 	return field
 }
 
@@ -131,7 +122,7 @@ func (f *DecimalField) copy() *DecimalField {
 }
 
 func create(f field) string {
-	s := dbq(f.DbColumn()) + " " + f.DbType()
+	s := dbq(f.ColumnName()) + " " + f.DataType()
 
 	if f.HasPrimaryKeyConstraint() {
 		s += " PRIMARY KEY"

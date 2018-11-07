@@ -18,7 +18,7 @@ type selectExpression interface {
 	getValue() interface{}
 	As(string) //is essentially the 'setter' method for alias
 	Alias() string
-	DbType() string
+	DataType() string
 	Scan(interface{}) error
 }
 
@@ -32,7 +32,7 @@ func (a *aggregate) asSql() string {
 }
 
 func (a assignment) asSql() string {
-	return dbq(a.lhs.DbColumn()) + " " + a.lookupName + " " + a.rhs
+	return dbq(a.lhs.ColumnName()) + " " + a.lookupName + " " + a.rhs
 }
 
 func (f *function) asSql() string {
@@ -52,8 +52,6 @@ func (s star) asSql() string {
 	return "*"
 }
 
-
-
 func (v *ValueExpression) asSql() string {
 	return v.outputField.valueAsSql()
 }
@@ -69,8 +67,6 @@ func (a aggregate) Alias() string {
 func (f function) Alias() string {
 	return f.outputField.Alias()
 }
-
-
 
 func (s star) Alias() string {
 	return "*"
@@ -96,24 +92,20 @@ func (v *ValueExpression) As(alias string) {
 	v.outputField.As(alias)
 }
 
-func (a aggregate) DbType() string {
-	return function(a).DbType()
+func (a aggregate) DataType() string {
+	return function(a).DataType()
 }
 
-func (f function) DbType() string {
-	return f.outputField.DbType()
+func (f function) DataType() string {
+	return f.outputField.DataType()
 }
 
-func (f *Column) DbType() string {
-	return f.dbType
-}
-
-func (s star) DbType() string {
+func (s star) DataType() string {
 	return ""
 }
 
-func (v *ValueExpression) DbType() string {
-	return v.outputField.DbType()
+func (v *ValueExpression) DataType() string {
+	return v.outputField.DataType()
 }
 
 func (a aggregate) Scan(v interface{}) error {

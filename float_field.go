@@ -1,7 +1,7 @@
 package gojang
 
 import (
-  "strconv"
+	"strconv"
 )
 
 type FloatField struct {

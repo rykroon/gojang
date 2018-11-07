@@ -2,24 +2,35 @@ package gojang
 
 import ()
 
+type onDelete string
+
+const (
+	Cascade    onDelete = "CASCADE"
+	Protect    onDelete = "RESTRICT"
+	SetNull    onDelete = "SET NULL"
+	SetDefault onDelete = "SET DEFAULT"
+)
+
 type constraints struct {
 	null       bool
 	unique     bool
 	primaryKey bool
+	foreignKey bool
+	onDelete   onDelete
 }
 
 type Column struct {
-	model    *Model
-	dbColumn string
-	dbType   string
-	alias    string
-
+	model      *Model
+	columnName string
+	dataType   string
 	constraints
+
+	alias      string
 	isRelation bool //foreignKey
 }
 
-func newColumn(dbType string) *Column {
-	return &Column{dbType: dbType}
+func newColumn(dataType string) *Column {
+	return &Column{dataType: dataType}
 }
 
 func (c *Column) Alias() string {
@@ -39,27 +50,39 @@ func (c *Column) asSql() string {
 
 	if c.HasModel() {
 		tableName := dbq(c.model.dbTable)
-		colName := dbq(c.dbColumn)
+		colName := dbq(c.columnName)
 		sql = tableName + "." + colName
 
 	} else {
-		sql = c.dbColumn
+		sql = c.columnName
 	}
 
 	return sql
 }
 
 func (c *Column) copy() *Column {
-	copy := newColumn(c.dbType)
+	copy := newColumn(c.dataType)
 	copy.model = c.model
-	copy.dbColumn = c.dbColumn
+	copy.columnName = c.columnName
 	copy.alias = c.alias
 	copy.constraints = c.constraints
 	return copy
 }
 
-func (c *Column) DbColumn() string {
-	return c.dbColumn
+func (c *Column) ColumnName() string {
+	return c.columnName
+}
+
+func (c *Column) setColumnName(name string) {
+	c.columnName = name
+}
+
+func (f *Column) DataType() string {
+	return f.dataType
+}
+
+func (c *Column) setDataType(dataType string) {
+	c.dataType = dataType
 }
 
 func (c *Column) Desc() orderByExpression {
@@ -88,10 +111,6 @@ func (f *Column) HasUniqueConstraint() bool {
 
 func (c *Column) Model() *Model {
 	return c.model
-}
-
-func (c *Column) setDbColumn(col string) {
-	c.dbColumn = col
 }
 
 func (c *Column) setModel(model *Model) {

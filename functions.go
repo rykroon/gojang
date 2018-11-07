@@ -21,7 +21,7 @@ func newFunction(name string, expr selectExpression, outputField field) *functio
 }
 
 func (f *function) toField() field {
-	f.outputField.setDbColumn(f.asSql())
+	f.outputField.setColumnName(f.asSql())
 	return f.outputField
 }
 
@@ -30,7 +30,7 @@ func (f *function) toField() field {
 func Cast(expr selectExpression, outputField field) *function {
 	cast := newFunction("CAST", expr, outputField)
 	cast.template = "%v(%v AS %v)"
-	cast.args = append(cast.args, outputField.DbType())
+	cast.args = append(cast.args, outputField.DataType())
 	return cast
 }
 
