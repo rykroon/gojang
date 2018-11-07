@@ -1,26 +1,8 @@
 package gojang
 
-import (
-	"fmt"
-	"github.com/shopspring/decimal"
-)
+import ()
 
 //A field type for each data type
-
-type DecimalField struct {
-	*Column
-
-	Valid bool
-	Value decimal.Decimal
-
-	maxDigits     int
-	decimalPlaces int
-}
-
-type CharField struct {
-	*TextField
-	maxLength int
-}
 
 type ForeignKey struct {
 	*BigIntegerField
@@ -39,28 +21,6 @@ type OneToOneField struct {
 }
 
 //Constructors
-
-func NewCharField(maxLength int) *CharField {
-	field := &CharField{maxLength: maxLength}
-	field.TextField = NewTextField()
-	dataType := fmt.Sprintf("VARCHAR(%v)", maxLength)
-	field.dataType = dataType
-	return field
-}
-
-func NewDecimalField(maxDigits int, decimalPlaces int) *DecimalField {
-	if maxDigits < decimalPlaces {
-		err := NewFieldError("The maximum digits cannot be less than the number of decimal places.")
-		panic(err)
-	}
-
-	field := &DecimalField{maxDigits: maxDigits, decimalPlaces: decimalPlaces}
-	dataType := fmt.Sprintf("NUMERIC(%v, %v)", maxDigits, decimalPlaces)
-	field.Column = newColumn(dataType)
-	field.Value = decimal.New(0, 0)
-	field.Valid = true
-	return field
-}
 
 func NewForeignKey(to *Model, onDelete onDelete) *ForeignKey {
 	field := &ForeignKey{}
@@ -85,18 +45,6 @@ func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 	field.unique = true
 
 	return field
-}
-
-func (f *CharField) copy() *CharField {
-	copy := NewCharField(f.maxLength)
-	copy.Column = f.Column.copy()
-	return copy
-}
-
-func (f *DecimalField) copy() *DecimalField {
-	copy := NewDecimalField(f.maxDigits, f.decimalPlaces)
-	copy.Column = f.Column.copy()
-	return copy
 }
 
 func create(f field) string {

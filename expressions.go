@@ -124,10 +124,6 @@ func (v *ValueExpression) Scan(value interface{}) error {
 	return v.outputField.Scan(value)
 }
 
-func (f *DecimalField) Scan(value interface{}) error {
-	return f.Value.Scan(value)
-}
-
 func (a aggregate) getValue() interface{} {
 	return function(a).getValue()
 }
@@ -142,10 +138,6 @@ func (s star) getValue() interface{} {
 
 func (v *ValueExpression) getValue() interface{} {
 	return v.outputField.getValue()
-}
-
-func (f *DecimalField) getValue() interface{} {
-	return f.Value
 }
 
 //
