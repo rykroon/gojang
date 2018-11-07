@@ -16,14 +16,6 @@ const SetDefault onDelete = "SET DEFAULT"
 
 //A field type for each data type
 
-
-type BooleanField struct {
-	*Column
-
-	Valid bool
-	Value bool
-}
-
 type DecimalField struct {
 	*Column
 
@@ -32,13 +24,6 @@ type DecimalField struct {
 
 	maxDigits     int
 	decimalPlaces int
-}
-
-type IntegerField struct {
-	*Column
-
-	Valid bool
-	Value int32
 }
 
 type SmallIntegerField struct {
@@ -108,15 +93,6 @@ func NewDecimalField(maxDigits int, decimalPlaces int) *DecimalField {
 	return field
 }
 
-
-
-func NewIntegerField() *IntegerField {
-	field := &IntegerField{}
-	field.Column = newColumn("INT4")
-	field.Valid = true
-	return field
-}
-
 func NewSmallIntegerField() *SmallIntegerField {
 	field := &SmallIntegerField{}
 	field.Column = newColumn("INT2")
@@ -178,12 +154,6 @@ func (f *CharField) copy() *CharField {
 
 func (f *DecimalField) copy() *DecimalField {
 	copy := NewDecimalField(f.maxDigits, f.decimalPlaces)
-	copy.Column = f.Column.copy()
-	return copy
-}
-
-func (f *IntegerField) copy() *IntegerField {
-	copy := NewIntegerField()
 	copy.Column = f.Column.copy()
 	return copy
 }

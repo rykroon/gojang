@@ -140,12 +140,6 @@ func (f *DecimalField) Scan(value interface{}) error {
 	return f.Value.Scan(value)
 }
 
-func (f *IntegerField) Scan(value interface{}) error {
-	result, ok := value.(int64)
-	f.Value, f.Valid = int32(result), ok
-	return nil
-}
-
 func (f *SmallIntegerField) Scan(value interface{}) error {
 	result, ok := value.(int64)
 	f.Value, f.Valid = int16(result), ok
@@ -175,10 +169,6 @@ func (v *ValueExpression) getValue() interface{} {
 
 func (f *DecimalField) getValue() interface{} {
 	return f.Value
-}
-
-func (f *IntegerField) getValue() interface{} {
-	return int(f.Value)
 }
 
 func (f *SmallIntegerField) getValue() interface{} {

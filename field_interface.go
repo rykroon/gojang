@@ -43,10 +43,6 @@ func (f *DecimalField) copyField() field {
 	return f.copy()
 }
 
-func (f *IntegerField) copyField() field {
-	return f.copy()
-}
-
 func (f *SmallIntegerField) copyField() field {
 	return f.copy()
 }
@@ -62,14 +58,6 @@ func (f *TextField) copyField() field {
 
 
 func (f *DecimalField) setNullConstraint(null bool) {
-	f.null = null
-
-	if f.null {
-		f.Valid = false
-	}
-}
-
-func (f *IntegerField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
@@ -121,12 +109,6 @@ func (f *DecimalField) validate() {
 	}
 }
 
-func (f *IntegerField) validate() {
-	if f.primaryKey && f.null {
-		panic(NewConstraintConflict(f, "primary key", "null"))
-	}
-}
-
 func (f *SmallIntegerField) validate() {
 	if f.primaryKey && f.null {
 		panic(NewConstraintConflict(f, "primary key", "null"))
@@ -162,14 +144,6 @@ func (f *DecimalField) valueAsSql() string {
 		return "NULL"
 	} else {
 		return f.Value.String()
-	}
-}
-
-func (f *IntegerField) valueAsSql() string {
-	if f.null && !f.Valid {
-		return "NULL"
-	} else {
-		return intAsSql(int(f.Value))
 	}
 }
 

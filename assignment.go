@@ -9,10 +9,6 @@ func (f *DecimalField) asAssignment() assignment {
 	return assignment(f.Exact(f.Value))
 }
 
-func (f *IntegerField) asAssignment() assignment {
-	return assignment(f.Exact(int(f.Value)))
-}
-
 func (f *SmallIntegerField) asAssignment() assignment {
 	return assignment(f.Exact(int(f.Value)))
 }

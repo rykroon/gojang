@@ -2,6 +2,13 @@ package gojang
 
 import ()
 
+type BooleanField struct {
+	*Column
+
+	Valid bool
+	Value bool
+}
+
 func NewBooleanField() *BooleanField {
 	field := &BooleanField{}
 	field.Column = newColumn("BOOL")

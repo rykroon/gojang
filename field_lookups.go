@@ -20,10 +20,6 @@ func (f *DecimalField) Exact(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "=", rhs: f.Value.String()}
 }
 
-func (f *IntegerField) Exact(value int) lookup {
-	return exactIntField(f, value)
-}
-
 func (f *SmallIntegerField) Exact(value int) lookup {
 	return exactIntField(f, value)
 }
@@ -50,10 +46,6 @@ func inIntField(field IntField, values []int) lookup {
 	return lookup{lhs: field, lookupName: "IN", rhs: integersAsSql(values)}
 }
 
-func (f *IntegerField) In(values ...int) lookup {
-	return inIntField(f, values)
-}
-
 func (f *SmallIntegerField) In(values ...int) lookup {
 	return inIntField(f, values)
 }
@@ -66,16 +58,8 @@ func gtIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: ">", rhs: intAsSql(value)}
 }
 
-
-
-
-
 func (f *DecimalField) Gt(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: f.Value.String()}
-}
-
-func (f *IntegerField) Gt(value int) lookup {
-	return gtIntField(f, value)
 }
 
 func (f *SmallIntegerField) Gt(value int) lookup {
@@ -94,10 +78,6 @@ func (f *DecimalField) Gte(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: f.Value.String()}
 }
 
-func (f *IntegerField) Gte(value int) lookup {
-	return gteIntField(f, value)
-}
-
 func (f *SmallIntegerField) Gte(value int) lookup {
 	return gteIntField(f, value)
 }
@@ -114,10 +94,6 @@ func (f *DecimalField) Lt(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "<", rhs: f.Value.String()}
 }
 
-func (f *IntegerField) Lt(value int) lookup {
-	return ltIntField(f, value)
-}
-
 func (f *SmallIntegerField) Lt(value int) lookup {
 	return ltIntField(f, value)
 }
@@ -132,10 +108,6 @@ func lteIntField(field IntField, value int) lookup {
 
 func (f *DecimalField) Lte(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: f.Value.String()}
-}
-
-func (f *IntegerField) Lte(value int) lookup {
-	return lteIntField(f, value)
 }
 
 func (f *SmallIntegerField) Lte(value int) lookup {
@@ -178,10 +150,6 @@ func (f *DecimalField) Range(from, to decimal.Decimal) lookup {
 	return lookup
 }
 
-func (f *IntegerField) Range(from, to int) lookup {
-	return rangeIntField(f, from, to)
-}
-
 func (f *SmallIntegerField) Range(from, to int) lookup {
 	return rangeIntField(f, from, to)
 }
@@ -205,10 +173,6 @@ func fieldIsNull(field field, value bool) lookup {
 }
 
 func (f *DecimalField) IsNull(value bool) lookup {
-	return fieldIsNull(f, value)
-}
-
-func (f *IntegerField) IsNull(value bool) lookup {
 	return fieldIsNull(f, value)
 }
 
