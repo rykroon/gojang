@@ -5,19 +5,7 @@ import ()
 //I don't think an assignment is technically a lookup, but they are similar in syntax
 type assignment lookup
 
-func (f *BigIntegerField) asAssignment() assignment {
-	return assignment(f.Exact(int(f.Value)))
-}
-
-func (f *BooleanField) asAssignment() assignment {
-	return assignment(f.Exact(f.Value))
-}
-
 func (f *DecimalField) asAssignment() assignment {
-	return assignment(f.Exact(f.Value))
-}
-
-func (f *FloatField) asAssignment() assignment {
 	return assignment(f.Exact(f.Value))
 }
 

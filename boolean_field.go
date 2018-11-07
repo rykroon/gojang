@@ -9,6 +9,11 @@ func NewBooleanField() *BooleanField {
 	return field
 }
 
+func (f *BooleanField) asAssignment() assignment {
+	return assignment(f.Exact(f.Value))
+}
+
+
 func (f *BooleanField) copy() *BooleanField {
 	copy := NewBooleanField()
 	copy.Column = f.Column.copy()
@@ -17,6 +22,10 @@ func (f *BooleanField) copy() *BooleanField {
 
 func (f *BooleanField) copyField() field {
 	return f.copy()
+}
+
+func (f *BooleanField) Count(distinct bool) *aggregate {
+	return Count(f, distinct)
 }
 
 func (f *BooleanField) Exact(value bool) lookup {
@@ -49,6 +58,14 @@ func (f *BooleanField) Lt(value bool) lookup {
 
 func (f *BooleanField) Lte(value bool) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: boolAsSql(value)}
+}
+
+func (f *BooleanField) Max() *aggregate {
+	return Max(f, NewBooleanField())
+}
+
+func (f *BooleanField) Min() *aggregate {
+	return Min(f, NewBooleanField())
 }
 
 func (f *BooleanField) Range(from, to bool) lookup {

@@ -39,16 +39,8 @@ func Sum(expr selectExpression, outputField field) *aggregate {
 	return newAggregate("SUM", expr, outputField)
 }
 
-func (f *BigIntegerField) Avg() *aggregate {
-	return Avg(f, NewFloatField())
-}
-
 func (f *DecimalField) Avg() *aggregate {
 	return Avg(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
-}
-
-func (f *FloatField) Avg() *aggregate {
-	return Avg(f, NewFloatField())
 }
 
 func (f *IntegerField) Avg() *aggregate {
@@ -65,19 +57,7 @@ func (s star) Count() *aggregate {
 	return count
 }
 
-func (f *BigIntegerField) Count(distinct bool) *aggregate {
-	return Count(f, distinct)
-}
-
-func (f *BooleanField) Count(distinct bool) *aggregate {
-	return Count(f, distinct)
-}
-
 func (f *DecimalField) Count(distinct bool) *aggregate {
-	return Count(f, distinct)
-}
-
-func (f *FloatField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
@@ -93,20 +73,8 @@ func (f *TextField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
-func (f *BigIntegerField) Max() *aggregate {
-	return Max(f, NewBigIntegerField())
-}
-
-func (f *BooleanField) Max() *aggregate {
-	return Max(f, NewBooleanField())
-}
-
 func (f *DecimalField) Max() *aggregate {
 	return Max(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
-}
-
-func (f *FloatField) Max() *aggregate {
-	return Max(f, NewFloatField())
 }
 
 func (f *IntegerField) Max() *aggregate {
@@ -121,20 +89,8 @@ func (f *TextField) Max() *aggregate {
 	return Max(f, NewTextField())
 }
 
-func (f *BigIntegerField) Min() *aggregate {
-	return Min(f, NewBigIntegerField())
-}
-
-func (f *BooleanField) Min() *aggregate {
-	return Min(f, NewBooleanField())
-}
-
 func (f *DecimalField) Min() *aggregate {
 	return Min(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
-}
-
-func (f *FloatField) Min() *aggregate {
-	return Min(f, NewFloatField())
 }
 
 func (f *IntegerField) Min() *aggregate {
@@ -149,16 +105,8 @@ func (f *TextField) Min() *aggregate {
 	return Min(f, NewTextField())
 }
 
-func (f *BigIntegerField) Sum() *aggregate {
-	return Sum(f, NewBigIntegerField())
-}
-
 func (f *DecimalField) Sum() *aggregate {
 	return Sum(f, NewDecimalField(f.maxDigits, f.decimalPlaces))
-}
-
-func (f *FloatField) Sum() *aggregate {
-	return Sum(f, NewFloatField())
 }
 
 func (f *IntegerField) Sum() *aggregate {

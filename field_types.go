@@ -34,13 +34,6 @@ type DecimalField struct {
 	decimalPlaces int
 }
 
-type FloatField struct {
-	*Column
-
-	Valid bool
-	Value float64
-}
-
 type IntegerField struct {
 	*Column
 
@@ -115,12 +108,7 @@ func NewDecimalField(maxDigits int, decimalPlaces int) *DecimalField {
 	return field
 }
 
-func NewFloatField() *FloatField {
-	field := &FloatField{}
-	field.Column = newColumn("FLOAT8")
-	field.Valid = true
-	return field
-}
+
 
 func NewIntegerField() *IntegerField {
 	field := &IntegerField{}
@@ -190,12 +178,6 @@ func (f *CharField) copy() *CharField {
 
 func (f *DecimalField) copy() *DecimalField {
 	copy := NewDecimalField(f.maxDigits, f.decimalPlaces)
-	copy.Column = f.Column.copy()
-	return copy
-}
-
-func (f *FloatField) copy() *FloatField {
-	copy := NewFloatField()
 	copy.Column = f.Column.copy()
 	return copy
 }

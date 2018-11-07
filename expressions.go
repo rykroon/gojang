@@ -4,7 +4,7 @@ import (
 	"fmt"
 	//"reflect"
 	//"github.com/shopspring/decimal"
-	"strconv"
+	//"strconv"
 )
 
 //Expressions describe a value or a computation that can be used as part of an
@@ -140,27 +140,6 @@ func (f *DecimalField) Scan(value interface{}) error {
 	return f.Value.Scan(value)
 }
 
-func (f *FloatField) Scan(value interface{}) error {
-	switch v := value.(type) {
-	case float64:
-		f.Value, f.Valid = v, true
-
-	case int64:
-		f.Value, f.Valid = float64(v), true
-
-	case []uint8:
-		float, err := strconv.ParseFloat(string(v), 64)
-		f.Value = float
-		f.Valid = err == nil
-		return err
-
-	default:
-		f.Value, f.Valid = 0, false
-	}
-
-	return nil
-}
-
 func (f *IntegerField) Scan(value interface{}) error {
 	result, ok := value.(int64)
 	f.Value, f.Valid = int32(result), ok
@@ -195,10 +174,6 @@ func (v *ValueExpression) getValue() interface{} {
 }
 
 func (f *DecimalField) getValue() interface{} {
-	return f.Value
-}
-
-func (f *FloatField) getValue() interface{} {
 	return f.Value
 }
 

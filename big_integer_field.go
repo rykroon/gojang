@@ -16,6 +16,14 @@ func NewBigIntegerField() *BigIntegerField {
 	return field
 }
 
+func (f *BigIntegerField) asAssignment() assignment {
+	return assignment(f.Exact(int(f.Value)))
+}
+
+func (f *BigIntegerField) Avg() *aggregate {
+	return Avg(f, NewFloatField())
+}
+
 func (f *BigIntegerField) copy() *BigIntegerField {
 	copy := NewBigIntegerField()
 	copy.Column = f.Column.copy()
@@ -24,6 +32,10 @@ func (f *BigIntegerField) copy() *BigIntegerField {
 
 func (f *BigIntegerField) copyField() field {
 	return f.copy()
+}
+
+func (f *BigIntegerField) Count(distinct bool) *aggregate {
+	return Count(f, distinct)
 }
 
 func (f *BigIntegerField) Exact(value int) lookup {
@@ -61,6 +73,14 @@ func (f *BigIntegerField) Lte(value int) lookup {
 	//return lookup{lhs: f, lookupName: "<=", rhs: intAsSql(value)}
 }
 
+func (f *BigIntegerField) Max() *aggregate {
+	return Max(f, NewBigIntegerField())
+}
+
+func (f *BigIntegerField) Min() *aggregate {
+	return Min(f, NewBigIntegerField())
+}
+
 func (f *BigIntegerField) Range(from, to int) lookup {
 	return rangeIntField(f, from, to)
 }
@@ -76,6 +96,10 @@ func (f *BigIntegerField) setNullConstraint(null bool) {
 	if f.null {
 		f.Valid = false
 	}
+}
+
+func (f *BigIntegerField) Sum() *aggregate {
+	return Sum(f, NewBigIntegerField())
 }
 
 func (f *BigIntegerField) validate() {

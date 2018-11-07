@@ -20,10 +20,6 @@ func (f *DecimalField) Exact(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "=", rhs: f.Value.String()}
 }
 
-func (f *FloatField) Exact(value float64) lookup {
-	return lookup{lhs: f, lookupName: "=", rhs: float64AsSql(value)}
-}
-
 func (f *IntegerField) Exact(value int) lookup {
 	return exactIntField(f, value)
 }
@@ -54,12 +50,6 @@ func inIntField(field IntField, values []int) lookup {
 	return lookup{lhs: field, lookupName: "IN", rhs: integersAsSql(values)}
 }
 
-
-
-func (f *FloatField) In(values ...float64) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: floatsAsSql(values)}
-}
-
 func (f *IntegerField) In(values ...int) lookup {
 	return inIntField(f, values)
 }
@@ -84,10 +74,6 @@ func (f *DecimalField) Gt(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: ">", rhs: f.Value.String()}
 }
 
-func (f *FloatField) Gt(value float64) lookup {
-	return lookup{lhs: f, lookupName: ">", rhs: float64AsSql(value)}
-}
-
 func (f *IntegerField) Gt(value int) lookup {
 	return gtIntField(f, value)
 }
@@ -104,16 +90,8 @@ func gteIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: ">=", rhs: intAsSql(value)}
 }
 
-
-
-
-
 func (f *DecimalField) Gte(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: f.Value.String()}
-}
-
-func (f *FloatField) Gte(value float64) lookup {
-	return lookup{lhs: f, lookupName: ">=", rhs: float64AsSql(value)}
 }
 
 func (f *IntegerField) Gte(value int) lookup {
@@ -132,16 +110,8 @@ func ltIntField(field IntField, value int) lookup {
 	return lookup{lhs: field, lookupName: "<", rhs: intAsSql(value)}
 }
 
-
-
-
-
 func (f *DecimalField) Lt(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "<", rhs: f.Value.String()}
-}
-
-func (f *FloatField) Lt(value float64) lookup {
-	return lookup{lhs: f, lookupName: "<", rhs: float64AsSql(value)}
 }
 
 func (f *IntegerField) Lt(value int) lookup {
@@ -162,10 +132,6 @@ func lteIntField(field IntField, value int) lookup {
 
 func (f *DecimalField) Lte(value decimal.Decimal) lookup {
 	return lookup{lhs: f, lookupName: "<=", rhs: f.Value.String()}
-}
-
-func (f *FloatField) Lte(value float64) lookup {
-	return lookup{lhs: f, lookupName: "<=", rhs: float64AsSql(value)}
 }
 
 func (f *IntegerField) Lte(value int) lookup {
@@ -212,12 +178,6 @@ func (f *DecimalField) Range(from, to decimal.Decimal) lookup {
 	return lookup
 }
 
-func (f *FloatField) Range(from, to float64) lookup {
-	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
-	lookup.rhs = float64AsSql(from) + " AND " + float64AsSql(to)
-	return lookup
-}
-
 func (f *IntegerField) Range(from, to int) lookup {
 	return rangeIntField(f, from, to)
 }
@@ -245,10 +205,6 @@ func fieldIsNull(field field, value bool) lookup {
 }
 
 func (f *DecimalField) IsNull(value bool) lookup {
-	return fieldIsNull(f, value)
-}
-
-func (f *FloatField) IsNull(value bool) lookup {
 	return fieldIsNull(f, value)
 }
 
