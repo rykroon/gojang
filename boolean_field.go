@@ -1,6 +1,8 @@
 package gojang
 
-import ()
+import (
+	"database/sql/driver"
+)
 
 type BooleanField struct {
 	*Column
@@ -34,12 +36,20 @@ func (f *BooleanField) copyField() field {
 	return f.copy()
 }
 
+//
+// Aggregates
+//
+
 func (f *BooleanField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
-func (f *BooleanField) getValue() interface{} {
-	return f.Value
+func (f *BooleanField) Max() *aggregate {
+	return Max(f, NewBooleanField())
+}
+
+func (f *BooleanField) Min() *aggregate {
+	return Min(f, NewBooleanField())
 }
 
 //
@@ -86,17 +96,21 @@ func (f *BooleanField) IsNull(value bool) lookup {
 	return isNull(f, value)
 }
 
-func (f *BooleanField) Max() *aggregate {
-	return Max(f, NewBooleanField())
-}
-
-func (f *BooleanField) Min() *aggregate {
-	return Min(f, NewBooleanField())
-}
+//
+// Scanner, Valuer
+//
 
 func (f *BooleanField) Scan(value interface{}) error {
 	f.Value, f.Valid = value.(bool)
 	return nil
+}
+
+func (f *BooleanField) xValue() (driver.Value, error) {
+	return f.Value, nil
+}
+
+func (f *BooleanField) getValue() interface{} {
+	return f.Value
 }
 
 func (f *BooleanField) setNullConstraint(null bool) {

@@ -1,6 +1,8 @@
 package gojang
 
-import ()
+import (
+	"database/sql/driver"
+)
 
 type BigIntegerField struct {
 	*Column
@@ -24,8 +26,28 @@ func (f *BigIntegerField) Assign(value int64) assignment {
 	return newAssignment(f, intAsSql(int(value)))
 }
 
+//
+// Aggregates
+//
+
 func (f *BigIntegerField) Avg() *aggregate {
 	return Avg(f, NewFloatField())
+}
+
+func (f *BigIntegerField) Count(distinct bool) *aggregate {
+	return Count(f, distinct)
+}
+
+func (f *BigIntegerField) Max() *aggregate {
+	return Max(f, NewBigIntegerField())
+}
+
+func (f *BigIntegerField) Min() *aggregate {
+	return Min(f, NewBigIntegerField())
+}
+
+func (f *BigIntegerField) Sum() *aggregate {
+	return Sum(f, NewBigIntegerField())
 }
 
 func (f *BigIntegerField) copy() *BigIntegerField {
@@ -36,14 +58,6 @@ func (f *BigIntegerField) copy() *BigIntegerField {
 
 func (f *BigIntegerField) copyField() field {
 	return f.copy()
-}
-
-func (f *BigIntegerField) Count(distinct bool) *aggregate {
-	return Count(f, distinct)
-}
-
-func (f *BigIntegerField) getValue() interface{} {
-	return int(f.Value)
 }
 
 //
@@ -90,17 +104,21 @@ func (f *BigIntegerField) IsNull(value bool) lookup {
 	return isNull(f, value)
 }
 
-func (f *BigIntegerField) Max() *aggregate {
-	return Max(f, NewBigIntegerField())
-}
-
-func (f *BigIntegerField) Min() *aggregate {
-	return Min(f, NewBigIntegerField())
-}
+//
+// Scanner, Valuer
+//
 
 func (f *BigIntegerField) Scan(value interface{}) error {
 	f.Value, f.Valid = value.(int64)
 	return nil
+}
+
+func (f *BigIntegerField) xValue() (driver.Value, error) {
+	return f.Value, nil
+}
+
+func (f *BigIntegerField) getValue() interface{} {
+	return int(f.Value)
 }
 
 func (f *BigIntegerField) setNullConstraint(null bool) {
@@ -109,10 +127,6 @@ func (f *BigIntegerField) setNullConstraint(null bool) {
 	if f.null {
 		f.Valid = false
 	}
-}
-
-func (f *BigIntegerField) Sum() *aggregate {
-	return Sum(f, NewBigIntegerField())
 }
 
 func (f *BigIntegerField) validate() {

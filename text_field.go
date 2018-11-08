@@ -1,6 +1,8 @@
 package gojang
 
-import ()
+import (
+	"database/sql/driver"
+)
 
 type TextField struct {
 	*Column
@@ -147,9 +149,21 @@ func (f *TextField) Upper() *TextField {
 	return upper.toField().(*TextField)
 }
 
+//
+// Scanner, Valuer
+//
+
 func (f *TextField) Scan(value interface{}) error {
 	f.Value, f.Valid = value.(string)
 	return nil
+}
+
+func (f *TextField) xValue() (driver.Value, error) {
+	return f.Value, nil
+}
+
+func (f *TextField) getValue() interface{} {
+	return f.Value
 }
 
 func (f *TextField) setNullConstraint(null bool) {
@@ -158,10 +172,6 @@ func (f *TextField) setNullConstraint(null bool) {
 	if f.null {
 		f.Valid = false
 	}
-}
-
-func (f *TextField) getValue() interface{} {
-	return f.Value
 }
 
 func (f *TextField) validate() {

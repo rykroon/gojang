@@ -1,6 +1,8 @@
 package gojang
 
-import ()
+import (
+	"database/sql/driver"
+)
 
 type SmallIntegerField struct {
 	*Column
@@ -24,10 +26,6 @@ func (f *SmallIntegerField) Assign(value int16) assignment {
 	return newAssignment(f, intAsSql(int(value)))
 }
 
-func (f *SmallIntegerField) Avg() *aggregate {
-	return Avg(f, NewFloatField())
-}
-
 func (f *SmallIntegerField) copy() *SmallIntegerField {
 	copy := NewSmallIntegerField()
 	copy.Column = f.Column.copy()
@@ -38,8 +36,28 @@ func (f *SmallIntegerField) copyField() field {
 	return f.copy()
 }
 
+//
+// Aggreagates
+//
+
+func (f *SmallIntegerField) Avg() *aggregate {
+	return Avg(f, NewFloatField())
+}
+
 func (f *SmallIntegerField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
+}
+
+func (f *SmallIntegerField) Max() *aggregate {
+	return Max(f, NewSmallIntegerField())
+}
+
+func (f *SmallIntegerField) Min() *aggregate {
+	return Min(f, NewSmallIntegerField())
+}
+
+func (f *SmallIntegerField) Sum() *aggregate {
+	return Sum(f, NewSmallIntegerField())
 }
 
 //
@@ -86,22 +104,22 @@ func (f *SmallIntegerField) IsNull(value bool) lookup {
 	return isNull(f, value)
 }
 
-func (f *SmallIntegerField) getValue() interface{} {
-	return int(f.Value)
-}
-
-func (f *SmallIntegerField) Max() *aggregate {
-	return Max(f, NewSmallIntegerField())
-}
-
-func (f *SmallIntegerField) Min() *aggregate {
-	return Min(f, NewSmallIntegerField())
-}
+//
+// Scanner, Valuer
+//
 
 func (f *SmallIntegerField) Scan(value interface{}) error {
 	result, ok := value.(int64)
 	f.Value, f.Valid = int16(result), ok
 	return nil
+}
+
+func (f *SmallIntegerField) xValue() (driver.Value, error) {
+	return int64(f.Value), nil
+}
+
+func (f *SmallIntegerField) getValue() interface{} {
+	return int(f.Value)
 }
 
 func (f *SmallIntegerField) setNullConstraint(null bool) {
@@ -110,10 +128,6 @@ func (f *SmallIntegerField) setNullConstraint(null bool) {
 	if f.null {
 		f.Valid = false
 	}
-}
-
-func (f *SmallIntegerField) Sum() *aggregate {
-	return Sum(f, NewSmallIntegerField())
 }
 
 func (f *SmallIntegerField) validate() {

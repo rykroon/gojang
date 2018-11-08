@@ -1,6 +1,7 @@
 package gojang
 
 import (
+	"database/sql/driver"
 	"strconv"
 )
 
@@ -26,10 +27,6 @@ func (f *FloatField) Assign(value float64) assignment {
 	return newAssignment(f, float64AsSql(value))
 }
 
-func (f *FloatField) Avg() *aggregate {
-	return Avg(f, NewFloatField())
-}
-
 func (f *FloatField) copy() *FloatField {
 	copy := NewFloatField()
 	copy.Column = f.Column.copy()
@@ -40,12 +37,28 @@ func (f *FloatField) copyField() field {
 	return f.copy()
 }
 
+//
+// Aggregates
+//
+
+func (f *FloatField) Avg() *aggregate {
+	return Avg(f, NewFloatField())
+}
+
 func (f *FloatField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
-func (f *FloatField) getValue() interface{} {
-	return f.Value
+func (f *FloatField) Max() *aggregate {
+	return Max(f, NewFloatField())
+}
+
+func (f *FloatField) Min() *aggregate {
+	return Min(f, NewFloatField())
+}
+
+func (f *FloatField) Sum() *aggregate {
+	return Sum(f, NewFloatField())
 }
 
 //
@@ -92,13 +105,9 @@ func (f *FloatField) IsNull(value bool) lookup {
 	return isNull(f, value)
 }
 
-func (f *FloatField) Max() *aggregate {
-	return Max(f, NewFloatField())
-}
-
-func (f *FloatField) Min() *aggregate {
-	return Min(f, NewFloatField())
-}
+//
+// Scanner, Valuer
+//
 
 func (f *FloatField) Scan(value interface{}) error {
 	switch v := value.(type) {
@@ -121,16 +130,20 @@ func (f *FloatField) Scan(value interface{}) error {
 	return nil
 }
 
+func (f *FloatField) xValue() (driver.Value, error) {
+	return f.Value, nil
+}
+
+func (f *FloatField) getValue() interface{} {
+	return f.Value
+}
+
 func (f *FloatField) setNullConstraint(null bool) {
 	f.null = null
 
 	if f.null {
 		f.Valid = false
 	}
-}
-
-func (f *FloatField) Sum() *aggregate {
-	return Sum(f, NewFloatField())
 }
 
 func (f *FloatField) validate() {

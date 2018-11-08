@@ -19,12 +19,12 @@ func iexact(lhs expression, rhs string) lookup {
 }
 
 func contains(lhs expression, rhs string) lookup {
-	rhs = fmt.Sprintf("%%v%", rhs)
+	rhs = fmt.Sprintf("%%%v%%", rhs)
 	return newLookup("LIKE", lhs, rhs)
 }
 
 func icontains(lhs expression, rhs string) lookup {
-	rhs = fmt.Sprintf("%%v%", rhs)
+	rhs = fmt.Sprintf("%%%v%%", rhs)
 	return newLookup("ILIKE", lhs, rhs)
 }
 
@@ -49,22 +49,22 @@ func lte(lhs expression, rhs string) lookup {
 }
 
 func startsWith(lhs expression, rhs string) lookup {
-	rhs = fmt.Sprintf("%v%", rhs)
+	rhs = fmt.Sprintf("%v%%", rhs)
 	return newLookup("LIKE", lhs, rhs)
 }
 
 func iStartsWith(lhs expression, rhs string) lookup {
-	rhs = fmt.Sprintf("%v%", rhs)
+	rhs = fmt.Sprintf("%v%%", rhs)
 	return newLookup("ILIKE", lhs, rhs)
 }
 
 func endsWith(lhs expression, rhs string) lookup {
-	rhs = fmt.Sprintf("%%v", rhs)
+	rhs = fmt.Sprintf("%%%v", rhs)
 	return newLookup("LIKE", lhs, rhs)
 }
 
 func iEndsWith(lhs expression, rhs string) lookup {
-	rhs = fmt.Sprintf("%%v", rhs)
+	rhs = fmt.Sprintf("%%%v", rhs)
 	return newLookup("ILIKE", lhs, rhs)
 }
 
