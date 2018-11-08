@@ -59,7 +59,7 @@ func (f *BigIntegerField) Exact(value int) lookup {
 
 func (f *BigIntegerField) In(values ...int) lookup {
 	rhs := integersAsSql(values)
-	return gt(f, rhs)
+	return in(f, rhs)
 }
 
 func (f *BigIntegerField) Gt(value int) lookup {
@@ -92,8 +92,6 @@ func (f *BigIntegerField) IsNull(value bool) lookup {
 	return isNull(f, value)
 }
 
-
-
 func (f *BigIntegerField) Max() *aggregate {
 	return Max(f, NewBigIntegerField())
 }
@@ -101,8 +99,6 @@ func (f *BigIntegerField) Max() *aggregate {
 func (f *BigIntegerField) Min() *aggregate {
 	return Min(f, NewBigIntegerField())
 }
-
-
 
 func (f *BigIntegerField) Scan(value interface{}) error {
 	f.Value, f.Valid = value.(int64)

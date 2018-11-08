@@ -39,14 +39,14 @@ func (f *function) asSql() string {
 	return fmt.Sprintf(f.template, f.args...)
 }
 
-func (l lookup) asSql() string {
-	sql := l.lhs.asSql() + " " + l.lookupName + " " + l.rhs
-
-	if l.not {
-		sql = "NOT(" + sql + ")"
-	}
-	return sql
-}
+// func (l lookup) asSql() string {
+// 	sql := l.lhs.asSql() + " " + l.lookupName + " " + l.rhs
+//
+// 	if l.not {
+// 		sql = "NOT(" + sql + ")"
+// 	}
+// 	return sql
+// }
 
 func (s star) asSql() string {
 	return "*"

@@ -46,36 +46,52 @@ func (f *FloatField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
-func (f *FloatField) Exact(value float64) lookup {
-	return lookup{lhs: f, lookupName: "=", rhs: float64AsSql(value)}
-}
-
 func (f *FloatField) getValue() interface{} {
 	return f.Value
 }
 
-func (f *FloatField) Gt(value float64) lookup {
-	return lookup{lhs: f, lookupName: ">", rhs: float64AsSql(value)}
-}
+//
+// Lookups
+//
 
-func (f *FloatField) Gte(value float64) lookup {
-	return lookup{lhs: f, lookupName: ">=", rhs: float64AsSql(value)}
+func (f *FloatField) Exact(value float64) lookup {
+	rhs := float64AsSql(value)
+	return exact(f, rhs)
 }
 
 func (f *FloatField) In(values ...float64) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: floatsAsSql(values)}
+	rhs := floatsAsSql(values)
+	return in(f, rhs)
 }
 
-func (f *FloatField) IsNull(value bool) lookup {
-	return fieldIsNull(f, value)
+func (f *FloatField) Gt(value float64) lookup {
+	rhs := float64AsSql(value)
+	return gt(f, rhs)
+}
+
+func (f *FloatField) Gte(value float64) lookup {
+	rhs := float64AsSql(value)
+	return gte(f, rhs)
 }
 
 func (f *FloatField) Lt(value float64) lookup {
-	return lookup{lhs: f, lookupName: "<", rhs: float64AsSql(value)}
+	rhs := float64AsSql(value)
+	return lt(f, rhs)
 }
 
 func (f *FloatField) Lte(value float64) lookup {
-	return lookup{lhs: f, lookupName: "<=", rhs: float64AsSql(value)}
+	rhs := float64AsSql(value)
+	return lte(f, rhs)
+}
+
+func (f *FloatField) Range(from, to float64) lookup {
+	rhs1 := float64AsSql(from)
+	rhs2 := float64AsSql(to)
+	return between(f, rhs1, rhs2)
+}
+
+func (f *FloatField) IsNull(value bool) lookup {
+	return isNull(f, value)
 }
 
 func (f *FloatField) Max() *aggregate {
@@ -84,12 +100,6 @@ func (f *FloatField) Max() *aggregate {
 
 func (f *FloatField) Min() *aggregate {
 	return Min(f, NewFloatField())
-}
-
-func (f *FloatField) Range(from, to float64) lookup {
-	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
-	lookup.rhs = float64AsSql(from) + " AND " + float64AsSql(to)
-	return lookup
 }
 
 func (f *FloatField) Scan(value interface{}) error {

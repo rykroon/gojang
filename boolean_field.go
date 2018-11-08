@@ -55,7 +55,7 @@ func (f *BooleanField) Exact(value bool) lookup {
 
 func (f *BooleanField) In(values ...bool) lookup {
 	rhs := boolsAsSql(values)
-	return gt(f, rhs)
+	return in(f, rhs)
 }
 
 func (f *BooleanField) Gt(value bool) lookup {
@@ -88,9 +88,6 @@ func (f *BooleanField) IsNull(value bool) lookup {
 	return isNull(f, value)
 }
 
-
-
-
 func (f *BooleanField) Max() *aggregate {
 	return Max(f, NewBooleanField())
 }
@@ -98,8 +95,6 @@ func (f *BooleanField) Max() *aggregate {
 func (f *BooleanField) Min() *aggregate {
 	return Min(f, NewBooleanField())
 }
-
-
 
 func (f *BooleanField) Scan(value interface{}) error {
 	f.Value, f.Valid = value.(bool)

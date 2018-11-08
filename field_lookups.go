@@ -13,8 +13,8 @@ import (
 
 type lookup string
 
-func newLookup(lookup string, lhs expression, rhs string) lookup {
-	return fmt.Sprintf("%v %v %v", lhs.asSql(), lookup, rhs)
+func newLookup(lookupName string, lhs expression, rhs string) lookup {
+	return lookup(fmt.Sprintf("%v %v %v", lhs.asSql(), lookupName, rhs))
 }
 
 func exact(lhs expression, rhs string) lookup {
