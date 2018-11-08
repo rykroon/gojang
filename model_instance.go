@@ -58,7 +58,8 @@ func (m *Model) insert() (int, error) {
 
 	for _, field := range m.fields {
 		if !field.PrimaryKey() {
-			createList = append(createList, field.asAssignment())
+			column, _ := field.(columner) //clean this code up
+			createList = append(createList, newAssignment(column, field.valueAsSql()))
 		}
 	}
 
@@ -81,7 +82,8 @@ func (m *Model) update() error {
 
 	for _, field := range m.fields {
 		if !field.PrimaryKey() {
-			updateList = append(updateList, field.asAssignment())
+			column, _ := field.(columner) //clean this code up
+			updateList = append(updateList, newAssignment(column, field.valueAsSql()))
 		}
 	}
 

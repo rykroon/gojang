@@ -16,14 +16,12 @@ func NewSmallIntegerField() *SmallIntegerField {
 	return field
 }
 
-func (f *SmallIntegerField) asAssignment() assignment {
-	return assignment(f.Exact(int(f.Value)))
-}
+// func (f *SmallIntegerField) asAssignment() assignment {
+// 	return assignment(f.Exact(int(f.Value)))
+// }
 
 func (f *SmallIntegerField) Assign(value int16) assignment {
-	field := f.copy()
-	field.Value = value
-	return field.asAssignment()
+	return newAssignment(f, intAsSql(int(value)))
 }
 
 func (f *SmallIntegerField) Avg() *aggregate {
@@ -44,32 +42,52 @@ func (f *SmallIntegerField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
+//
+// Lookups
+//
+
 func (f *SmallIntegerField) Exact(value int) lookup {
-	return exactIntField(f, value)
+	rhs := intAsSql(value)
+	return exact(f, rhs)
+}
+
+func (f *SmallIntegerField) In(values ...int) lookup {
+	rhs := integersAsSql(values)
+	return in(f, rhs)
+}
+
+func (f *SmallIntegerField) Gt(value int) lookup {
+	rhs := intAsSql(value)
+	return gt(f, rhs)
+}
+
+func (f *SmallIntegerField) Gte(value int) lookup {
+	rhs := intAsSql(value)
+	return gte(f, rhs)
+}
+
+func (f *SmallIntegerField) Lt(value int) lookup {
+	rhs := intAsSql(value)
+	return lt(f, rhs)
+}
+
+func (f *SmallIntegerField) Lte(value int) lookup {
+	rhs := intAsSql(value)
+	return lte(f, rhs)
+}
+
+func (f *SmallIntegerField) Range(from, to int) lookup {
+	rhs1 := intAsSql(from)
+	rhs2 := intAsSql(to)
+	return between(f, rhs1, rhs2)
+}
+
+func (f *SmallIntegerField) IsNull(value bool) lookup {
+	return isNull(f, value)
 }
 
 func (f *SmallIntegerField) getValue() interface{} {
 	return int(f.Value)
-}
-
-func (f *SmallIntegerField) Gt(value int) lookup {
-	return gtIntField(f, value)
-}
-
-func (f *SmallIntegerField) Gte(value int) lookup {
-	return gteIntField(f, value)
-}
-
-func (f *SmallIntegerField) In(values ...int) lookup {
-	return inIntField(f, values)
-}
-
-func (f *SmallIntegerField) Lt(value int) lookup {
-	return ltIntField(f, value)
-}
-
-func (f *SmallIntegerField) Lte(value int) lookup {
-	return lteIntField(f, value)
 }
 
 func (f *SmallIntegerField) Max() *aggregate {
@@ -78,10 +96,6 @@ func (f *SmallIntegerField) Max() *aggregate {
 
 func (f *SmallIntegerField) Min() *aggregate {
 	return Min(f, NewSmallIntegerField())
-}
-
-func (f *SmallIntegerField) Range(from, to int) lookup {
-	return rangeIntField(f, from, to)
 }
 
 func (f *SmallIntegerField) Scan(value interface{}) error {

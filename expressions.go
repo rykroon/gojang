@@ -31,9 +31,9 @@ func (a *aggregate) asSql() string {
 	return f.asSql()
 }
 
-func (a assignment) asSql() string {
-	return dbq(a.lhs.ColumnName()) + " " + a.lookupName + " " + a.rhs
-}
+// func (a assignment) asSql() string {
+// 	return dbq(a.lhs.ColumnName()) + " " + a.lookupName + " " + a.rhs
+// }
 
 func (f *function) asSql() string {
 	return fmt.Sprintf(f.template, f.args...)

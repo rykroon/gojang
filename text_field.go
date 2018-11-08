@@ -16,19 +16,13 @@ func NewTextField() *TextField {
 	return field
 }
 
-func (f *TextField) asAssignment() assignment {
-	return assignment(f.Exact(f.Value))
-}
+//
+// func (f *TextField) asAssignment() assignment {
+// 	return assignment(f.Exact(f.Value))
+// }
 
 func (f *TextField) Assign(value string) assignment {
-	field := f.copy()
-	field.Value = value
-	return field.asAssignment()
-}
-
-func (f *TextField) Contains(value string) lookup {
-	value = "%" + value + "%"
-	return lookup{lhs: f, lookupName: "LIKE", rhs: stringAsSql(value)}
+	return newAssignment(f, stringAsSql(value))
 }
 
 func (f *TextField) copy() *TextField {
@@ -41,57 +35,102 @@ func (f *TextField) copyField() field {
 	return f.copy()
 }
 
+//Aggregates
+
 func (f *TextField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
-func (f *TextField) EndsWith(value string) lookup {
-	value = "%" + value
-	return lookup{lhs: f, lookupName: "LIKE", rhs: stringAsSql(value)}
+func (f *TextField) Max() *aggregate {
+	return Max(f, NewTextField())
 }
+
+func (f *TextField) Min() *aggregate {
+	return Min(f, NewTextField())
+}
+
+//
+// Lookups
+//
 
 func (f *TextField) Exact(value string) lookup {
-	return lookup{lhs: f, lookupName: "=", rhs: stringAsSql(value)}
-}
-
-func (f *TextField) getValue() interface{} {
-	return f.Value
-}
-
-func (f *TextField) Gt(value string) lookup {
-	return lookup{lhs: f, lookupName: ">", rhs: stringAsSql(value)}
-}
-
-func (f *TextField) Gte(value string) lookup {
-	return lookup{lhs: f, lookupName: ">=", rhs: stringAsSql(value)}
-}
-
-func (f *TextField) IContains(value string) lookup {
-	value = "%" + value + "%"
-	return lookup{lhs: f, lookupName: "ILIKE", rhs: stringAsSql(value)}
-}
-
-func (f *TextField) IEndsWith(value string) lookup {
-	value = "%" + value
-	return lookup{lhs: f, lookupName: "ILIKE", rhs: stringAsSql(value)}
+	rhs := stringAsSql(value)
+	return exact(f, rhs)
 }
 
 func (f *TextField) IExact(value string) lookup {
-	return lookup{lhs: f, lookupName: "ILIKE", rhs: stringAsSql(value)}
+	rhs := stringAsSql(value)
+	return iexact(f, rhs)
+}
+
+func (f *TextField) Contains(value string) lookup {
+	rhs := stringAsSql(value)
+	return contains(f, rhs)
+}
+
+func (f *TextField) IContains(value string) lookup {
+	rhs := stringAsSql(value)
+	return icontains(f, rhs)
 }
 
 func (f *TextField) In(values ...string) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: stringsAsSql(values)}
+	rhs := stringsAsSql(values)
+	return in(f, rhs)
 }
 
-func (f *TextField) IsNull(value bool) lookup {
-	return fieldIsNull(f, value)
+func (f *TextField) Gt(value string) lookup {
+	rhs := stringAsSql(value)
+	return gt(f, rhs)
+}
+
+func (f *TextField) Gte(value string) lookup {
+	rhs := stringAsSql(value)
+	return gte(f, rhs)
+}
+
+func (f *TextField) Lt(value string) lookup {
+	rhs := stringAsSql(value)
+	return lt(f, rhs)
+}
+
+func (f *TextField) Lte(value string) lookup {
+	rhs := stringAsSql(value)
+	return lte(f, rhs)
+}
+
+func (f *TextField) StartsWith(value string) lookup {
+	rhs := stringAsSql(value)
+	return startsWith(f, rhs)
 }
 
 func (f *TextField) IStartsWith(value string) lookup {
-	value = value + "%"
-	return lookup{lhs: f, lookupName: "ILIKE", rhs: stringAsSql(value)}
+	rhs := stringAsSql(value)
+	return iStartsWith(f, rhs)
 }
+
+func (f *TextField) EndsWith(value string) lookup {
+	rhs := stringAsSql(value)
+	return endsWith(f, rhs)
+}
+
+func (f *TextField) IEndsWith(value string) lookup {
+	rhs := stringAsSql(value)
+	return iEndsWith(f, rhs)
+}
+
+func (f *TextField) Range(from, to string) lookup {
+	rhs1 := stringAsSql(from)
+	rhs2 := stringAsSql(to)
+	return between(f, rhs1, rhs2)
+}
+
+func (f *TextField) IsNull(value bool) lookup {
+	return isNull(f, value)
+}
+
+//
+// Transforms
+//
 
 func (f *TextField) Length() *IntegerField {
 	length := Length(f)
@@ -103,31 +142,9 @@ func (f *TextField) Lower() *TextField {
 	return lower.toField().(*TextField)
 }
 
-func (f *TextField) Lt(value string) lookup {
-	return lookup{lhs: f, lookupName: "<", rhs: stringAsSql(value)}
-}
-
-func (f *TextField) Lte(value string) lookup {
-	return lookup{lhs: f, lookupName: "<=", rhs: stringAsSql(value)}
-}
-
-func (f *TextField) Max() *aggregate {
-	return Max(f, NewTextField())
-}
-
-func (f *TextField) Min() *aggregate {
-	return Min(f, NewTextField())
-}
-
-func (f *TextField) StartsWith(value string) lookup {
-	value = value + "%"
-	return lookup{lhs: f, lookupName: "LIKE", rhs: stringAsSql(value)}
-}
-
-func (f *TextField) Range(from, to string) lookup {
-	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
-	lookup.rhs = stringAsSql(from) + " AND " + stringAsSql(to)
-	return lookup
+func (f *TextField) Upper() *TextField {
+	upper := Upper(f)
+	return upper.toField().(*TextField)
 }
 
 func (f *TextField) Scan(value interface{}) error {
@@ -143,9 +160,8 @@ func (f *TextField) setNullConstraint(null bool) {
 	}
 }
 
-func (f *TextField) Upper() *TextField {
-	upper := Upper(f)
-	return upper.toField().(*TextField)
+func (f *TextField) getValue() interface{} {
+	return f.Value
 }
 
 func (f *TextField) validate() {

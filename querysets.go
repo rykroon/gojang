@@ -2,7 +2,8 @@ package gojang
 
 import (
 	"database/sql"
-	//"fmt"
+	"fmt"
+	"strings"
 )
 
 type QuerySet struct {
@@ -64,10 +65,14 @@ func (q QuerySet) Filter(lookups ...lookup) QuerySet {
 
 //returns a new QuerySet containing objects that do not match the given lookup parameters.
 func (q QuerySet) Exclude(lookups ...lookup) QuerySet {
+	var lookupStrings []string
 	for _, lookup := range lookups {
-		lookup.not = true
-		q.lookups = append(q.lookups, lookup)
+		lookupStrings = append(lookupStrings, string(lookup))
 	}
+
+	lookupList := strings.Join(lookupStrings, ",")
+	exclude := lookup(fmt.Sprintf("NOT(%v)", lookupList))
+	q.lookups = append(q.lookups, exclude)
 
 	q.Query = q.buildQuery()
 	return q
@@ -150,23 +155,23 @@ func (q QuerySet) Create(assignments ...assignment) (object, error) {
 	q.selected = append(q.selected, q.model.Pk.copyField())
 	obj := newObj()
 
-	for _, assign := range assignments {
-		q.set = append(q.set, assign)
-	}
-
-	q.Query = q.buildQuery()
-	pkeyName := q.model.Pk.ColumnName()
-	q.Query += " RETURNING " + dbq(pkeyName)
-
-	obj, err := q.queryRowAndScan()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, assign := range assignments {
-		attrName := q.model.colToAttr[assign.lhs.ColumnName()]
-		obj.SetAttr(attrName, assign.lhs.getValue())
-	}
+	// for _, assign := range assignments {
+	// 	q.set = append(q.set, assign)
+	// }
+	//
+	// q.Query = q.buildQuery()
+	// pkeyName := q.model.Pk.ColumnName()
+	// q.Query += " RETURNING " + dbq(pkeyName)
+	//
+	// obj, err := q.queryRowAndScan()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//
+	// for _, assign := range assignments {
+	// 	attrName := q.model.colToAttr[assign.lhs.ColumnName()]
+	// 	obj.SetAttr(attrName, assign.lhs.getValue())
+	// }
 
 	return obj, nil
 }

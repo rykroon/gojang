@@ -4,13 +4,6 @@ import (
 	"fmt"
 )
 
-// type lookup struct {
-// 	not        bool
-// 	lhs        field
-// 	lookupName string
-// 	rhs        string
-// }
-
 type lookup string
 
 func newLookup(lookupName string, lhs expression, rhs string) lookup {
@@ -60,7 +53,7 @@ func startsWith(lhs expression, rhs string) lookup {
 	return newLookup("LIKE", lhs, rhs)
 }
 
-func istartsWith(lhs expression, rhs string) lookup {
+func iStartsWith(lhs expression, rhs string) lookup {
 	rhs = fmt.Sprintf("%v%", rhs)
 	return newLookup("ILIKE", lhs, rhs)
 }
@@ -70,7 +63,7 @@ func endsWith(lhs expression, rhs string) lookup {
 	return newLookup("LIKE", lhs, rhs)
 }
 
-func iendsWith(lhs expression, rhs string) lookup {
+func iEndsWith(lhs expression, rhs string) lookup {
 	rhs = fmt.Sprintf("%%v", rhs)
 	return newLookup("ILIKE", lhs, rhs)
 }

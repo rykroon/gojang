@@ -71,7 +71,6 @@ func (q QuerySet) processInsert() string {
 
 	for _, assign := range q.set {
 		columnList = append(columnList, dbq(assign.lhs.ColumnName()))
-		//valueList = append(valueList, assign.lhs.valueAsSql())
 		valueList = append(valueList, assign.rhs)
 	}
 
@@ -98,9 +97,9 @@ func (q QuerySet) processWhere() string {
 
 		for i, lookup := range q.lookups {
 			if i == 0 {
-				sql += lookup.asSql()
+				sql += string(lookup)
 			} else {
-				sql += " AND " + lookup.asSql()
+				sql += " AND " + string(lookup)
 			}
 		}
 	}

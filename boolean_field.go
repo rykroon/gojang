@@ -16,14 +16,12 @@ func NewBooleanField() *BooleanField {
 	return field
 }
 
-func (f *BooleanField) asAssignment() assignment {
-	return assignment(f.Exact(f.Value))
-}
+// func (f *BooleanField) asAssignment() assignment {
+// 	return assignment(f.Exact(f.Value))
+// }
 
 func (f *BooleanField) Assign(value bool) assignment {
-	field := f.copy()
-	field.Value = value
-	return field.asAssignment()
+	return newAssignment(f, boolAsSql(value))
 }
 
 func (f *BooleanField) copy() *BooleanField {

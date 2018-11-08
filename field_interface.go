@@ -26,7 +26,7 @@ type field interface {
 
 	HasRelation() bool
 
-	asAssignment() assignment
+	//asAssignment() assignment
 	Asc() orderByExpression
 	Desc() orderByExpression
 	Count(bool) *aggregate

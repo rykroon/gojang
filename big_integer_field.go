@@ -16,14 +16,12 @@ func NewBigIntegerField() *BigIntegerField {
 	return field
 }
 
-func (f *BigIntegerField) asAssignment() assignment {
-	return assignment(f.Exact(int(f.Value)))
-}
+// func (f *BigIntegerField) asAssignment() assignment {
+// 	return assignment(f.Exact(int(f.Value)))
+// }
 
 func (f *BigIntegerField) Assign(value int64) assignment {
-	field := f.copy()
-	field.Value = value
-	return field.asAssignment()
+	return newAssignment(f, intAsSql(int(value)))
 }
 
 func (f *BigIntegerField) Avg() *aggregate {

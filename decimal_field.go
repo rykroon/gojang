@@ -29,8 +29,12 @@ func NewDecimalField(maxDigits int, decimalPlaces int) *DecimalField {
 	return field
 }
 
-func (f *DecimalField) asAssignment() assignment {
-	return assignment(f.Exact(f.Value))
+// func (f *DecimalField) asAssignment() assignment {
+// 	return assignment(f.Exact(f.Value))
+// }
+
+func (f *DecimalField) Assign(value decimal.Decimal) assignment {
+	return newAssignment(f, value.String())
 }
 
 func (f *DecimalField) copy() *DecimalField {
