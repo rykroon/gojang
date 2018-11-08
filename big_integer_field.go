@@ -44,40 +44,55 @@ func (f *BigIntegerField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
-func (f *BigIntegerField) Exact(value int) lookup {
-	return exactIntField(f, value)
-}
-
 func (f *BigIntegerField) getValue() interface{} {
 	return int(f.Value)
 }
 
-func (f *BigIntegerField) Gt(value int) lookup {
-	return gtIntField(f, value)
-}
+//
+// Lookups
+//
 
-func (f *BigIntegerField) Gte(value int) lookup {
-	return gteIntField(f, value)
-	//return lookup{lhs: f, lookupName: ">=", rhs: intAsSql(value)}
+func (f *BigIntegerField) Exact(value int) lookup {
+	rhs := intAsSql(value)
+	return exact(f, rhs)
 }
 
 func (f *BigIntegerField) In(values ...int) lookup {
-	return inIntField(f, values)
+	rhs := integersAsSql(values)
+	return gt(f, rhs)
 }
 
-func (f *BigIntegerField) IsNull(value bool) lookup {
-	return fieldIsNull(f, value)
+func (f *BigIntegerField) Gt(value int) lookup {
+	rhs := intAsSql(value)
+	return gt(f, rhs)
+}
+
+func (f *BigIntegerField) Gte(value int) lookup {
+	rhs := intAsSql(value)
+	return gte(f, rhs)
 }
 
 func (f *BigIntegerField) Lt(value int) lookup {
-	return ltIntField(f, value)
-	//return lookup{lhs: f, lookupName: "<", rhs: intAsSql(value)}
+	rhs := intAsSql(value)
+	return lt(f, rhs)
 }
 
 func (f *BigIntegerField) Lte(value int) lookup {
-	return lteIntField(f, value)
-	//return lookup{lhs: f, lookupName: "<=", rhs: intAsSql(value)}
+	rhs := intAsSql(value)
+	return lte(f, rhs)
 }
+
+func (f *BigIntegerField) Range(from, to int) lookup {
+	rhs1 := intAsSql(from)
+	rhs2 := intAsSql(to)
+	return between(f, rhs1, rhs2)
+}
+
+func (f *BigIntegerField) IsNull(value bool) lookup {
+	return isNull(f, value)
+}
+
+
 
 func (f *BigIntegerField) Max() *aggregate {
 	return Max(f, NewBigIntegerField())
@@ -87,9 +102,7 @@ func (f *BigIntegerField) Min() *aggregate {
 	return Min(f, NewBigIntegerField())
 }
 
-func (f *BigIntegerField) Range(from, to int) lookup {
-	return rangeIntField(f, from, to)
-}
+
 
 func (f *BigIntegerField) Scan(value interface{}) error {
 	f.Value, f.Valid = value.(int64)

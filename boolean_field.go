@@ -40,37 +40,56 @@ func (f *BooleanField) Count(distinct bool) *aggregate {
 	return Count(f, distinct)
 }
 
-func (f *BooleanField) Exact(value bool) lookup {
-	return lookup{lhs: f, lookupName: "=", rhs: boolAsSql(value)}
-}
-
 func (f *BooleanField) getValue() interface{} {
 	return f.Value
 }
 
-func (f *BooleanField) Gt(value bool) lookup {
-	return lookup{lhs: f, lookupName: ">", rhs: boolAsSql(value)}
-}
+//
+// Lookups
+//
 
-func (f *BooleanField) Gte(value bool) lookup {
-	return lookup{lhs: f, lookupName: ">=", rhs: boolAsSql(value)}
+func (f *BooleanField) Exact(value bool) lookup {
+	rhs := boolAsSql(value)
+	return exact(f, rhs)
 }
 
 func (f *BooleanField) In(values ...bool) lookup {
-	return lookup{lhs: f, lookupName: "IN", rhs: boolsAsSql(values)}
+	rhs := boolsAsSql(values)
+	return gt(f, rhs)
 }
 
-func (f *BooleanField) IsNull(value bool) lookup {
-	return fieldIsNull(f, value)
+func (f *BooleanField) Gt(value bool) lookup {
+	rhs := boolAsSql(value)
+	return gt(f, rhs)
+}
+
+func (f *BooleanField) Gte(value bool) lookup {
+	rhs := boolAsSql(value)
+	return gte(f, rhs)
 }
 
 func (f *BooleanField) Lt(value bool) lookup {
-	return lookup{lhs: f, lookupName: "<", rhs: boolAsSql(value)}
+	rhs := boolAsSql(value)
+	return lt(f, rhs)
 }
 
 func (f *BooleanField) Lte(value bool) lookup {
-	return lookup{lhs: f, lookupName: "<=", rhs: boolAsSql(value)}
+	rhs := boolAsSql(value)
+	return lte(f, rhs)
 }
+
+func (f *BooleanField) Range(from, to bool) lookup {
+	rhs1 := boolAsSql(from)
+	rhs2 := boolAsSql(to)
+	return between(f, rhs1, rhs2)
+}
+
+func (f *BooleanField) IsNull(value bool) lookup {
+	return isNull(f, value)
+}
+
+
+
 
 func (f *BooleanField) Max() *aggregate {
 	return Max(f, NewBooleanField())
@@ -80,11 +99,7 @@ func (f *BooleanField) Min() *aggregate {
 	return Min(f, NewBooleanField())
 }
 
-func (f *BooleanField) Range(from, to bool) lookup {
-	lookup := lookup{lhs: f, lookupName: "BETWEEN"}
-	lookup.rhs = boolAsSql(from) + " AND " + boolAsSql(to)
-	return lookup
-}
+
 
 func (f *BooleanField) Scan(value interface{}) error {
 	f.Value, f.Valid = value.(bool)
