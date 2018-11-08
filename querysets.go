@@ -155,23 +155,23 @@ func (q QuerySet) Create(assignments ...assignment) (object, error) {
 	q.selected = append(q.selected, q.model.Pk.copyField())
 	obj := newObj()
 
-	// for _, assign := range assignments {
-	// 	q.set = append(q.set, assign)
-	// }
-	//
-	// q.Query = q.buildQuery()
-	// pkeyName := q.model.Pk.ColumnName()
-	// q.Query += " RETURNING " + dbq(pkeyName)
-	//
-	// obj, err := q.queryRowAndScan()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
-	// for _, assign := range assignments {
-	// 	attrName := q.model.colToAttr[assign.lhs.ColumnName()]
-	// 	obj.SetAttr(attrName, assign.lhs.getValue())
-	// }
+	for _, assign := range assignments {
+		q.set = append(q.set, assign)
+	}
+
+	q.Query = q.buildQuery()
+	pkeyName := q.model.Pk.ColumnName()
+	q.Query += " RETURNING " + dbq(pkeyName)
+
+	obj, err := q.queryRowAndScan()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, assign := range assignments {
+		attrName := q.model.colToAttr[assign.lhs.ColumnName()]
+		obj.SetAttr(attrName, assign.lhs.getValue())
+	}
 
 	return obj, nil
 }
