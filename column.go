@@ -30,7 +30,7 @@ type Column struct {
 }
 
 type columner interface {
-	asSql() string
+	expression
 
 	ColumnName() string
 	setColumnName(string)
@@ -53,6 +53,21 @@ func newColumn(dataType string) *Column {
 	return &Column{dataType: dataType}
 }
 
+func (c *Column) asSql() string {
+	sql := ""
+
+	if c.HasModel() {
+		tableName := dbq(c.model.dbTable)
+		colName := dbq(c.columnName)
+		sql = tableName + "." + colName
+
+	} else {
+		sql = c.columnName
+	}
+
+	return sql
+}
+
 //Getters and Setters
 func (c *Column) ColumnName() string {
 	return c.columnName
@@ -62,8 +77,8 @@ func (c *Column) setColumnName(name string) {
 	c.columnName = name
 }
 
-func (f *Column) DataType() string {
-	return f.dataType
+func (c *Column) DataType() string {
+	return c.dataType
 }
 
 func (c *Column) setDataType(dataType string) {
@@ -86,12 +101,12 @@ func (c *Column) setUnique(unique bool) {
 	c.unique = unique
 }
 
-func (f *Column) Null() bool {
-	return f.null
+func (c *Column) Null() bool {
+	return c.null
 }
 
-func (f *Column) setNull(null bool) {
-	f.null = null
+func (c *Column) setNull(null bool) {
+	c.null = null
 }
 
 func (c *Column) Alias() string {
@@ -106,19 +121,8 @@ func (c *Column) Asc() orderByExpression {
 	return orderByExpression(c.asSql() + " ASC")
 }
 
-func (c *Column) asSql() string {
-	sql := ""
-
-	if c.HasModel() {
-		tableName := dbq(c.model.dbTable)
-		colName := dbq(c.columnName)
-		sql = tableName + "." + colName
-
-	} else {
-		sql = c.columnName
-	}
-
-	return sql
+func (c *Column) Desc() orderByExpression {
+	return orderByExpression(c.asSql() + " DESC")
 }
 
 func (c *Column) copy() *Column {
@@ -128,10 +132,6 @@ func (c *Column) copy() *Column {
 	copy.constraints = c.constraints
 	copy.alias = c.alias
 	return copy
-}
-
-func (c *Column) Desc() orderByExpression {
-	return orderByExpression(c.asSql() + " DESC")
 }
 
 func (c *Column) HasModel() bool {
@@ -148,4 +148,30 @@ func (c *Column) Model() *Model {
 
 func (c *Column) setModel(model *Model) {
 	c.model = model
+}
+
+func create(f field) string {
+	s := dbq(f.ColumnName()) + " " + f.DataType()
+
+	if f.PrimaryKey() {
+		s += " PRIMARY KEY"
+	} else {
+
+		if f.HasRelation() {
+			fkey := f.(relatedField)
+			s += " REFERENCES " + dbq(fkey.getRelatedModel().dbTable) + " ON DELETE " + fkey.getOnDelete()
+		}
+
+		if f.Null() {
+			s += " NULL"
+		} else {
+			s += " NOT NULL"
+		}
+
+		if f.Unique() {
+			s += " UNIQUE"
+		}
+	}
+
+	return s
 }

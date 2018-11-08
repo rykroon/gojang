@@ -46,29 +46,3 @@ func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
 
 	return field
 }
-
-func create(f field) string {
-	s := dbq(f.ColumnName()) + " " + f.DataType()
-
-	if f.PrimaryKey() {
-		s += " PRIMARY KEY"
-	} else {
-
-		if f.HasRelation() {
-			fkey := f.(relatedField)
-			s += " REFERENCES " + dbq(fkey.getRelatedModel().dbTable) + " ON DELETE " + fkey.getOnDelete()
-		}
-
-		if f.Null() {
-			s += " NULL"
-		} else {
-			s += " NOT NULL"
-		}
-
-		if f.Unique() {
-			s += " UNIQUE"
-		}
-	}
-
-	return s
-}
