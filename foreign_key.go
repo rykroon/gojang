@@ -2,8 +2,6 @@ package gojang
 
 import ()
 
-//A field type for each data type
-
 type ForeignKey struct {
 	*BigIntegerField
 
@@ -20,8 +18,6 @@ type OneToOneField struct {
 	*ForeignKey
 }
 
-//Constructors
-
 func NewForeignKey(to *Model, onDelete onDelete) *ForeignKey {
 	field := &ForeignKey{}
 	field.BigIntegerField = NewBigIntegerField()
@@ -30,19 +26,6 @@ func NewForeignKey(to *Model, onDelete onDelete) *ForeignKey {
 	field.manyToOne = true
 	field.relatedModel = to
 	field.onDelete = onDelete
-
-	return field
-}
-
-func NewOneToOneField(to *Model, onDelete onDelete) *OneToOneField {
-	field := &OneToOneField{}
-	field.ForeignKey = NewForeignKey(to, onDelete)
-
-	field.manyToOne = false
-	field.oneToOne = true
-
-	//unique constraint must be true for OneToOne Field
-	field.unique = true
 
 	return field
 }
