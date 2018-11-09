@@ -16,5 +16,5 @@ func newAssignment(lhs field, rhs string) assignment {
 }
 
 func (a assignment) asSql() string {
-	return fmt.Sprintf("%v = %v", a.lhs.asSql(), a.rhs)
+	return fmt.Sprintf("%v = %v", dbq(a.lhs.ColumnName()), a.rhs)
 }

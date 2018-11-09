@@ -81,7 +81,8 @@ func (m *Model) update() error {
 
 	for _, field := range m.fields {
 		if !field.PrimaryKey() {
-			updateList = append(updateList, newAssignment(field, field.valueAsSql()))
+			assign := newAssignment(field, field.valueAsSql())
+			updateList = append(updateList, assign)
 		}
 	}
 
