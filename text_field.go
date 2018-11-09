@@ -8,7 +8,7 @@ type TextField struct {
 	*Column
 
 	Valid bool
-	Value string
+	Val   string
 }
 
 func NewTextField() *TextField {
@@ -20,7 +20,7 @@ func NewTextField() *TextField {
 
 //
 // func (f *TextField) asAssignment() assignment {
-// 	return assignment(f.Exact(f.Value))
+// 	return assignment(f.Exact(f.Val))
 // }
 
 func (f *TextField) Assign(value string) assignment {
@@ -154,16 +154,16 @@ func (f *TextField) Upper() *TextField {
 //
 
 func (f *TextField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(string)
+	f.Val, f.Valid = value.(string)
 	return nil
 }
 
 func (f *TextField) xValue() (driver.Value, error) {
-	return f.Value, nil
+	return f.Val, nil
 }
 
 func (f *TextField) getValue() interface{} {
-	return f.Value
+	return f.Val
 }
 
 func (f *TextField) setNullConstraint(null bool) {
@@ -184,6 +184,6 @@ func (f *TextField) valueAsSql() string {
 	if f.null && !f.Valid {
 		return "NULL"
 	} else {
-		return stringAsSql(f.Value)
+		return stringAsSql(f.Val)
 	}
 }

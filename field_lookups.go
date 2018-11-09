@@ -1,10 +1,16 @@
 package gojang
 
 import (
+	"database/sql/driver"
 	"fmt"
 )
 
 type lookup string
+
+type filterer interface {
+	expression
+	driver.Valuer
+}
 
 func newLookup(lookupName string, lhs expression, rhs string) lookup {
 	return lookup(fmt.Sprintf("%v %v %v", lhs.asSql(), lookupName, rhs))

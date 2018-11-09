@@ -52,9 +52,9 @@ func (s star) asSql() string {
 	return "*"
 }
 
-func (v *ValueExpression) asSql() string {
-	return v.outputField.valueAsSql()
-}
+// func (v *ValueExpression) asSql() string {
+// 	return v.outputField.valueAsSql()
+// }
 
 //
 //Select Expression Method Set
@@ -72,9 +72,9 @@ func (s star) Alias() string {
 	return "*"
 }
 
-func (v *ValueExpression) Alias() string {
-	return v.outputField.Alias()
-}
+// func (v *ValueExpression) Alias() string {
+// 	return v.outputField.Alias()
+// }
 
 func (a *aggregate) As(alias string) {
 	a.outputField.As(alias)
@@ -88,9 +88,9 @@ func (s star) As(string) {
 	return
 }
 
-func (v *ValueExpression) As(alias string) {
-	v.outputField.As(alias)
-}
+// func (v *ValueExpression) As(alias string) {
+// 	v.outputField.As(alias)
+// }
 
 func (a aggregate) DataType() string {
 	return function(a).DataType()
@@ -104,9 +104,9 @@ func (s star) DataType() string {
 	return ""
 }
 
-func (v *ValueExpression) DataType() string {
-	return v.outputField.DataType()
-}
+// func (v *ValueExpression) DataType() string {
+// 	return v.outputField.DataType()
+// }
 
 func (a aggregate) Scan(v interface{}) error {
 	return function(a).Scan(v)
@@ -120,9 +120,9 @@ func (s star) Scan(interface{}) error {
 	return nil
 }
 
-func (v *ValueExpression) Scan(value interface{}) error {
-	return v.outputField.Scan(value)
-}
+// func (v *ValueExpression) Scan(value interface{}) error {
+// 	return v.outputField.Scan(value)
+// }
 
 func (a aggregate) getValue() interface{} {
 	return function(a).getValue()
@@ -136,9 +136,9 @@ func (s star) getValue() interface{} {
 	return nil
 }
 
-func (v *ValueExpression) getValue() interface{} {
-	return v.outputField.getValue()
-}
+// func (v *ValueExpression) getValue() interface{} {
+// 	return v.outputField.getValue()
+// }
 
 //
 //Methods that return Order By Expressions

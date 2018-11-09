@@ -22,3 +22,7 @@ func (f *CharField) copy() *CharField {
 	copy.Column = f.Column.copy()
 	return copy
 }
+
+func (f *CharField) copyField() field {
+	return f.copy()
+}

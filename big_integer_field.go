@@ -8,7 +8,7 @@ type BigIntegerField struct {
 	*Column
 
 	Valid bool
-	Value int64
+	Val   int64
 }
 
 func NewBigIntegerField() *BigIntegerField {
@@ -19,7 +19,7 @@ func NewBigIntegerField() *BigIntegerField {
 }
 
 // func (f *BigIntegerField) asAssignment() assignment {
-// 	return assignment(f.Exact(int(f.Value)))
+// 	return assignment(f.Exact(int(f.Val)))
 // }
 
 func (f *BigIntegerField) Assign(value int64) assignment {
@@ -109,16 +109,16 @@ func (f *BigIntegerField) IsNull(value bool) lookup {
 //
 
 func (f *BigIntegerField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(int64)
+	f.Val, f.Valid = value.(int64)
 	return nil
 }
 
 func (f *BigIntegerField) xValue() (driver.Value, error) {
-	return f.Value, nil
+	return f.Val, nil
 }
 
 func (f *BigIntegerField) getValue() interface{} {
-	return int(f.Value)
+	return int(f.Val)
 }
 
 func (f *BigIntegerField) setNullConstraint(null bool) {
@@ -139,6 +139,6 @@ func (f *BigIntegerField) valueAsSql() string {
 	if f.null && !f.Valid {
 		return "NULL"
 	} else {
-		return intAsSql(int(f.Value))
+		return intAsSql(int(f.Val))
 	}
 }

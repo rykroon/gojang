@@ -14,7 +14,7 @@ func NewBigAutoField() *BigAutoField {
 }
 
 func (f *BigAutoField) Id() int {
-	return f.Val()
+	return int(f.Val)
 }
 
 func (f *BigAutoField) isAutoField() bool {

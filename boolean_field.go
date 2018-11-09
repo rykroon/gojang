@@ -8,18 +8,18 @@ type BooleanField struct {
 	*Column
 
 	Valid bool
-	Value bool
+	Val   bool
 }
 
 func NewBooleanField() *BooleanField {
 	field := &BooleanField{}
 	field.Column = newColumn("BOOL")
-	field.Valid = true
+	field.Val = true
 	return field
 }
 
 // func (f *BooleanField) asAssignment() assignment {
-// 	return assignment(f.Exact(f.Value))
+// 	return assignment(f.Exact(f.Val))
 // }
 
 func (f *BooleanField) Assign(value bool) assignment {
@@ -101,16 +101,16 @@ func (f *BooleanField) IsNull(value bool) lookup {
 //
 
 func (f *BooleanField) Scan(value interface{}) error {
-	f.Value, f.Valid = value.(bool)
+	f.Val, f.Valid = value.(bool)
 	return nil
 }
 
 func (f *BooleanField) xValue() (driver.Value, error) {
-	return f.Value, nil
+	return f.Val, nil
 }
 
 func (f *BooleanField) getValue() interface{} {
-	return f.Value
+	return f.Val
 }
 
 func (f *BooleanField) setNullConstraint(null bool) {
@@ -131,6 +131,6 @@ func (f *BooleanField) valueAsSql() string {
 	if f.null && !f.Valid {
 		return "NULL"
 	} else {
-		return boolAsSql(f.Value)
+		return boolAsSql(f.Val)
 	}
 }

@@ -9,7 +9,7 @@ type FloatField struct {
 	*Column
 
 	Valid bool
-	Value float64
+	Val   float64
 }
 
 func NewFloatField() *FloatField {
@@ -20,7 +20,7 @@ func NewFloatField() *FloatField {
 }
 
 // func (f *FloatField) asAssignment() assignment {
-// 	return assignment(f.Exact(f.Value))
+// 	return assignment(f.Exact(f.Val))
 // }
 
 func (f *FloatField) Assign(value float64) assignment {
@@ -112,30 +112,30 @@ func (f *FloatField) IsNull(value bool) lookup {
 func (f *FloatField) Scan(value interface{}) error {
 	switch v := value.(type) {
 	case float64:
-		f.Value, f.Valid = v, true
+		f.Val, f.Valid = v, true
 
 	case int64:
-		f.Value, f.Valid = float64(v), true
+		f.Val, f.Valid = float64(v), true
 
 	case []uint8:
 		float, err := strconv.ParseFloat(string(v), 64)
-		f.Value = float
+		f.Val = float
 		f.Valid = err == nil
 		return err
 
 	default:
-		f.Value, f.Valid = 0, false
+		f.Val, f.Valid = 0, false
 	}
 
 	return nil
 }
 
 func (f *FloatField) xValue() (driver.Value, error) {
-	return f.Value, nil
+	return f.Val, nil
 }
 
 func (f *FloatField) getValue() interface{} {
-	return f.Value
+	return f.Val
 }
 
 func (f *FloatField) setNullConstraint(null bool) {
@@ -156,6 +156,6 @@ func (f *FloatField) valueAsSql() string {
 	if f.null && !f.Valid {
 		return "NULL"
 	} else {
-		return float64AsSql(f.Value)
+		return float64AsSql(f.Val)
 	}
 }

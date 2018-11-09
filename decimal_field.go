@@ -9,7 +9,7 @@ type DecimalField struct {
 	*Column
 
 	Valid bool
-	Value decimal.Decimal
+	Val   decimal.Decimal
 
 	maxDigits     int
 	decimalPlaces int
@@ -24,13 +24,13 @@ func NewDecimalField(maxDigits int, decimalPlaces int) *DecimalField {
 	field := &DecimalField{maxDigits: maxDigits, decimalPlaces: decimalPlaces}
 	dataType := fmt.Sprintf("NUMERIC(%v, %v)", maxDigits, decimalPlaces)
 	field.Column = newColumn(dataType)
-	field.Value = decimal.New(0, 0)
+	field.Val = decimal.New(0, 0)
 	field.Valid = true
 	return field
 }
 
 // func (f *DecimalField) asAssignment() assignment {
-// 	return assignment(f.Exact(f.Value))
+// 	return assignment(f.Exact(f.Val))
 // }
 
 func (f *DecimalField) Assign(value decimal.Decimal) assignment {
@@ -41,6 +41,32 @@ func (f *DecimalField) copy() *DecimalField {
 	copy := NewDecimalField(f.maxDigits, f.decimalPlaces)
 	copy.Column = f.Column.copy()
 	return copy
+}
+
+func (f *DecimalField) copyField() field {
+	return f.copy()
+}
+
+func (f *DecimalField) setNullConstraint(null bool) {
+	f.null = null
+
+	if f.null {
+		f.Valid = false
+	}
+}
+
+func (f *DecimalField) validate() {
+	if f.primaryKey {
+		panic(NewInvalidConstraint(f, "primary key"))
+	}
+}
+
+func (f *DecimalField) valueAsSql() string {
+	if f.null && !f.Valid {
+		return "NULL"
+	} else {
+		return f.Val.String()
+	}
 }
 
 //Aggregates
@@ -110,9 +136,9 @@ func (f *DecimalField) IsNull(value bool) lookup {
 //Other
 
 func (f *DecimalField) Scan(value interface{}) error {
-	return f.Value.Scan(value)
+	return f.Val.Scan(value)
 }
 
 func (f *DecimalField) getValue() interface{} {
-	return f.Value
+	return f.Val
 }

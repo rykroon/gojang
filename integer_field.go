@@ -8,7 +8,7 @@ type IntegerField struct {
 	*Column
 
 	Valid bool
-	Value int32
+	Val   int32
 }
 
 func NewIntegerField() *IntegerField {
@@ -19,7 +19,7 @@ func NewIntegerField() *IntegerField {
 }
 
 // func (f *IntegerField) asAssignment() assignment {
-// 	return assignment(f.Exact(int(f.Value)))
+// 	return assignment(f.Exact(int(f.Val)))
 // }
 
 func (f *IntegerField) Assign(value int32) assignment {
@@ -110,16 +110,16 @@ func (f *IntegerField) IsNull(value bool) lookup {
 
 func (f *IntegerField) Scan(value interface{}) error {
 	result, ok := value.(int64)
-	f.Value, f.Valid = int32(result), ok
+	f.Val, f.Valid = int32(result), ok
 	return nil
 }
 
 func (f *IntegerField) xValue() (driver.Value, error) {
-	return int64(f.Value), nil
+	return int64(f.Val), nil
 }
 
 func (f *IntegerField) getValue() interface{} {
-	return int(f.Value)
+	return int(f.Val)
 }
 
 func (f *IntegerField) setNullConstraint(null bool) {
@@ -140,6 +140,6 @@ func (f *IntegerField) valueAsSql() string {
 	if f.null && !f.Valid {
 		return "NULL"
 	} else {
-		return intAsSql(int(f.Value))
+		return intAsSql(int(f.Val))
 	}
 }

@@ -34,7 +34,7 @@ type NumericField interface {
 
 type IntField interface {
 	NumericField
-	Val() int
+	//Val() int
 	setInt(int)
 
 	//lookups
@@ -54,25 +54,25 @@ type PrimaryKeyField interface {
 }
 
 func (f *BigIntegerField) setInt(num int) {
-	f.Value = int64(num)
+	f.Val = int64(num)
 }
 
 func (f *IntegerField) setInt(num int) {
-	f.Value = int32(num)
+	f.Val = int32(num)
 }
 
 func (f *SmallIntegerField) setInt(num int) {
-	f.Value = int16(num)
+	f.Val = int16(num)
 }
 
-func (f BigIntegerField) Val() int {
-	return int(f.Value)
-}
-
-func (f IntegerField) Val() int {
-	return int(f.Value)
-}
-
-func (f SmallIntegerField) Val() int {
-	return int(f.Value)
-}
+// func (f BigIntegerField) Val() int {
+// 	return int(f.Value)
+// }
+//
+// func (f IntegerField) Val() int {
+// 	return int(f.Value)
+// }
+//
+// func (f SmallIntegerField) Val() int {
+// 	return int(f.Value)
+// }

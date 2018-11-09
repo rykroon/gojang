@@ -6,41 +6,41 @@ import (
 	"strings"
 )
 
-type ValueExpression struct {
-	outputField field
-}
-
-func NewValueFromBool(value bool) *ValueExpression {
-	valExpr := &ValueExpression{}
-	field := NewBooleanField()
-	field.Value = value
-	valExpr.outputField = field
-	return valExpr
-}
-
-func NewValueFromFloat(value float64) *ValueExpression {
-	valExpr := &ValueExpression{}
-	field := NewFloatField()
-	field.Value = value
-	valExpr.outputField = field
-	return valExpr
-}
-
-func NewValueFromInt(value int) *ValueExpression {
-	valExpr := &ValueExpression{}
-	field := NewBigIntegerField()
-	field.Value = int64(value)
-	valExpr.outputField = field
-	return valExpr
-}
-
-func NewValueFromString(value string) *ValueExpression {
-	valExpr := &ValueExpression{}
-	field := NewTextField()
-	field.Value = value
-	valExpr.outputField = field
-	return valExpr
-}
+// type ValueExpression struct {
+// 	outputField field
+// }
+//
+// func NewValueFromBool(value bool) *ValueExpression {
+// 	valExpr := &ValueExpression{}
+// 	field := NewBooleanField()
+// 	field.Value = value
+// 	valExpr.outputField = field
+// 	return valExpr
+// }
+//
+// func NewValueFromFloat(value float64) *ValueExpression {
+// 	valExpr := &ValueExpression{}
+// 	field := NewFloatField()
+// 	field.Value = value
+// 	valExpr.outputField = field
+// 	return valExpr
+// }
+//
+// func NewValueFromInt(value int) *ValueExpression {
+// 	valExpr := &ValueExpression{}
+// 	field := NewBigIntegerField()
+// 	field.Value = int64(value)
+// 	valExpr.outputField = field
+// 	return valExpr
+// }
+//
+// func NewValueFromString(value string) *ValueExpression {
+// 	valExpr := &ValueExpression{}
+// 	field := NewTextField()
+// 	field.Value = value
+// 	valExpr.outputField = field
+// 	return valExpr
+// }
 
 func boolAsSql(b bool) string {
 	if b {

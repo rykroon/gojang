@@ -8,7 +8,7 @@ type SmallIntegerField struct {
 	*Column
 
 	Valid bool
-	Value int16
+	Val   int16
 }
 
 func NewSmallIntegerField() *SmallIntegerField {
@@ -19,7 +19,7 @@ func NewSmallIntegerField() *SmallIntegerField {
 }
 
 // func (f *SmallIntegerField) asAssignment() assignment {
-// 	return assignment(f.Exact(int(f.Value)))
+// 	return assignment(f.Exact(int(f.Val)))
 // }
 
 func (f *SmallIntegerField) Assign(value int16) assignment {
@@ -110,16 +110,16 @@ func (f *SmallIntegerField) IsNull(value bool) lookup {
 
 func (f *SmallIntegerField) Scan(value interface{}) error {
 	result, ok := value.(int64)
-	f.Value, f.Valid = int16(result), ok
+	f.Val, f.Valid = int16(result), ok
 	return nil
 }
 
 func (f *SmallIntegerField) xValue() (driver.Value, error) {
-	return int64(f.Value), nil
+	return int64(f.Val), nil
 }
 
 func (f *SmallIntegerField) getValue() interface{} {
-	return int(f.Value)
+	return int(f.Val)
 }
 
 func (f *SmallIntegerField) setNullConstraint(null bool) {
@@ -140,6 +140,6 @@ func (f *SmallIntegerField) valueAsSql() string {
 	if f.null && !f.Valid {
 		return "NULL"
 	} else {
-		return intAsSql(int(f.Value))
+		return intAsSql(int(f.Val))
 	}
 }
