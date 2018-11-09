@@ -1,6 +1,7 @@
 package gojang
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"github.com/shopspring/decimal"
 )
@@ -133,10 +134,16 @@ func (f *DecimalField) IsNull(value bool) lookup {
 	return isNull(f, value)
 }
 
-//Other
+//
+// Scanner Valuer
+//
 
 func (f *DecimalField) Scan(value interface{}) error {
 	return f.Val.Scan(value)
+}
+
+func (f *DecimalField) Value() (driver.Value, error) {
+	return f.Val.Value()
 }
 
 func (f *DecimalField) getValue() interface{} {

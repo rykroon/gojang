@@ -130,7 +130,7 @@ func (f *FloatField) Scan(value interface{}) error {
 	return nil
 }
 
-func (f *FloatField) xValue() (driver.Value, error) {
+func (f *FloatField) Value() (driver.Value, error) {
 	return f.Val, nil
 }
 

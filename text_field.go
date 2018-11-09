@@ -158,7 +158,7 @@ func (f *TextField) Scan(value interface{}) error {
 	return nil
 }
 
-func (f *TextField) xValue() (driver.Value, error) {
+func (f *TextField) Value() (driver.Value, error) {
 	return f.Val, nil
 }
 

@@ -113,7 +113,7 @@ func (f *BigIntegerField) Scan(value interface{}) error {
 	return nil
 }
 
-func (f *BigIntegerField) xValue() (driver.Value, error) {
+func (f *BigIntegerField) Value() (driver.Value, error) {
 	return f.Val, nil
 }
 

@@ -114,7 +114,7 @@ func (f *SmallIntegerField) Scan(value interface{}) error {
 	return nil
 }
 
-func (f *SmallIntegerField) xValue() (driver.Value, error) {
+func (f *SmallIntegerField) Value() (driver.Value, error) {
 	return int64(f.Val), nil
 }
 

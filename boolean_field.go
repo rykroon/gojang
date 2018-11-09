@@ -105,7 +105,7 @@ func (f *BooleanField) Scan(value interface{}) error {
 	return nil
 }
 
-func (f *BooleanField) xValue() (driver.Value, error) {
+func (f *BooleanField) Value() (driver.Value, error) {
 	return f.Val, nil
 }
 
