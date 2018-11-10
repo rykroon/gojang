@@ -1,6 +1,8 @@
 package gojang
 
-import ()
+import (
+	"fmt"
+)
 
 type onDelete string
 
@@ -10,6 +12,12 @@ const (
 	SetNull    onDelete = "SET NULL"
 	SetDefault onDelete = "SET DEFAULT"
 )
+
+type foreignKeyConstraint struct {
+	foreignKey   bool
+	onDelete     onDelete
+	relatedModel *Model
+}
 
 type constraints struct {
 	null       bool
@@ -54,21 +62,35 @@ func newColumn(dataType string) *Column {
 }
 
 func (c *Column) asSql() string {
-	sql := ""
-
-	if c.HasModel() {
-		tableName := dbq(c.model.dbTable)
-		colName := dbq(c.columnName)
-		sql = tableName + "." + colName
-
-	} else {
-		sql = c.columnName
-	}
-
-	return sql
+	return c.QualifiedName()
 }
 
 //Getters and Setters
+
+func (c *Column) HasModel() bool {
+	return c.model != nil
+}
+
+func (c *Column) Model() *Model {
+	return c.model
+}
+
+func (c *Column) setModel(model *Model) {
+	c.model = model
+}
+
+func (c *Column) QualifiedName() string {
+	if c.HasModel() {
+		return fmt.Sprintf("%v.%v", dbq(c.model.dbTable), c.UnqualifiedName())
+	}
+
+	return c.UnqualifiedName()
+}
+
+func (c *Column) UnqualifiedName() string {
+	return dbq(c.columnName)
+}
+
 func (c *Column) ColumnName() string {
 	return c.columnName
 }
@@ -117,6 +139,10 @@ func (c *Column) As(alias string) {
 	c.alias = alias
 }
 
+//
+// OrderByExpressions
+//
+
 func (c *Column) Asc() orderByExpression {
 	return orderByExpression(c.asSql() + " ASC")
 }
@@ -134,20 +160,8 @@ func (c *Column) copy() *Column {
 	return copy
 }
 
-func (c *Column) HasModel() bool {
-	return c.model != nil
-}
-
 func (c *Column) HasRelation() bool {
 	return c.isRelation
-}
-
-func (c *Column) Model() *Model {
-	return c.model
-}
-
-func (c *Column) setModel(model *Model) {
-	c.model = model
 }
 
 func create(f field) string {

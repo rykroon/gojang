@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	//sq "github.com/masterminds/squirrel"
 )
 
 type QuerySet struct {
