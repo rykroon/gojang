@@ -65,6 +65,9 @@ func (f *BigIntegerField) copyField() field {
 //
 
 func (f *BigIntegerField) Exact(value int) lookup {
+	// field := f.copy()
+	// field.Val = int64(value)
+
 	rhs := intAsSql(value)
 	return exact(f, rhs)
 }

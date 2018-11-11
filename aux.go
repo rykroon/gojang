@@ -3,6 +3,7 @@ package gojang
 import (
 	"fmt"
 	"strings"
+	"reflect"
 )
 
 //Transforms a 'CamelCase' string into a 'snake_case' string
@@ -26,6 +27,10 @@ func snakeCase(s string) string {
 //auxillary print function for testing purposes
 func print(args ...interface{}) {
 	fmt.Println(args...)
+}
+
+func typeOf(i interface{}) string {
+	return reflect.TypeOf(i).String()
 }
 
 func doubleQuotes(s string) string {

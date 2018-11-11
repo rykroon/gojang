@@ -2,9 +2,10 @@ package gojang
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"strings"
-	//sq "github.com/masterminds/squirrel"
+	sq "github.com/masterminds/squirrel"
 )
 
 type QuerySet struct {
@@ -19,6 +20,11 @@ type QuerySet struct {
 	update bool
 	delete bool
 
+	selectBuilder sq.SelectBuilder
+	insertBuilder sq.InsertBuilder
+	updateBuilder sq.UpdateBuilder
+	deleteBuilder sq.DeleteBuilder
+
 	set []assignment
 
 	joins   []relatedField
@@ -30,14 +36,26 @@ type QuerySet struct {
 	ResultCache []object
 }
 
+type selecter interface {
+	sql.Scanner
+	driver.Valuer
+	Alias() string
+	As(string)
+}
+
 func newQuerySet(model *Model) QuerySet {
-	q := QuerySet{model: model, db: model.db}
+	qs := QuerySet{model: model, db: model.db}
 	for _, field := range model.fields {
-		q.selected = append(q.selected, field.copyField())
+		qs.selected = append(qs.selected, field.copyField())
 	}
 
-	q.Query = q.buildQuery()
-	return q
+	qs.selectBuilder = qs.newSelect()
+	qs.insertBuilder = qs.newInsert()
+	qs.updateBuilder = qs.newUpdate()
+	qs.deleteBuilder = qs.newDelete()
+
+	qs.Query = qs.buildQuery()
+	return qs
 }
 
 func (q *QuerySet) Evaluate() ([]object, error) {
@@ -51,17 +69,38 @@ func (q *QuerySet) Evaluate() ([]object, error) {
 }
 
 //
+// Squirrel related methods
+//
+
+func (qs *QuerySet) newSelect() sq.SelectBuilder {
+	return sq.Select().From(qs.model.dbTable).RunWith(qs.model.db)
+}
+
+func (qs *QuerySet) newInsert() sq.InsertBuilder {
+	return sq.Insert(qs.model.dbTable).RunWith(qs.model.db)
+}
+
+func (qs *QuerySet) newUpdate() sq.UpdateBuilder {
+	return sq.Update(qs.model.dbTable).RunWith(qs.model.db)
+}
+
+func (qs *QuerySet) newDelete() sq.DeleteBuilder {
+	return sq.Delete(qs.model.dbTable).RunWith(qs.model.db)
+}
+
+//
 //Functions that return QuerySets
 //
 
 //Returns a new QuerySet containing objects that match the given lookup parameters.
-func (q QuerySet) Filter(lookups ...lookup) QuerySet {
+func (qs QuerySet) Filter(lookups ...lookup) QuerySet {
 	for _, lookup := range lookups {
-		q.lookups = append(q.lookups, lookup)
+		qs.lookups = append(qs.lookups, lookup)
+		//maybe add .Where() for each relevant builder
 	}
 
-	q.Query = q.buildQuery()
-	return q
+	qs.Query = qs.buildQuery()
+	return qs
 }
 
 //returns a new QuerySet containing objects that do not match the given lookup parameters.
@@ -79,13 +118,14 @@ func (q QuerySet) Exclude(lookups ...lookup) QuerySet {
 	return q
 }
 
-func (q QuerySet) OrderBy(orderBys ...orderByExpression) QuerySet {
+func (qs QuerySet) OrderBy(orderBys ...orderByExpression) QuerySet {
 	for _, orderBy := range orderBys {
-		q.orderBy = append(q.orderBy, orderBy)
+		qs.orderBy = append(qs.orderBy, orderBy)
+		qs.selectBuilder = qs.selectBuilder.OrderBy(string(orderBy))
 	}
 
-	q.Query = q.buildQuery()
-	return q
+	qs.Query = qs.buildQuery()
+	return qs
 }
 
 //Returns a QuerySet that returns an array of maps.
