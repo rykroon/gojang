@@ -2,8 +2,8 @@ package gojang
 
 import (
 	"fmt"
-	"strings"
 	"reflect"
+	"strings"
 )
 
 //Transforms a 'CamelCase' string into a 'snake_case' string

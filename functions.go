@@ -20,6 +20,26 @@ func newFunction(name string, expr selectExpression, outputField field) *functio
 	return funct
 }
 
+func (f function) Alias() string {
+	return f.outputField.Alias()
+}
+
+func (f *function) As(alias string) {
+	f.outputField.As(alias)
+}
+
+func (f function) DataType() string {
+	return f.outputField.DataType()
+}
+
+func (f function) getValue() interface{} {
+	return f.outputField.getValue()
+}
+
+func (f function) Scan(v interface{}) error {
+	return f.outputField.Scan(v)
+}
+
 func (f *function) toField() field {
 	f.outputField.setColumnName(f.asSql())
 	return f.outputField

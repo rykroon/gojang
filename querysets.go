@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
-	"strings"
 	sq "github.com/masterminds/squirrel"
+	"strings"
 )
 
 type QuerySet struct {

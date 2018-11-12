@@ -13,6 +13,31 @@ func newAggregate(name string, expr selectExpression, outputField field) *aggreg
 	return &a
 }
 
+func (a *aggregate) asSql() string {
+	f := function(*a)
+	return f.asSql()
+}
+
+func (a aggregate) Alias() string {
+	return function(a).Alias()
+}
+
+func (a *aggregate) As(alias string) {
+	a.outputField.As(alias)
+}
+
+func (a aggregate) DataType() string {
+	return function(a).DataType()
+}
+
+func (a aggregate) getValue() interface{} {
+	return function(a).getValue()
+}
+
+func (a aggregate) Scan(v interface{}) error {
+	return function(a).Scan(v)
+}
+
 func Avg(expr selectExpression, outputField field) *aggregate {
 	return newAggregate("AVG", expr, outputField)
 }
