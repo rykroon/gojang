@@ -1,6 +1,7 @@
 package gojang
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -26,6 +27,10 @@ func (f function) Alias() string {
 
 func (f *function) As(alias string) {
 	f.outputField.As(alias)
+}
+
+func (f *function) asSql() string {
+	return fmt.Sprintf(f.template, f.args...)
 }
 
 func (f function) DataType() string {

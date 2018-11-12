@@ -56,6 +56,8 @@ type columner interface {
 	setPrimaryKey(bool)
 }
 
+type orderByExpression string
+
 //Constructor
 func newColumn(dataType string) *Column {
 	return &Column{dataType: dataType}

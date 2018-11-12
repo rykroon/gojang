@@ -63,9 +63,3 @@ func Min(expr selectExpression, outputField field) *aggregate {
 func Sum(expr selectExpression, outputField field) *aggregate {
 	return newAggregate("SUM", expr, outputField)
 }
-
-func (s star) Count() *aggregate {
-	count := Count(s, false)
-	count.As("count")
-	return count
-}
