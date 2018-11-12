@@ -96,7 +96,9 @@ func (qs *QuerySet) newDelete() sq.DeleteBuilder {
 func (qs QuerySet) Filter(lookups ...lookup) QuerySet {
 	for _, lookup := range lookups {
 		qs.lookups = append(qs.lookups, lookup)
-		//maybe add .Where() for each relevant builder
+		qs.selectBuilder = qs.selectBuilder.Where(string(lookup))
+		qs.updateBuilder = qs.updateBuilder.Where(string(lookup))
+		qs.deleteBuilder = qs.deleteBuilder.Where(string(lookup))
 	}
 
 	qs.Query = qs.buildQuery()
@@ -104,18 +106,23 @@ func (qs QuerySet) Filter(lookups ...lookup) QuerySet {
 }
 
 //returns a new QuerySet containing objects that do not match the given lookup parameters.
-func (q QuerySet) Exclude(lookups ...lookup) QuerySet {
+func (qs QuerySet) Exclude(lookups ...lookup) QuerySet {
 	var lookupStrings []string
 	for _, lookup := range lookups {
 		lookupStrings = append(lookupStrings, string(lookup))
 	}
 
 	lookupList := strings.Join(lookupStrings, ",")
-	exclude := lookup(fmt.Sprintf("NOT(%v)", lookupList))
-	q.lookups = append(q.lookups, exclude)
+	notString := fmt.Sprintf("NOT(%v)", lookupList)
+	exclude := lookup(notString)
+	qs.lookups = append(qs.lookups, exclude)
 
-	q.Query = q.buildQuery()
-	return q
+	qs.selectBuilder = qs.selectBuilder.Where(notString)
+	qs.updateBuilder = qs.updateBuilder.Where(notString)
+	qs.deleteBuilder = qs.deleteBuilder.Where(notString)
+
+	qs.Query = qs.buildQuery()
+	return qs
 }
 
 func (qs QuerySet) OrderBy(orderBys ...orderByExpression) QuerySet {
@@ -148,18 +155,18 @@ func (q QuerySet) All() QuerySet {
 //
 
 //populates the Model associated with the queryset with the data returned from the query
-func (q QuerySet) Get(lookups ...lookup) (object, error) {
+func (qs QuerySet) Get(lookups ...lookup) (object, error) {
 	if len(lookups) > 0 {
-		q = q.Filter(lookups...)
+		qs = qs.Filter(lookups...)
 	}
 
-	rows, err := q.query()
+	rows, err := qs.query()
 	if err != nil {
 		return nil, err
 	}
 
 	numOfRows := 0
-	dest := q.getDest()
+	dest := qs.getDest()
 	obj := newObj()
 
 	for rows.Next() {
@@ -174,7 +181,7 @@ func (q QuerySet) Get(lookups ...lookup) (object, error) {
 			return nil, err
 		}
 
-		obj = q.getObject()
+		obj = qs.getObject()
 
 	}
 
@@ -218,19 +225,11 @@ func (q QuerySet) Create(assignments ...assignment) (object, error) {
 }
 
 //Returns an integer representing the number of objects in the database matching the QuerySet.
-func (q QuerySet) Count() (int, error) {
-	q.selected = nil
-	q.orderBy = nil
-
-	var star star
-	countExpr := star.Count()
-	q.selected = append(q.selected, countExpr)
-	q.Query = q.buildQuery()
-
-	row := q.queryRow()
+func (qs QuerySet) Count() (int, error) {
+	sb := qs.selectBuilder.Columns("COUNT(*)")
 	result := 0
 
-	err := row.Scan(&result)
+	err := sb.Scan(&result)
 	if err != nil {
 		return 0, err
 	}
@@ -260,8 +259,10 @@ func (q *QuerySet) Aggregate(aggregates ...*aggregate) (object, error) {
 }
 
 //Returns True if the QuerySet contains any results, and False if not.
-func (q QuerySet) Exists() (bool, error) {
-	rows, err := q.query()
+func (qs QuerySet) Exists() (bool, error) {
+	sb := qs.selectBuilder.Columns("*")
+	rows, err := sb.Query()
+
 	if err != nil {
 		return false, err
 	}
@@ -296,11 +297,8 @@ func (q QuerySet) Update(assignments ...assignment) (int, error) {
 }
 
 //Performs an SQL delete query on all rows in the QuerySet and returns the number of objects deleted
-func (q QuerySet) Delete() (int, error) {
-	q.delete = true
-	q.Query = q.buildQuery()
-
-	result, err := q.exec()
+func (qs QuerySet) Delete() (int, error) {
+	result, err := qs.deleteBuilder.Exec()
 	if err != nil {
 		return 0, err
 	}
