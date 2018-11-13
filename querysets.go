@@ -14,7 +14,7 @@ type QuerySet struct {
 	db    *sql.DB
 
 	//distinct  bool
-	selected []selectExpression
+	selected []selecter //selectExpression
 	//deferred
 	insert bool
 	update bool
@@ -41,12 +41,14 @@ type selecter interface {
 	driver.Valuer
 	Alias() string
 	As(string)
+	asSql() string
+	getValue() interface{}
 }
 
 func newQuerySet(model *Model) QuerySet {
 	qs := QuerySet{model: model, db: model.db}
 	for _, field := range model.fields {
-		qs.selected = append(qs.selected, field.copyField())
+		qs.selected = append(qs.selected, field.copyField().(selecter))
 	}
 
 	qs.selectBuilder = qs.newSelect()
@@ -200,7 +202,7 @@ func (qs QuerySet) Get(lookups ...lookup) (object, error) {
 func (q QuerySet) Create(assignments ...assignment) (object, error) {
 	q.insert = true
 	q.selected = nil
-	q.selected = append(q.selected, q.model.Pk.copyField())
+	q.selected = append(q.selected, q.model.Pk.copyField().(selecter))
 	obj := newObj()
 
 	for _, assign := range assignments {

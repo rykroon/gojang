@@ -1,6 +1,7 @@
 package gojang
 
 import (
+	"database/sql/driver"
 	"strings"
 )
 
@@ -36,6 +37,10 @@ func (a aggregate) getValue() interface{} {
 
 func (a aggregate) Scan(v interface{}) error {
 	return function(a).Scan(v)
+}
+
+func (a aggregate) Value() (driver.Value, error) {
+	return a.outputField.(selecter).Value()
 }
 
 func Avg(expr selectExpression, outputField field) *aggregate {
