@@ -153,14 +153,14 @@ func (c *Column) Desc() orderByExpression {
 	return orderByExpression(c.asSql() + " DESC")
 }
 
-func (c *Column) copy() *Column {
-	copy := newColumn(c.dataType)
-	copy.model = c.model
-	copy.columnName = c.columnName
-	copy.constraints = c.constraints
-	copy.alias = c.alias
-	return copy
-}
+// func (c *Column) copy() *Column {
+// 	copy := newColumn(c.dataType)
+// 	copy.model = c.model
+// 	copy.columnName = c.columnName
+// 	copy.constraints = c.constraints
+// 	copy.alias = c.alias
+// 	return copy
+// }
 
 func (c *Column) HasRelation() bool {
 	return c.isRelation

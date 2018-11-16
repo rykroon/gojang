@@ -28,7 +28,7 @@ func (f *SmallIntegerField) Assign(value int16) assignment {
 
 func (f *SmallIntegerField) copy() *SmallIntegerField {
 	copy := NewSmallIntegerField()
-	copy.Column = f.Column.copy()
+	*copy = *f
 	return copy
 }
 

@@ -26,6 +26,16 @@ func (f *BigIntegerField) Assign(value int64) assignment {
 	return newAssignment(f, intAsSql(int(value)))
 }
 
+func (f *BigIntegerField) copy() *BigIntegerField {
+	copy := NewBigIntegerField()
+	*copy = *f
+	return copy
+}
+
+func (f *BigIntegerField) copyField() field {
+	return f.copy()
+}
+
 //
 // Aggregates
 //
@@ -48,16 +58,6 @@ func (f *BigIntegerField) Min() *aggregate {
 
 func (f *BigIntegerField) Sum() *aggregate {
 	return Sum(f, NewBigIntegerField())
-}
-
-func (f *BigIntegerField) copy() *BigIntegerField {
-	copy := NewBigIntegerField()
-	copy.Column = f.Column.copy()
-	return copy
-}
-
-func (f *BigIntegerField) copyField() field {
-	return f.copy()
 }
 
 //

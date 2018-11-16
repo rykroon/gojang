@@ -40,7 +40,7 @@ func (f *DecimalField) Assign(value decimal.Decimal) assignment {
 
 func (f *DecimalField) copy() *DecimalField {
 	copy := NewDecimalField(f.maxDigits, f.decimalPlaces)
-	copy.Column = f.Column.copy()
+	*copy = *f
 	return copy
 }
 

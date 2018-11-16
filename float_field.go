@@ -29,7 +29,7 @@ func (f *FloatField) Assign(value float64) assignment {
 
 func (f *FloatField) copy() *FloatField {
 	copy := NewFloatField()
-	copy.Column = f.Column.copy()
+	*copy = *f
 	return copy
 }
 

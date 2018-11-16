@@ -28,7 +28,7 @@ func (f *IntegerField) Assign(value int32) assignment {
 
 func (f *IntegerField) copy() *IntegerField {
 	copy := NewIntegerField()
-	copy.Column = f.Column.copy()
+	*copy = *f
 	return copy
 }
 

@@ -28,7 +28,7 @@ func (f *BooleanField) Assign(value bool) assignment {
 
 func (f *BooleanField) copy() *BooleanField {
 	copy := NewBooleanField()
-	copy.Column = f.Column.copy()
+	*copy = *f
 	return copy
 }
 

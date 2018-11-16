@@ -29,7 +29,7 @@ func (f *TextField) Assign(value string) assignment {
 
 func (f *TextField) copy() *TextField {
 	copy := NewTextField()
-	copy.Column = f.Column.copy()
+	*copy = *f
 	return copy
 }
 

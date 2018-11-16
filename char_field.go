@@ -19,7 +19,7 @@ func NewCharField(maxLength int) *CharField {
 
 func (f *CharField) copy() *CharField {
 	copy := NewCharField(f.maxLength)
-	copy.Column = f.Column.copy()
+	*copy = *f
 	return copy
 }
 
