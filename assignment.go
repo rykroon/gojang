@@ -13,7 +13,8 @@ type assignment struct {
 
 type columnAssigner interface {
 	ColumnName() string
-	asSqlValue() string
+	//asSqlValue() string
+	getValue() interface{}
 }
 
 func newAssignment(lhs field, rhs string) assignment {
