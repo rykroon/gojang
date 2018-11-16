@@ -42,6 +42,27 @@ import (
 // 	return valExpr
 // }
 
+type boolValue bool
+type int64Value int64
+type float64Value float64
+type stringValue string
+
+func (v boolValue) asSqlValue() string {
+	return boolAsSql(bool(v))
+}
+
+func (v int64Value) asSqlValue() string {
+	return intAsSql(int(int64(v)))
+}
+
+func (v float64Value) asSqlValue() string {
+	return float64AsSql(float64(v))
+}
+
+func (v stringValue) asSqlValue() string {
+	return stringAsSql(string(v))
+}
+
 func boolAsSql(b bool) string {
 	if b {
 		return "TRUE"

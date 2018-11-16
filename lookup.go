@@ -12,8 +12,35 @@ type filterer interface {
 	QualifiedName() string
 }
 
-func newLookup(lookupName string, lhs filterer, rhs string) lookup {
-	return lookup(fmt.Sprintf("%v %v %v", lhs.QualifiedName(), lookupName, rhs))
+type sqlValuer interface {
+	asSqlValue() string
+}
+
+func newLookup(operator string, lhs filterer, rhs string) lookup {
+	return lookup(fmt.Sprintf("%v %v %v", lhs.QualifiedName(), operator, rhs))
+}
+
+func newPatternLookup(lhs filterer, rhs sqlValuer, pattern string, caseSensitive bool) lookup {
+	var value string
+	strVal, ok := rhs.(stringValue)
+
+	if ok {
+		value = string(strVal)
+	} else {
+		value = rhs.asSqlValue()
+	}
+
+	newRhs := stringValue(fmt.Sprintf(pattern, value))
+
+	var operator string
+
+	if caseSensitive {
+		operator = "LIKE"
+	} else {
+		operator = "ILIKE"
+	}
+
+	return newLookup(operator, lhs, newRhs.asSqlValue())
 }
 
 func exact(lhs filterer, rhs string) lookup {
@@ -27,11 +54,15 @@ func iexact(lhs filterer, rhs string) lookup {
 func contains(lhs filterer, rhs string) lookup {
 	rhs = fmt.Sprintf("%%%v%%", rhs)
 	return newLookup("LIKE", lhs, rhs)
+
+	//return newPatternLookup(lhs, rhs, "%%%v%%", true)
 }
 
 func icontains(lhs filterer, rhs string) lookup {
 	rhs = fmt.Sprintf("%%%v%%", rhs)
 	return newLookup("ILIKE", lhs, rhs)
+
+	//return newPatternLookup(lhs, rhs, "%%%v%%", false)
 }
 
 func in(lhs filterer, rhs string) lookup {
@@ -57,21 +88,29 @@ func lte(lhs filterer, rhs string) lookup {
 func startsWith(lhs filterer, rhs string) lookup {
 	rhs = fmt.Sprintf("%v%%", rhs)
 	return newLookup("LIKE", lhs, rhs)
+
+	//return newPatternLookup(lhs, rhs, "%v%%", true)
 }
 
 func iStartsWith(lhs filterer, rhs string) lookup {
 	rhs = fmt.Sprintf("%v%%", rhs)
 	return newLookup("ILIKE", lhs, rhs)
+
+	//return newPatternLookup(lhs, rhs, "%v%%", false)
 }
 
 func endsWith(lhs filterer, rhs string) lookup {
 	rhs = fmt.Sprintf("%%%v", rhs)
 	return newLookup("LIKE", lhs, rhs)
+
+	//return newPatternLookup(lhs, rhs, "%%%v", true)
 }
 
 func iEndsWith(lhs filterer, rhs string) lookup {
 	rhs = fmt.Sprintf("%%%v", rhs)
 	return newLookup("ILIKE", lhs, rhs)
+
+	//return newPatternLookup(lhs, rhs, "%%%v", false)
 }
 
 func between(lhs filterer, rhs1, rhs2 string) lookup {
