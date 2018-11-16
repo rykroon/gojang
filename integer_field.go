@@ -26,6 +26,14 @@ func (f *IntegerField) Assign(value int32) assignment {
 	return newAssignment(f, intAsSql(int(value)))
 }
 
+func (f *IntegerField) asSqlValue() string {
+	if f.null && !f.Valid {
+		return "NULL"
+	} else {
+		return intAsSql(int(f.Val))
+	}
+}
+
 func (f *IntegerField) copy() *IntegerField {
 	copy := NewIntegerField()
 	*copy = *f
@@ -34,6 +42,12 @@ func (f *IntegerField) copy() *IntegerField {
 
 func (f *IntegerField) copyField() field {
 	return f.copy()
+}
+
+func (f *IntegerField) Set(value int32) columnAssigner {
+	copy := f.copy()
+	copy.Val = value
+	return copy
 }
 
 //
@@ -133,13 +147,5 @@ func (f *IntegerField) setNullConstraint(null bool) {
 func (f *IntegerField) validate() {
 	if f.primaryKey && f.null {
 		panic(NewConstraintConflict(f, "primary key", "null"))
-	}
-}
-
-func (f *IntegerField) valueAsSql() string {
-	if f.null && !f.Valid {
-		return "NULL"
-	} else {
-		return intAsSql(int(f.Val))
 	}
 }

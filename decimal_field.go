@@ -38,6 +38,14 @@ func (f *DecimalField) Assign(value decimal.Decimal) assignment {
 	return newAssignment(f, value.String())
 }
 
+func (f *DecimalField) asSqlValue() string {
+	if f.null && !f.Valid {
+		return "NULL"
+	} else {
+		return f.Val.String()
+	}
+}
+
 func (f *DecimalField) copy() *DecimalField {
 	copy := NewDecimalField(f.maxDigits, f.decimalPlaces)
 	*copy = *f
@@ -46,6 +54,12 @@ func (f *DecimalField) copy() *DecimalField {
 
 func (f *DecimalField) copyField() field {
 	return f.copy()
+}
+
+func (f *DecimalField) Set(value decimal.Decimal) columnAssigner {
+	copy := f.copy()
+	copy.Val = value
+	return copy
 }
 
 func (f *DecimalField) setNullConstraint(null bool) {
@@ -59,14 +73,6 @@ func (f *DecimalField) setNullConstraint(null bool) {
 func (f *DecimalField) validate() {
 	if f.primaryKey {
 		panic(NewInvalidConstraint(f, "primary key"))
-	}
-}
-
-func (f *DecimalField) valueAsSql() string {
-	if f.null && !f.Valid {
-		return "NULL"
-	} else {
-		return f.Val.String()
 	}
 }
 

@@ -34,5 +34,6 @@ type field interface {
 	copyField() field
 
 	validate()
-	valueAsSql() string
+	//valueAsSql() string
+	asSqlValue() string
 }

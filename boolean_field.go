@@ -26,6 +26,14 @@ func (f *BooleanField) Assign(value bool) assignment {
 	return newAssignment(f, boolAsSql(value))
 }
 
+func (f *BooleanField) asSqlValue() string {
+	if f.null && !f.Valid {
+		return "NULL"
+	} else {
+		return boolAsSql(f.Val)
+	}
+}
+
 func (f *BooleanField) copy() *BooleanField {
 	copy := NewBooleanField()
 	*copy = *f
@@ -34,6 +42,12 @@ func (f *BooleanField) copy() *BooleanField {
 
 func (f *BooleanField) copyField() field {
 	return f.copy()
+}
+
+func (f *BooleanField) Set(value bool) columnAssigner {
+	copy := f.copy()
+	copy.Val = value
+	return copy
 }
 
 //
@@ -124,13 +138,5 @@ func (f *BooleanField) setNullConstraint(null bool) {
 func (f *BooleanField) validate() {
 	if f.primaryKey {
 		panic(NewInvalidConstraint(f, "primary key"))
-	}
-}
-
-func (f *BooleanField) valueAsSql() string {
-	if f.null && !f.Valid {
-		return "NULL"
-	} else {
-		return boolAsSql(f.Val)
 	}
 }

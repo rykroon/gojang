@@ -26,6 +26,14 @@ func (f *BigIntegerField) Assign(value int64) assignment {
 	return newAssignment(f, intAsSql(int(value)))
 }
 
+func (f *BigIntegerField) asSqlValue() string {
+	if f.null && !f.Valid {
+		return "NULL"
+	} else {
+		return intAsSql(int(f.Val))
+	}
+}
+
 func (f *BigIntegerField) copy() *BigIntegerField {
 	copy := NewBigIntegerField()
 	*copy = *f
@@ -34,6 +42,12 @@ func (f *BigIntegerField) copy() *BigIntegerField {
 
 func (f *BigIntegerField) copyField() field {
 	return f.copy()
+}
+
+func (f *BigIntegerField) Set(value int64) columnAssigner {
+	copy := f.copy()
+	copy.Val = value
+	return copy
 }
 
 //
@@ -135,13 +149,5 @@ func (f *BigIntegerField) setNullConstraint(null bool) {
 func (f *BigIntegerField) validate() {
 	if f.primaryKey && f.null {
 		panic(NewConstraintConflict(f, "primary key", "null"))
-	}
-}
-
-func (f *BigIntegerField) valueAsSql() string {
-	if f.null && !f.Valid {
-		return "NULL"
-	} else {
-		return intAsSql(int(f.Val))
 	}
 }

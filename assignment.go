@@ -11,6 +11,11 @@ type assignment struct {
 	rhs string
 }
 
+type columnAssigner interface {
+	ColumnName() string
+	asSqlValue() string
+}
+
 func newAssignment(lhs field, rhs string) assignment {
 	return assignment{lhs: lhs, rhs: rhs}
 }

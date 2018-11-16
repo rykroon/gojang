@@ -27,6 +27,14 @@ func (f *TextField) Assign(value string) assignment {
 	return newAssignment(f, stringAsSql(value))
 }
 
+func (f *TextField) asSqlValue() string {
+	if f.null && !f.Valid {
+		return "NULL"
+	} else {
+		return stringAsSql(f.Val)
+	}
+}
+
 func (f *TextField) copy() *TextField {
 	copy := NewTextField()
 	*copy = *f
@@ -35,6 +43,12 @@ func (f *TextField) copy() *TextField {
 
 func (f *TextField) copyField() field {
 	return f.copy()
+}
+
+func (f *TextField) Set(value string) columnAssigner {
+	copy := f.copy()
+	copy.Val = value
+	return copy
 }
 
 //Aggregates
@@ -177,13 +191,5 @@ func (f *TextField) setNullConstraint(null bool) {
 func (f *TextField) validate() {
 	if f.primaryKey {
 		panic(NewInvalidConstraint(f, "primary key"))
-	}
-}
-
-func (f *TextField) valueAsSql() string {
-	if f.null && !f.Valid {
-		return "NULL"
-	} else {
-		return stringAsSql(f.Val)
 	}
 }
