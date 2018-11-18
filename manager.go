@@ -40,9 +40,9 @@ func (m Manager) Get(lookups ...lookup) (object, error) {
 	return qs.Get(lookups...)
 }
 
-func (m Manager) Create(assignments ...assignment) (object, error) {
+func (m Manager) Create(assigners ...columnAssigner) (object, error) {
 	qs := newQuerySet(m.model)
-	return qs.Create(assignments...)
+	return qs.Create(assigners...)
 }
 
 func (m Manager) Count() (int, error) {
@@ -60,9 +60,10 @@ func (m Manager) Exists() (bool, error) {
 	return qs.Exists()
 }
 
-func (m Manager) Update(assignments ...assignment) (int, error) {
+// func (m Manager) Update(assignments ...assignment) (int, error) {
+func (m Manager) Update(assigners ...columnAssigner) (int, error) {
 	qs := newQuerySet(m.model)
-	return qs.Update(assignments...)
+	return qs.Update(assigners...)
 }
 
 func (m Manager) Delete() (int, error) {

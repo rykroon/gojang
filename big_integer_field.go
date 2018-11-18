@@ -26,6 +26,12 @@ func (f *BigIntegerField) Assign(value int64) assignment {
 	return newAssignment(f, intAsSql(int(value)))
 }
 
+func (f *BigIntegerField) asMap() map[string]interface{} {
+	result := make(map[string]interface{})
+	result[dbq(f.ColumnName())] = f
+	return result
+}
+
 func (f *BigIntegerField) asSqlValue() string {
 	if f.null && !f.Valid {
 		return "NULL"

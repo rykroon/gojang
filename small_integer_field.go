@@ -26,6 +26,12 @@ func (f *SmallIntegerField) Assign(value int16) assignment {
 	return newAssignment(f, intAsSql(int(value)))
 }
 
+func (f *SmallIntegerField) asMap() map[string]interface{} {
+	result := make(map[string]interface{})
+	result[dbq(f.ColumnName())] = f
+	return result
+}
+
 func (f *SmallIntegerField) asSqlValue() string {
 	if f.null && !f.Valid {
 		return "NULL"

@@ -27,6 +27,12 @@ func (f *TextField) Assign(value string) assignment {
 	return newAssignment(f, stringAsSql(value))
 }
 
+func (f *TextField) asMap() map[string]interface{} {
+	result := make(map[string]interface{})
+	result[dbq(f.ColumnName())] = f
+	return result
+}
+
 func (f *TextField) asSqlValue() string {
 	if f.null && !f.Valid {
 		return "NULL"

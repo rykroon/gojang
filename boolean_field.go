@@ -26,6 +26,12 @@ func (f *BooleanField) Assign(value bool) assignment {
 	return newAssignment(f, boolAsSql(value))
 }
 
+func (f *BooleanField) asMap() map[string]interface{} {
+	result := make(map[string]interface{})
+	result[dbq(f.ColumnName())] = f
+	return result
+}
+
 func (f *BooleanField) asSqlValue() string {
 	if f.null && !f.Valid {
 		return "NULL"

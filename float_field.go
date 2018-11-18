@@ -27,6 +27,12 @@ func (f *FloatField) Assign(value float64) assignment {
 	return newAssignment(f, float64AsSql(value))
 }
 
+func (f *FloatField) asMap() map[string]interface{} {
+	result := make(map[string]interface{})
+	result[dbq(f.ColumnName())] = f
+	return result
+}
+
 func (f *FloatField) asSqlValue() string {
 	if f.null && !f.Valid {
 		return "NULL"

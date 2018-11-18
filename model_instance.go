@@ -54,11 +54,11 @@ func (m *Model) Save() error {
 }
 
 func (m *Model) insert() (int, error) {
-	var createList []assignment
+	var createList []columnAssigner
 
 	for _, field := range m.fields {
 		if !field.PrimaryKey() {
-			createList = append(createList, newAssignment(field, field.asSqlValue()))
+			createList = append(createList, field.(columnAssigner))
 		}
 	}
 
@@ -69,7 +69,7 @@ func (m *Model) insert() (int, error) {
 
 	pkeyAttr := m.colToAttr[m.Pk.ColumnName()]
 	if obj.HasAttr(pkeyAttr) {
-		return obj.GetAttr(pkeyAttr).(int), nil
+		return int(obj.GetAttr(pkeyAttr).(int64)), nil
 	}
 
 	return 0, errors.New("gojang: idk, we lost the key, sorry")
@@ -77,12 +77,12 @@ func (m *Model) insert() (int, error) {
 
 //
 func (m *Model) update() error {
-	var updateList []assignment
+	var updateList []columnAssigner
 
 	for _, field := range m.fields {
 		if !field.PrimaryKey() {
-			assign := newAssignment(field, field.asSqlValue())
-			updateList = append(updateList, assign)
+			assigner := field.(columnAssigner)
+			updateList = append(updateList, assigner)
 		}
 	}
 

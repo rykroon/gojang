@@ -26,6 +26,12 @@ func (f *IntegerField) Assign(value int32) assignment {
 	return newAssignment(f, intAsSql(int(value)))
 }
 
+func (f *IntegerField) asMap() map[string]interface{} {
+	result := make(map[string]interface{})
+	result[dbq(f.ColumnName())] = f
+	return result
+}
+
 func (f *IntegerField) asSqlValue() string {
 	if f.null && !f.Valid {
 		return "NULL"

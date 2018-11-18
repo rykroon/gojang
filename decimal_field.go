@@ -38,6 +38,12 @@ func (f *DecimalField) Assign(value decimal.Decimal) assignment {
 	return newAssignment(f, value.String())
 }
 
+func (f *DecimalField) asMap() map[string]interface{} {
+	result := make(map[string]interface{})
+	result[dbq(f.ColumnName())] = f
+	return result
+}
+
 func (f *DecimalField) asSqlValue() string {
 	if f.null && !f.Valid {
 		return "NULL"

@@ -45,6 +45,14 @@ type selecter interface {
 	getValue() interface{}
 }
 
+type columnAssigner interface {
+	driver.Valuer
+	ColumnName() string
+	asMap() map[string]interface{}
+	Alias() string
+	getValue() interface{}
+}
+
 func newQuerySet(model *Model) QuerySet {
 	qs := QuerySet{model: model, db: model.db}
 	for _, field := range model.fields {
@@ -75,19 +83,31 @@ func (q *QuerySet) Evaluate() ([]object, error) {
 //
 
 func (qs *QuerySet) newSelect() sq.SelectBuilder {
-	return sq.Select().From(qs.model.dbTable).RunWith(qs.model.db)
+	sb := sq.Select().From(qs.model.dbTable)
+	sb = sb.RunWith(qs.model.db)
+	sb = sb.PlaceholderFormat(sq.Dollar)
+	return sb
 }
 
 func (qs *QuerySet) newInsert() sq.InsertBuilder {
-	return sq.Insert(qs.model.dbTable).RunWith(qs.model.db)
+	ib := sq.Insert(qs.model.dbTable)
+	ib = ib.RunWith(qs.model.db)
+	ib = ib.PlaceholderFormat(sq.Dollar)
+	return ib
 }
 
 func (qs *QuerySet) newUpdate() sq.UpdateBuilder {
-	return sq.Update(qs.model.dbTable).RunWith(qs.model.db)
+	ub := sq.Update(qs.model.dbTable)
+	ub = ub.RunWith(qs.model.db)
+	ub = ub.PlaceholderFormat(sq.Dollar)
+	return ub
 }
 
 func (qs *QuerySet) newDelete() sq.DeleteBuilder {
-	return sq.Delete(qs.model.dbTable).RunWith(qs.model.db)
+	db := sq.Delete(qs.model.dbTable)
+	db = db.RunWith(qs.model.db)
+	db = db.PlaceholderFormat(sq.Dollar)
+	return db
 }
 
 //
@@ -199,28 +219,29 @@ func (qs QuerySet) Get(lookups ...lookup) (object, error) {
 	return obj, nil
 }
 
-func (q QuerySet) Create(assignments ...assignment) (object, error) {
-	q.insert = true
-	q.selected = nil
-	q.selected = append(q.selected, q.model.Pk.copyField().(selecter))
-	obj := newObj()
+func (qs QuerySet) Create(assigners ...columnAssigner) (object, error) {
+	mapper := make(map[string]interface{})
 
-	for _, assign := range assignments {
-		q.set = append(q.set, assign)
+	for _, assigner := range assigners {
+		mapper[dbq(assigner.ColumnName())] = assigner
 	}
 
-	q.Query = q.buildQuery()
-	pkeyName := q.model.Pk.ColumnName()
-	q.Query += " RETURNING " + dbq(pkeyName)
+	qs.insertBuilder = qs.insertBuilder.SetMap(mapper)
+	pkeyName := qs.model.Pk.ColumnName()
+	qs.insertBuilder = qs.insertBuilder.Suffix(fmt.Sprintf("RETURNING %v", dbq(pkeyName)))
 
-	obj, err := q.queryRowAndScan()
+	row := qs.insertBuilder.QueryRow()
+	var pkey int64
+	err := row.Scan(&pkey)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, assign := range assignments {
-		attrName := q.model.colToAttr[assign.lhs.ColumnName()]
-		obj.SetAttr(attrName, assign.lhs.getValue())
+	obj := newObj()
+	obj.SetAttr(qs.model.Pk.Alias(), pkey)
+
+	for _, assigner := range assigners {
+		obj.SetAttr(assigner.Alias(), assigner.getValue())
 	}
 
 	return obj, nil
@@ -276,15 +297,12 @@ func (qs QuerySet) Exists() (bool, error) {
 	return false, rows.Err()
 }
 
-func (q QuerySet) Update(assignments ...assignment) (int, error) {
-	q.update = true
-
-	for _, assign := range assignments {
-		q.set = append(q.set, assign)
+func (qs QuerySet) Update(assigners ...columnAssigner) (int, error) {
+	for _, assigner := range assigners {
+		qs.updateBuilder = qs.updateBuilder.Set(dbq(assigner.ColumnName()), assigner)
 	}
 
-	q.Query = q.buildQuery()
-	result, err := q.exec()
+	result, err := qs.updateBuilder.Exec()
 
 	if err != nil {
 		return 0, err
